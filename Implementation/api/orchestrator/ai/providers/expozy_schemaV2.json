@@ -1,0 +1,453 @@
+{
+    "type": "OBJECT",
+    "properties": {
+        "metadata": {
+            "type": "OBJECT",
+            "properties": {
+                "id": {
+                    "type": "STRING"
+                },
+                "name": {
+                    "type": "STRING"
+                },
+                "pageType": {
+                    "type": "STRING",
+                    "enum": [
+                        "landing",
+                        "product",
+                        "category",
+                        "blog",
+                        "cart",
+                        "account",
+                        "contact",
+                        "custom"
+                    ]
+                },
+                "route": {
+                    "type": "STRING",
+                    "nullable": true
+                },
+                "title": {
+                    "type": "STRING",
+                    "nullable": true
+                },
+                "description": {
+                    "type": "STRING",
+                    "nullable": true
+                }
+            },
+            "required": [
+                "id",
+                "name",
+                "pageType"
+            ],
+            "propertyOrdering": [
+                "id",
+                "name",
+                "pageType",
+                "route",
+                "title",
+                "description"
+            ]
+        },
+        "theme": {
+            "type": "OBJECT",
+            "nullable": true,
+            "properties": {
+                "primaryColor": {
+                    "type": "STRING",
+                    "nullable": true
+                },
+                "darkMode": {
+                    "type": "BOOLEAN",
+                    "nullable": true
+                }
+            },
+            "propertyOrdering": [
+                "primaryColor",
+                "darkMode"
+            ]
+        },
+        "dataSources": {
+            "type": "ARRAY",
+            "nullable": true,
+            "items": {
+                "type": "OBJECT",
+                "properties": {
+                    "id": {
+                        "type": "STRING"
+                    },
+                    "endpoint": {
+                        "type": "STRING"
+                    },
+                    "keyName": {
+                        "type": "STRING"
+                    },
+                    "params": {
+                        "type": "OBJECT",
+                        "nullable": true,
+                        "properties": {
+                            "limit": {
+                                "type": "INTEGER",
+                                "nullable": true
+                            },
+                            "page": {
+                                "type": "INTEGER",
+                                "nullable": true
+                            },
+                            "filter": {
+                                "type": "STRING",
+                                "nullable": true
+                            },
+                            "category_id": {
+                                "type": "STRING",
+                                "nullable": true
+                            },
+                            "product_id": {
+                                "type": "STRING",
+                                "nullable": true
+                            },
+                            "slug": {
+                                "type": "STRING",
+                                "nullable": true
+                            },
+                            "sort": {
+                                "type": "STRING",
+                                "nullable": true
+                            },
+                            "order": {
+                                "type": "STRING",
+                                "nullable": true
+                            },
+                            "search": {
+                                "type": "STRING",
+                                "nullable": true
+                            },
+                            "status": {
+                                "type": "STRING",
+                                "nullable": true
+                            },
+                            "tag": {
+                                "type": "STRING",
+                                "nullable": true
+                            }
+                        },
+                        "propertyOrdering": [
+                            "limit",
+                            "page",
+                            "filter",
+                            "category_id",
+                            "product_id",
+                            "slug",
+                            "sort",
+                            "order",
+                            "search",
+                            "status",
+                            "tag"
+                        ]
+                    },
+                    "options": {
+                        "type": "OBJECT",
+                        "nullable": true,
+                        "properties": {
+                            "pushurl": {
+                                "type": "BOOLEAN",
+                                "nullable": true
+                            },
+                            "scroll": {
+                                "type": "BOOLEAN",
+                                "nullable": true
+                            },
+                            "clear": {
+                                "type": "BOOLEAN",
+                                "nullable": true
+                            }
+                        },
+                        "propertyOrdering": [
+                            "pushurl",
+                            "scroll",
+                            "clear"
+                        ]
+                    },
+                    "autoLoad": {
+                        "type": "BOOLEAN",
+                        "nullable": true
+                    }
+                },
+                "required": [
+                    "id",
+                    "endpoint",
+                    "keyName"
+                ],
+                "propertyOrdering": [
+                    "id",
+                    "endpoint",
+                    "keyName",
+                    "params",
+                    "options",
+                    "autoLoad"
+                ]
+            }
+        },
+        "actions": {
+            "type": "ARRAY",
+            "nullable": true,
+            "items": {
+                "type": "OBJECT",
+                "properties": {
+                    "id": {
+                        "type": "STRING"
+                    },
+                    "endpoint": {
+                        "type": "STRING"
+                    },
+                    "keyName": {
+                        "type": "STRING",
+                        "nullable": true
+                    },
+                    "options": {
+                        "type": "OBJECT",
+                        "nullable": true,
+                        "properties": {
+                            "pushurl": {
+                                "type": "BOOLEAN",
+                                "nullable": true
+                            },
+                            "scroll": {
+                                "type": "BOOLEAN",
+                                "nullable": true
+                            },
+                            "clear": {
+                                "type": "BOOLEAN",
+                                "nullable": true
+                            }
+                        },
+                        "propertyOrdering": [
+                            "pushurl",
+                            "scroll",
+                            "clear"
+                        ]
+                    }
+                },
+                "required": [
+                    "id",
+                    "endpoint"
+                ],
+                "propertyOrdering": [
+                    "id",
+                    "endpoint",
+                    "keyName",
+                    "options"
+                ]
+            }
+        },
+        "sections": {
+            "type": "ARRAY",
+            "items": {
+                "type": "OBJECT",
+                "properties": {
+                    "id": {
+                        "type": "STRING",
+                        "nullable": true
+                    },
+                    "type": {
+                        "type": "STRING",
+                        "enum": [
+                            "hero",
+                            "content",
+                            "products",
+                            "posts",
+                            "form",
+                            "cta",
+                            "features",
+                            "testimonials",
+                            "faq",
+                            "footer"
+                        ]
+                    },
+                    "className": {
+                        "type": "STRING",
+                        "nullable": true
+                    },
+                    "title": {
+                        "type": "STRING",
+                        "nullable": true
+                    },
+                    "subtitle": {
+                        "type": "STRING",
+                        "nullable": true
+                    },
+                    "content": {
+                        "type": "STRING",
+                        "nullable": true
+                    },
+                    "backgroundImage": {
+                        "type": "STRING",
+                        "nullable": true
+                    },
+                    "dataSource": {
+                        "type": "STRING",
+                        "nullable": true
+                    },
+                    "actionRef": {
+                        "type": "STRING",
+                        "nullable": true
+                    },
+                    "columns": {
+                        "type": "INTEGER",
+                        "nullable": true
+                    },
+                    "items": {
+                        "type": "ARRAY",
+                        "nullable": true,
+                        "items": {
+                            "type": "OBJECT",
+                            "properties": {
+                                "title": {
+                                    "type": "STRING",
+                                    "nullable": true
+                                },
+                                "content": {
+                                    "type": "STRING",
+                                    "nullable": true
+                                },
+                                "icon": {
+                                    "type": "STRING",
+                                    "nullable": true
+                                },
+                                "href": {
+                                    "type": "STRING",
+                                    "nullable": true
+                                },
+                                "image": {
+                                    "type": "STRING",
+                                    "nullable": true
+                                }
+                            },
+                            "propertyOrdering": [
+                                "title",
+                                "content",
+                                "icon",
+                                "href",
+                                "image"
+                            ]
+                        }
+                    },
+                    "buttons": {
+                        "type": "ARRAY",
+                        "nullable": true,
+                        "items": {
+                            "type": "OBJECT",
+                            "properties": {
+                                "text": {
+                                    "type": "STRING"
+                                },
+                                "href": {
+                                    "type": "STRING",
+                                    "nullable": true
+                                },
+                                "actionRef": {
+                                    "type": "STRING",
+                                    "nullable": true
+                                },
+                                "variant": {
+                                    "type": "STRING",
+                                    "enum": [
+                                        "primary",
+                                        "secondary",
+                                        "outline"
+                                    ],
+                                    "nullable": true
+                                }
+                            },
+                            "required": [
+                                "text"
+                            ],
+                            "propertyOrdering": [
+                                "text",
+                                "href",
+                                "actionRef",
+                                "variant"
+                            ]
+                        }
+                    },
+                    "fields": {
+                        "type": "ARRAY",
+                        "nullable": true,
+                        "items": {
+                            "type": "OBJECT",
+                            "properties": {
+                                "name": {
+                                    "type": "STRING"
+                                },
+                                "label": {
+                                    "type": "STRING",
+                                    "nullable": true
+                                },
+                                "type": {
+                                    "type": "STRING",
+                                    "enum": [
+                                        "text",
+                                        "email",
+                                        "password",
+                                        "textarea",
+                                        "select",
+                                        "checkbox"
+                                    ],
+                                    "nullable": true
+                                },
+                                "placeholder": {
+                                    "type": "STRING",
+                                    "nullable": true
+                                },
+                                "required": {
+                                    "type": "BOOLEAN",
+                                    "nullable": true
+                                }
+                            },
+                            "required": [
+                                "name"
+                            ],
+                            "propertyOrdering": [
+                                "name",
+                                "label",
+                                "type",
+                                "placeholder",
+                                "required"
+                            ]
+                        }
+                    }
+                },
+                "required": [
+                    "type"
+                ],
+                "propertyOrdering": [
+                    "id",
+                    "type",
+                    "className",
+                    "title",
+                    "subtitle",
+                    "content",
+                    "backgroundImage",
+                    "dataSource",
+                    "actionRef",
+                    "columns",
+                    "items",
+                    "buttons",
+                    "fields"
+                ]
+            }
+        }
+    },
+    "required": [
+        "metadata",
+        "sections"
+    ],
+    "propertyOrdering": [
+        "metadata",
+        "theme",
+        "dataSources",
+        "actions",
+        "sections"
+    ]
+}
