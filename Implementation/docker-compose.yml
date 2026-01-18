@@ -1,67 +1,42 @@
-# =============================================================================
-# AI Orchestrator - Docker Compose
-# =============================================================================
-# 
-# Services:
-#   - api:      FastAPI webhook handler (port 8000)
-#   - worker:   Python job processor
-#   - preview:  FastAPI static file server (port 8001)
-#   - postgres: PostgreSQL database
-#   - rabbitmq: Message queue
-#
-# Volumes:
-#   - previews_data: Shared between worker (rw) and preview (ro)
-#   - postgres_data: Database persistence
-#   - rabbitmq_data: Queue persistence
-#
-# Usage:
-#   cp .env.example .env
-#   docker-compose up -d
-#   docker-compose logs -f
-#
-# =============================================================================
-
 services:
-  # ---------------------------------------------------------------------------
-  # API Service - Telegram Webhook Handler
-  # ---------------------------------------------------------------------------
   api:
     build:
       context: .
       dockerfile: Dockerfile
-      target: api 
+      target: api
     container_name: orchestrator-api
     command: uvicorn api.main:app --host 0.0.0.0 --port 8000
     ports:
       - "8000:8000"
+    env_file:
+      - .env
     environment:
-      - DATABASE_URL=${DATABASE_URL}
-      - RABBITMQ_URL=${RABBITMQ_URL}
-      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
-      - TELEGRAM_SECRET_TOKEN=${TELEGRAM_SECRET_TOKEN}
       - LOG_LEVEL=${LOG_LEVEL:-INFO}
       - LOG_FORMAT=${LOG_FORMAT:-json}
-      - VERTEX_PROJECT_ID=${VERTEX_PROJECT_ID}
-      - VERTEX_REGION=${VERTEX_REGION:-europe-west1}
-      - VERTEX_SERVICE_ACCOUNT_JSON=${VERTEX_SERVICE_ACCOUNT_JSON}
     depends_on:
       postgres:
         condition: service_healthy
       rabbitmq:
         condition: service_healthy
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 15s
     restart: unless-stopped
     networks:
       - orchestrator-net
+  migrations:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: migrations
+    container_name: orchestrator-migrations
+    command: alembic upgrade head
+    env_file:
+      - .env
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: "no"
+    networks:
+      - orchestrator-net
 
-  # ---------------------------------------------------------------------------
-  # Worker Service - Job Processor
-  # ---------------------------------------------------------------------------
   worker:
     build:
       context: .
@@ -69,38 +44,22 @@ services:
       target: worker
     container_name: orchestrator-worker
     command: python -m api.orchestrator.worker.main
+    env_file:
+      - .env
     environment:
-      - DATABASE_URL=${DATABASE_URL}
-      - RABBITMQ_URL=${RABBITMQ_URL}
-      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
-      - AI_PROVIDER=${AI_PROVIDER:-mock}
-      - AI_API_KEY=${AI_API_KEY:-}
-      - AI_MODEL=${AI_MODEL:-gemini-2.0-flash}
-      - AI_TIMEOUT=${AI_TIMEOUT:-120}
       - PREVIEWS_PATH=/previews
-      - PREVIEW_BASE_URL=${PREVIEW_BASE_URL}
-      - MAX_RETRIES=${MAX_RETRIES:-5}
-      - RETRY_BASE_DELAY=${RETRY_BASE_DELAY:-2}
       - LOG_LEVEL=${LOG_LEVEL:-INFO}
       - LOG_FORMAT=${LOG_FORMAT:-json}
-      - VERTEX_PROJECT_ID=${VERTEX_PROJECT_ID}
-      - VERTEX_REGION=${VERTEX_REGION:-europe-west1}
-      - VERTEX_SERVICE_ACCOUNT_JSON=${VERTEX_SERVICE_ACCOUNT_JSON}
     depends_on:
       postgres:
         condition: service_healthy
       rabbitmq:
         condition: service_healthy
     volumes:
-      # Shared volume - worker writes preview bundles
       - previews_data:/previews
     restart: unless-stopped
     networks:
       - orchestrator-net
-
-  # ---------------------------------------------------------------------------
-  # Preview Service - Secure Static File Server
-  # ---------------------------------------------------------------------------   
 
   preview:
     build:
@@ -111,26 +70,18 @@ services:
     command: uvicorn api.orchestrator.preview.main:app --host 0.0.0.0 --port 8001
     ports:
       - "8001:8001"
+    env_file:
+      - .env
     environment:
       - PREVIEWS_PATH=/previews
       - LOG_LEVEL=${LOG_LEVEL:-INFO}
       - LOG_FORMAT=${LOG_FORMAT:-json}
     volumes:
-      # Shared volume - preview reads bundles (read-only)
       - previews_data:/previews:ro
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8001/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 10s
     restart: unless-stopped
     networks:
       - orchestrator-net
 
-  # ---------------------------------------------------------------------------
-  # PostgreSQL Database
-  # ---------------------------------------------------------------------------
   postgres:
     image: postgres:16-alpine
     container_name: orchestrator-postgres
@@ -141,86 +92,38 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:
-      # Expose for local development only - remove in production
       - "5432:5432"
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U orchestrator -d orchestrator"]
       interval: 10s
       timeout: 5s
       retries: 5
-      start_period: 10s
     restart: unless-stopped
     networks:
       - orchestrator-net
 
-  # ---------------------------------------------------------------------------
-  # RabbitMQ Message Queue
-  # ---------------------------------------------------------------------------
   rabbitmq:
     image: rabbitmq:3.13-management-alpine
     container_name: orchestrator-rabbitmq
     environment:
       RABBITMQ_DEFAULT_USER: orchestrator
       RABBITMQ_DEFAULT_PASS: orchestrator_secret
-    volumes:
-      - rabbitmq_data:/var/lib/rabbitmq
     ports:
-      # AMQP port
       - "5672:5672"
-      # Management UI - for development only
       - "15672:15672"
     healthcheck:
       test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
       interval: 10s
       timeout: 5s
       retries: 5
-      start_period: 30s
     restart: unless-stopped
     networks:
       - orchestrator-net
 
-  # ---------------------------------------------------------------------------
-  # Database Migrations
-  # ---------------------------------------------------------------------------
-  migrations:
-    build:
-      context: .
-      dockerfile: Dockerfile
-      target: migrations 
-    container_name: orchestrator-migrations
-    command: alembic upgrade head
-    environment:
-      - DATABASE_URL=${DATABASE_URL}
-    depends_on:
-      postgres:
-        condition: service_healthy
-    restart: "no"
-    networks:
-      - orchestrator-net
-
-# =============================================================================
-# Named Volumes
-# =============================================================================
 volumes:
-  # Shared between worker and preview services
   previews_data:
-    name: previews_data
-    driver: local
-
-  # Database persistence
   postgres_data:
-    name: orchestrator_postgres_data
-    driver: local
 
-  # Queue persistence
-  rabbitmq_data:
-    name: orchestrator_rabbitmq_data
-    driver: local
-
-# =============================================================================
-# Networks
-# =============================================================================
 networks:
   orchestrator-net:
-    name: orchestrator-network
     driver: bridge

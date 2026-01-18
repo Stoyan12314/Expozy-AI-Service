@@ -1,12 +1,7 @@
 """
 Pluggable AI provider adapter interface with comprehensive validation.
 
-Implements validation layers as described in the research paper:
-- Section 5.1: Structural Conformance (JSON Schema validation)
-- Section 5.2: Semantic Validation (cross-references, page-type requirements)
-- Section 5.3: Security Boundaries (XSS pattern detection)
-- Section 4.3: Alpine Directive Policy
-- Section 4.4: Tailwind Policy
+This version keeps ONLY VertexAIAdapter as the provider implementation.
 """
 
 import json
@@ -164,7 +159,6 @@ PAGE_TYPE_REQUIREMENTS = {
 
 @dataclass
 class ValidationResult:
-    """Result of template validation."""
     valid: bool = True
     endpoint_errors: list[str] = field(default_factory=list)
     crossref_errors: list[str] = field(default_factory=list)
@@ -175,34 +169,51 @@ class ValidationResult:
     route_errors: list[str] = field(default_factory=list)
     page_type_warnings: list[str] = field(default_factory=list)
     completeness_warnings: list[str] = field(default_factory=list)
-    
+
     def has_errors(self) -> bool:
         return bool(
-            self.endpoint_errors or self.crossref_errors or self.security_flags or
-            self.alpine_errors or self.tailwind_errors or self.theme_errors or self.route_errors
+            self.endpoint_errors
+            or self.crossref_errors
+            or self.security_flags
+            or self.alpine_errors
+            or self.tailwind_errors
+            or self.theme_errors
+            or self.route_errors
         )
-    
+
     def has_warnings(self) -> bool:
         return bool(self.page_type_warnings or self.completeness_warnings)
-    
+
     def all_errors(self) -> list[str]:
-        return (self.endpoint_errors + self.crossref_errors + self.security_flags +
-                self.alpine_errors + self.tailwind_errors + self.theme_errors + self.route_errors)
-    
+        return (
+            self.endpoint_errors
+            + self.crossref_errors
+            + self.security_flags
+            + self.alpine_errors
+            + self.tailwind_errors
+            + self.theme_errors
+            + self.route_errors
+        )
+
     def to_dict(self) -> dict[str, Any]:
         return {
-            "valid": self.valid, "has_errors": self.has_errors(), "has_warnings": self.has_warnings(),
-            "endpoint_errors": self.endpoint_errors, "crossref_errors": self.crossref_errors,
-            "security_flags": self.security_flags, "alpine_errors": self.alpine_errors,
-            "tailwind_errors": self.tailwind_errors, "theme_errors": self.theme_errors,
-            "route_errors": self.route_errors, "page_type_warnings": self.page_type_warnings,
+            "valid": self.valid,
+            "has_errors": self.has_errors(),
+            "has_warnings": self.has_warnings(),
+            "endpoint_errors": self.endpoint_errors,
+            "crossref_errors": self.crossref_errors,
+            "security_flags": self.security_flags,
+            "alpine_errors": self.alpine_errors,
+            "tailwind_errors": self.tailwind_errors,
+            "theme_errors": self.theme_errors,
+            "route_errors": self.route_errors,
+            "page_type_warnings": self.page_type_warnings,
             "completeness_warnings": self.completeness_warnings,
         }
 
 
 @dataclass
 class GenerationResult:
-    """Result of AI template generation."""
     success: bool
     template: Optional[dict[str, Any]] = None
     raw_response: Optional[str] = None
@@ -216,8 +227,6 @@ class GenerationResult:
 # =============================================================================
 
 class TemplateValidator:
-    """Comprehensive template validation."""
-    
     @staticmethod
     def validate_endpoints(pkg: dict[str, Any]) -> list[str]:
         errors: list[str] = []
@@ -236,7 +245,7 @@ class TemplateValidator:
                 if ep and DANGEROUS_ENDPOINTS.search(ep):
                     errors.append(f"actions[{i}].endpoint '{ep}' matches dangerous pattern")
         return errors
-    
+
     @staticmethod
     def validate_crossrefs(pkg: dict[str, Any]) -> list[str]:
         errors: list[str] = []
@@ -257,7 +266,7 @@ class TemplateValidator:
                     if btn_ar and btn_ar not in ac_ids:
                         errors.append(f"sections[{i}].buttons[{j}].actionRef '{btn_ar}' references unknown id")
         return errors
-    
+
     @staticmethod
     def find_unsafe_strings(obj: Any, path: str = "$") -> list[str]:
         hits: list[str] = []
@@ -273,14 +282,16 @@ class TemplateValidator:
             for i, v in enumerate(obj):
                 hits.extend(TemplateValidator.find_unsafe_strings(v, f"{path}[{i}]"))
         return hits
-    
+
     @staticmethod
     def validate_alpine(pkg: dict[str, Any]) -> list[str]:
         errors: list[str] = []
+
         def check_string(val: str, path: str) -> None:
             for pat, desc in ALPINE_UNSAFE_PATTERNS:
                 if pat.search(val):
                     errors.append(f"{path}: contains unsafe Alpine pattern - {desc}")
+
         def recurse(obj: Any, path: str) -> None:
             if isinstance(obj, str):
                 check_string(obj, path)
@@ -290,9 +301,10 @@ class TemplateValidator:
             elif isinstance(obj, list):
                 for i, v in enumerate(obj):
                     recurse(v, f"{path}[{i}]")
+
         recurse(pkg, "$")
         return errors
-    
+
     @staticmethod
     def validate_tailwind(pkg: dict[str, Any]) -> list[str]:
         errors: list[str] = []
@@ -309,7 +321,7 @@ class TemplateValidator:
                 if pat.search(cn):
                     errors.append(f"{path}: contains dangerous pattern - {desc}")
         return errors
-    
+
     @staticmethod
     def validate_theme(pkg: dict[str, Any]) -> list[str]:
         errors: list[str] = []
@@ -328,7 +340,7 @@ class TemplateValidator:
         if dark_mode is not None and not isinstance(dark_mode, bool):
             errors.append(f"theme.darkMode: expected boolean, got {type(dark_mode).__name__}")
         return errors
-    
+
     @staticmethod
     def validate_route(pkg: dict[str, Any]) -> list[str]:
         errors: list[str] = []
@@ -347,7 +359,7 @@ class TemplateValidator:
             elif not route.startswith("/"):
                 errors.append(f"metadata.route '{route}' must start with '/'")
         return errors
-    
+
     @staticmethod
     def validate_page_type(pkg: dict[str, Any]) -> list[str]:
         warnings: list[str] = []
@@ -373,7 +385,7 @@ class TemplateValidator:
                 if field_name not in form_fields:
                     warnings.append(f"pageType '{page_type}' typically requires form field '{field_name}'")
         return warnings
-    
+
     @staticmethod
     def validate_completeness(pkg: dict[str, Any]) -> list[str]:
         warnings: list[str] = []
@@ -393,7 +405,7 @@ class TemplateValidator:
                 if sec_type in ("products", "posts") and not sec.get("dataSource"):
                     warnings.append(f"sections[{i}]: '{sec_type}' section has no dataSource")
         return warnings
-    
+
     @classmethod
     def validate(cls, pkg: dict[str, Any]) -> ValidationResult:
         result = ValidationResult()
@@ -415,18 +427,15 @@ class TemplateValidator:
 # =============================================================================
 
 class ProviderAdapter(ABC):
-    """Abstract base class for AI providers."""
-    
     @abstractmethod
     async def generate(self, prompt: str) -> GenerationResult:
-        pass
-    
+        raise NotImplementedError
+
     def _validate_template(self, template: dict[str, Any]) -> ValidationResult:
         return TemplateValidator.validate(template)
 
 
 def load_response_schema() -> Optional[dict[str, Any]]:
-    """Load EXPOZY response schema if available."""
     schema_path = Path(__file__).parent / "expozy_schemaV2.json"
     if schema_path.exists():
         try:
@@ -442,42 +451,44 @@ def load_response_schema() -> Optional[dict[str, Any]]:
 # =============================================================================
 
 class VertexAIAdapter(ProviderAdapter):
-    """Google Cloud Vertex AI adapter with OAuth2 authentication."""
-    
+    """Google Cloud Vertex AI adapter with OAuth2 service-account auth."""
+
     def __init__(self) -> None:
         self._settings = get_settings()
         self._response_schema = load_response_schema()
         self._access_token: Optional[str] = None
         self._token_expiry: float = 0
         self._credentials = self._load_credentials()
+
         if self._response_schema:
             logger.info("Loaded EXPOZY response schema for structured output")
-    
+
     def _load_credentials(self) -> Optional[dict[str, Any]]:
-        """Load service account credentials from environment variable."""
         creds_json = self._settings.vertex_service_account_json
         if creds_json:
             try:
                 creds = json.loads(creds_json)
-                logger.info("Loaded Vertex AI service account credentials",
-                           client_email=creds.get("client_email", "unknown"))
+                logger.info(
+                    "Loaded Vertex AI service account credentials",
+                    client_email=creds.get("client_email", "unknown"),
+                )
                 return creds
             except json.JSONDecodeError as e:
                 logger.error("Failed to parse VERTEX_SERVICE_ACCOUNT_JSON", error=str(e))
         else:
             logger.warning("VERTEX_SERVICE_ACCOUNT_JSON not set")
         return None
-    
+
     async def _get_access_token(self) -> str:
-        """Get or refresh OAuth2 access token."""
-        import jwt
-        
+        # Import inside method so your app fails only if you actually use Vertex.
+        import jwt  # requires PyJWT
+
         if self._access_token and time.time() < self._token_expiry - 60:
             return self._access_token
-        
+
         if not self._credentials:
             raise ValueError("No service account credentials available")
-        
+
         now = int(time.time())
         payload = {
             "iss": self._credentials["client_email"],
@@ -485,97 +496,143 @@ class VertexAIAdapter(ProviderAdapter):
             "aud": "https://oauth2.googleapis.com/token",
             "iat": now,
             "exp": now + 3600,
-            "scope": "https://www.googleapis.com/auth/cloud-platform"
+            "scope": "https://www.googleapis.com/auth/cloud-platform",
         }
-        
+
         signed_jwt = jwt.encode(payload, self._credentials["private_key"], algorithm="RS256")
-        
+
         async with httpx.AsyncClient() as client:
             response = await client.post(
                 "https://oauth2.googleapis.com/token",
-                data={"grant_type": "urn:ietf:params:oauth:grant-type:jwt-bearer", "assertion": signed_jwt}
+                data={
+                    "grant_type": "urn:ietf:params:oauth:grant-type:jwt-bearer",
+                    "assertion": signed_jwt,
+                },
             )
             if response.status_code != 200:
-                logger.error("Failed to get access token", status=response.status_code, response=response.text[:500])
+                logger.error(
+                    "Failed to get access token",
+                    status=response.status_code,
+                    response=response.text[:500],
+                )
                 raise ValueError(f"Token exchange failed: {response.status_code}")
-            
+
             token_data = response.json()
             self._access_token = token_data["access_token"]
             self._token_expiry = now + token_data.get("expires_in", 3600)
             logger.debug("Obtained new access token", expires_in=token_data.get("expires_in"))
             return self._access_token
-    
+
     async def generate(self, prompt: str) -> GenerationResult:
         project_id = self._settings.vertex_project_id
         region = self._settings.vertex_region or "europe-west1"
         model = self._settings.ai_model or "gemini-2.0-flash-001"
-        
+
         if not project_id:
             return GenerationResult(success=False, error="VERTEX_PROJECT_ID not configured", retryable=False)
         if not self._credentials:
             return GenerationResult(success=False, error="VERTEX_SERVICE_ACCOUNT_JSON not configured", retryable=False)
-        
-        url = (f"https://{region}-aiplatform.googleapis.com/v1/"
-               f"projects/{project_id}/locations/{region}/"
-               f"publishers/google/models/{model}:generateContent")
-        
+
+        url = (
+            f"https://{region}-aiplatform.googleapis.com/v1/"
+            f"projects/{project_id}/locations/{region}/"
+            f"publishers/google/models/{model}:generateContent"
+        )
+
         try:
             access_token = await self._get_access_token()
         except Exception as e:
             logger.error("Failed to get access token", error=str(e))
             return GenerationResult(success=False, error=f"Authentication failed: {e}", retryable=True)
-        
-        generation_config: dict[str, Any] = {"temperature": 0.2, "maxOutputTokens": 8192, "responseMimeType": "application/json"}
+
+        generation_config: dict[str, Any] = {
+            "temperature": 0.2,
+            "maxOutputTokens": 8192,
+            "responseMimeType": "application/json",
+        }
         if self._response_schema:
             generation_config["responseSchema"] = self._response_schema
-        
+
         payload = {
-            "contents": [{"role": "user", "parts": [{"text": f"{SYSTEM_PROMPT}\n\nUser request: {prompt}"}]}],
-            "generationConfig": generation_config
+            "contents": [
+                {
+                    "role": "user",
+                    "parts": [{"text": f"{SYSTEM_PROMPT}\n\nUser request: {prompt}"}],
+                }
+            ],
+            "generationConfig": generation_config,
         }
         headers = {"Authorization": f"Bearer {access_token}", "Content-Type": "application/json"}
-        
+
         try:
             async with httpx.AsyncClient(timeout=self._settings.ai_timeout) as client:
                 response = await client.post(url, headers=headers, json=payload)
-                
+
                 if response.status_code == 429:
                     return GenerationResult(success=False, error="Rate limited", retryable=True)
+
                 if response.status_code == 401:
+                    # force refresh token next time
                     self._access_token = None
                     self._token_expiry = 0
                     return GenerationResult(success=False, error="Authentication expired", retryable=True)
+
                 if response.status_code != 200:
-                    logger.error("Vertex AI API error", status_code=response.status_code, response=response.text[:500])
-                    return GenerationResult(success=False, error=f"API error: {response.status_code}",
-                                          raw_response=response.text[:500], retryable=response.status_code >= 500)
-                
+                    logger.error(
+                        "Vertex AI API error",
+                        status_code=response.status_code,
+                        response=response.text[:500],
+                    )
+                    return GenerationResult(
+                        success=False,
+                        error=f"API error: {response.status_code}",
+                        raw_response=response.text[:500],
+                        retryable=response.status_code >= 500,
+                    )
+
                 data = response.json()
                 try:
-                    text = data['candidates'][0]['content']['parts'][0]['text']
+                    text = data["candidates"][0]["content"]["parts"][0]["text"]
                 except (KeyError, IndexError) as e:
                     logger.error("Failed to extract text from Vertex AI response", error=str(e))
-                    return GenerationResult(success=False, error="Invalid response structure",
-                                          raw_response=json.dumps(data)[:500], retryable=True)
-                
+                    return GenerationResult(
+                        success=False,
+                        error="Invalid response structure",
+                        raw_response=json.dumps(data)[:500],
+                        retryable=True,
+                    )
+
                 try:
                     template = json.loads(text)
                 except json.JSONDecodeError as e:
                     logger.error("Failed to parse JSON from Vertex AI", error=str(e), text=text[:500])
-                    return GenerationResult(success=False, error=f"Invalid JSON: {e}", raw_response=text[:500], retryable=True)
-                
+                    return GenerationResult(
+                        success=False,
+                        error=f"Invalid JSON: {e}",
+                        raw_response=text[:500],
+                        retryable=True,
+                    )
+
                 validation = self._validate_template(template)
                 if validation.has_errors():
                     logger.warning("Template validation errors", errors=validation.all_errors())
-                    return GenerationResult(success=False, template=template, raw_response=text[:2000],
-                                          error=f"Validation failed: {'; '.join(validation.all_errors()[:3])}",
-                                          validation=validation, retryable=True)
-                
+                    return GenerationResult(
+                        success=False,
+                        template=template,
+                        raw_response=text[:2000],
+                        error=f"Validation failed: {'; '.join(validation.all_errors()[:3])}",
+                        validation=validation,
+                        retryable=True,
+                    )
+
                 if validation.has_warnings():
-                    logger.info("Template validation warnings", warnings=validation.page_type_warnings + validation.completeness_warnings)
-                
+                    logger.info(
+                        "Template validation warnings",
+                        warnings=validation.page_type_warnings + validation.completeness_warnings,
+                    )
+
                 return GenerationResult(success=True, template=template, raw_response=text[:2000], validation=validation)
-                
+
         except httpx.TimeoutException:
             logger.error("Vertex AI API timeout", timeout=self._settings.ai_timeout)
             return GenerationResult(success=False, error="Timeout", retryable=True)
@@ -585,159 +642,24 @@ class VertexAIAdapter(ProviderAdapter):
 
 
 # =============================================================================
-# GEMINI ADAPTER (Google AI Studio)
-# =============================================================================
-
-class GeminiAdapter(ProviderAdapter):
-    """Google Gemini adapter with API key authentication."""
-    
-    def __init__(self) -> None:
-        self._settings = get_settings()
-        self._response_schema = load_response_schema()
-        if self._response_schema:
-            logger.info("Loaded EXPOZY response schema for structured output")
-    
-    async def generate(self, prompt: str) -> GenerationResult:
-        url = f"https://generativelanguage.googleapis.com/v1beta/models/{self._settings.ai_model}:generateContent"
-        generation_config: dict[str, Any] = {"temperature": 0.2, "maxOutputTokens": 8192, "responseMimeType": "application/json"}
-        if self._response_schema:
-            generation_config["responseSchema"] = self._response_schema
-        
-        payload = {
-            "contents": [{"role": "user", "parts": [{"text": f"{SYSTEM_PROMPT}\n\nUser request: {prompt}"}]}],
-            "generationConfig": generation_config
-        }
-        
-        try:
-            async with httpx.AsyncClient(timeout=self._settings.ai_timeout) as client:
-                response = await client.post(url, params={"key": self._settings.ai_api_key}, json=payload)
-                
-                if response.status_code == 429:
-                    return GenerationResult(success=False, error="Rate limited", retryable=True)
-                if response.status_code != 200:
-                    logger.error("Gemini API error", status_code=response.status_code, response=response.text[:500])
-                    return GenerationResult(success=False, error=f"API error: {response.status_code}",
-                                          raw_response=response.text[:500], retryable=response.status_code >= 500)
-                
-                data = response.json()
-                try:
-                    text = data['candidates'][0]['content']['parts'][0]['text']
-                except (KeyError, IndexError) as e:
-                    return GenerationResult(success=False, error="Invalid response structure", raw_response=json.dumps(data)[:500], retryable=True)
-                
-                try:
-                    template = json.loads(text)
-                except json.JSONDecodeError as e:
-                    return GenerationResult(success=False, error=f"Invalid JSON: {e}", raw_response=text[:500], retryable=True)
-                
-                validation = self._validate_template(template)
-                if validation.has_errors():
-                    return GenerationResult(success=False, template=template, raw_response=text[:2000],
-                                          error=f"Validation failed: {'; '.join(validation.all_errors()[:3])}",
-                                          validation=validation, retryable=True)
-                
-                return GenerationResult(success=True, template=template, raw_response=text[:2000], validation=validation)
-                
-        except httpx.TimeoutException:
-            return GenerationResult(success=False, error="Timeout", retryable=True)
-        except Exception as e:
-            logger.error("Gemini adapter error", error=str(e), exc_info=True)
-            return GenerationResult(success=False, error=str(e), retryable=True)
-
-
-# =============================================================================
-# OPENAI ADAPTER
-# =============================================================================
-
-class OpenAIAdapter(ProviderAdapter):
-    """OpenAI adapter."""
-    
-    def __init__(self) -> None:
-        self._settings = get_settings()
-        self._response_schema = load_response_schema()
-    
-    async def generate(self, prompt: str) -> GenerationResult:
-        url = "https://api.openai.com/v1/chat/completions"
-        headers = {"Authorization": f"Bearer {self._settings.ai_api_key}", "Content-Type": "application/json"}
-        payload: dict[str, Any] = {
-            "model": self._settings.ai_model or "gpt-4o",
-            "messages": [{"role": "system", "content": SYSTEM_PROMPT}, {"role": "user", "content": prompt}],
-            "temperature": 0.2, "max_tokens": 8192,
-        }
-        if self._response_schema:
-            payload["response_format"] = {"type": "json_schema", "json_schema": {"name": "expozy_template", "schema": self._response_schema, "strict": True}}
-        else:
-            payload["response_format"] = {"type": "json_object"}
-        
-        try:
-            async with httpx.AsyncClient(timeout=self._settings.ai_timeout) as client:
-                response = await client.post(url, headers=headers, json=payload)
-                if response.status_code == 429:
-                    return GenerationResult(success=False, error="Rate limited", retryable=True)
-                if response.status_code != 200:
-                    return GenerationResult(success=False, error=f"API error: {response.status_code}",
-                                          raw_response=response.text[:500], retryable=response.status_code >= 500)
-                
-                data = response.json()
-                text = data['choices'][0]['message']['content']
-                template = json.loads(text)
-                validation = self._validate_template(template)
-                if validation.has_errors():
-                    return GenerationResult(success=False, template=template, raw_response=text[:2000],
-                                          error=f"Validation failed: {'; '.join(validation.all_errors()[:3])}",
-                                          validation=validation, retryable=True)
-                return GenerationResult(success=True, template=template, raw_response=text[:2000], validation=validation)
-        except httpx.TimeoutException:
-            return GenerationResult(success=False, error="Timeout", retryable=True)
-        except json.JSONDecodeError as e:
-            return GenerationResult(success=False, error=f"Invalid JSON: {e}", retryable=True)
-        except Exception as e:
-            return GenerationResult(success=False, error=str(e), retryable=True)
-
-
-# =============================================================================
-# MOCK ADAPTER
-# =============================================================================
-
-class MockAdapter(ProviderAdapter):
-    """Mock adapter for testing."""
-    
-    async def generate(self, prompt: str) -> GenerationResult:
-        template = {
-            "metadata": {"name": "Generated Template", "description": f"Generated from: {prompt[:50]}", "pageType": "landing", "route": "/generated-page"},
-            "theme": {"primaryColor": "#3B82F6", "darkMode": False},
-            "dataSources": [{"id": "products_source", "endpoint": "get.products", "params": {"limit": 12}}],
-            "actions": [{"id": "add_to_cart", "endpoint": "Shop.post_carts", "method": "POST"}],
-            "sections": [
-                {"type": "hero", "title": "Welcome", "subtitle": prompt[:100], "buttons": [{"label": "Shop Now", "variant": "primary", "href": "/products"}]},
-                {"type": "products", "title": "Featured Products", "dataSource": "products_source"},
-                {"type": "cta", "title": "Ready to get started?", "buttons": [{"label": "Add to Cart", "variant": "primary", "actionRef": "add_to_cart"}]}
-            ]
-        }
-        return GenerationResult(success=True, template=template, validation=self._validate_template(template))
-
-
-# =============================================================================
-# PROVIDER FACTORY
+# PROVIDER FACTORY (Vertex only)
 # =============================================================================
 
 def get_provider() -> ProviderAdapter:
-    """Get configured provider adapter based on settings."""
+    """
+    Always return VertexAIAdapter.
+
+    Make sure your env has:
+      - VERTEX_PROJECT_ID
+      - VERTEX_REGION (optional)
+      - VERTEX_SERVICE_ACCOUNT_JSON
+      - AI_MODEL (optional)
+    """
     settings = get_settings()
-    provider = settings.ai_provider.lower()
-    
-    if provider == "vertex":
-        logger.info("Using Vertex AI provider", project=settings.vertex_project_id, region=settings.vertex_region, model=settings.ai_model)
-        return VertexAIAdapter()
-    elif provider == "gemini":
-        logger.info("Using Gemini AI provider", model=settings.ai_model)
-        return GeminiAdapter()
-    elif provider == "openai":
-        logger.info("Using OpenAI provider", model=settings.ai_model)
-        return OpenAIAdapter()
-    elif provider == "mock":
-        logger.info("Using Mock provider (no AI calls)")
-        return MockAdapter()
-    else:
-        logger.warning(f"Unknown provider '{provider}', falling back to mock")
-        return MockAdapter()
+    logger.info(
+        "Using Vertex AI provider",
+        project=settings.vertex_project_id,
+        region=settings.vertex_region,
+        model=settings.ai_model,
+    )
+    return VertexAIAdapter()
