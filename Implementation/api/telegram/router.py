@@ -26,7 +26,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from api.orchestrator.db.models import Job, TelegramUpdate as TelegramUpdateDB
 from api.orchestrator.models.schemas import ErrorResponse, TelegramUpdate, WebhookResponse
 from api.telegram.service.telegram import notify_job_started, send_telegram_message
-from api.telegram.telegramBotSetUp import (
+from Implementation.api.telegram.telegram_messages import (
     EMPTY_PROMPT_MESSAGE,
     HELP_MESSAGE,
     INVALID_COMMAND_MESSAGE,
