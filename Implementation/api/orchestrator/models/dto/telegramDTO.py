@@ -1,25 +1,13 @@
 """
-Pydantic v2 schemas needed for:
-Telegram webhook -> create job -> publish to RabbitMQ -> respond immediately.
-
-Keeps:
-- TelegramUpdate parsing helpers (get_text/get_chat_id/get_user_id)
-- WebhookResponse for FastAPI response model
-- ErrorResponse for error responses
-- JobQueueMessage for RabbitMQ payload
+Telegram DTOs for incoming webhook validation + helper accessors.
 """
 
 from __future__ import annotations
 
-from typing import Any, Optional
-from uuid import UUID
+from typing import Optional
 
 from pydantic import BaseModel, ConfigDict, Field
 
-
-# =============================================================================
-# Telegram Update Schemas (incoming webhook validation)
-# =============================================================================
 
 class TelegramUser(BaseModel):
     id: int
@@ -70,30 +58,3 @@ class TelegramUpdate(BaseModel):
     def get_user_id(self) -> Optional[int]:
         msg = self.get_message()
         return msg.from_.id if msg and msg.from_ else None
-
-
-# =============================================================================
-# Queue message schema (RabbitMQ payload)
-# =============================================================================
-
-class JobQueueMessage(BaseModel):
-    job_id: UUID
-    attempt: int = 1
-
-    model_config = ConfigDict(frozen=True)
-
-
-# =============================================================================
-# API Response Schemas (what your FastAPI returns)
-# =============================================================================
-
-class WebhookResponse(BaseModel):
-    ok: bool = True
-    job_id: Optional[UUID] = None
-    message: Optional[str] = None
-
-
-class ErrorResponse(BaseModel):
-    error: str
-    detail: Optional[str] = None
-    request_id: Optional[str] = None

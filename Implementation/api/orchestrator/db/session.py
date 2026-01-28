@@ -15,7 +15,7 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_asyn
 from sqlalchemy.ext.asyncio.engine import AsyncEngine
 
 from shared.config import get_settings
-from api.orchestrator.db.models import Base  # <-- ADD THIS
+from api.orchestrator.db.models.base import Base
 
 # Singletons
 _engine: Optional[AsyncEngine] = None

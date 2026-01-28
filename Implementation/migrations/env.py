@@ -9,6 +9,9 @@ from sqlalchemy.engine import Connection
 
 from alembic import context
 
+from api.orchestrator.db.models import Base
+target_metadata = Base.metadata
+
 # Import models to register them with Base.metadata
 from api.orchestrator.db.models import Base
 from shared.config import get_settings

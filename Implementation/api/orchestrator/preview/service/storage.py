@@ -22,9 +22,9 @@ class StorageService:
 
     async def create_bundle(
         self,
-        template: dict[str, Any],   # keep arg if your worker passes it
+        template: dict[str, Any],   
         html_content: str,
-        job_id: Optional[UUID] = None,  # keep arg if your worker passes it
+        job_id: Optional[UUID] = None,  
     ) -> UUID:
         self._ensure_base_path()
 

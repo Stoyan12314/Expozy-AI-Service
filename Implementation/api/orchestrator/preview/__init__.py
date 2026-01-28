@@ -1,1 +1,1 @@
-"""Preview service package."""
+"""Worker service package."""

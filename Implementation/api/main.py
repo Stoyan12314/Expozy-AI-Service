@@ -6,12 +6,19 @@ from fastapi import FastAPI
 from fastapi.responses import ORJSONResponse
 
 from shared.config import get_settings
-from shared.services import get_mq, close_mq, close_db
-from api.telegram.service.telegram import get_telegram_client, close_telegram_client
+from shared.services import close_db, close_mq
 from shared.utils import setup_logging, get_logger
 
-from api.telegram import router
+# ✅ import router from controller
+from api.telegram.controller.telegram_webhook import router as telegram_router
+# ✅ import telegram client from service layer
+from api.telegram.telegram_client import (
+    get_telegram_client,
+    close_telegram_client,
+)
+
 from api.exceptions import register_exception_handlers
+
 
 setup_logging()
 logger = get_logger(__name__)
@@ -20,13 +27,13 @@ settings = get_settings()
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """Startup and shutdown handler."""
     logger.info("API starting up", telegram_configured=bool(settings.telegram_bot_token))
+
     
     get_telegram_client()
-    
+
     yield
-    
+
     logger.info("API shutting down")
     await close_telegram_client()
     await close_mq()
@@ -41,8 +48,13 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
+
 @app.get("/health")
 async def health_check():
     return {"status": "healthy", "service": "api"}
-app.include_router(router.router, prefix="/telegram", tags=["Telegram"])
+
+
+# ✅ include the controller router
+app.include_router(telegram_router, prefix="/telegram", tags=["Telegram"])
+
 register_exception_handlers(app)
