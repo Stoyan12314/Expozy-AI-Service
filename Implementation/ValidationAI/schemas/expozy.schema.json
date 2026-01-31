@@ -1,0 +1,294 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "EXPOZY Template Package (v1, generation)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "pageType", "meta", "dataSources", "actions", "layout"],
+  "properties": {
+    "schemaVersion": { "type": "string" },
+    "pageType": { "type": "string", "enum": ["landing", "product", "category"] },
+
+    "meta": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "slug", "lang"],
+      "properties": {
+        "name": { "type": "string" },
+        "slug": { "type": "string" },
+        "lang": { "type": "string" },
+        "seo": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "title": { "$ref": "#/$defs/textOrBind" },
+            "description": { "$ref": "#/$defs/textOrBind" },
+            "image": { "$ref": "#/$defs/textOrBind" }
+          }
+        }
+      }
+    },
+
+    "route": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "usesTargetId": { "type": "boolean" },
+        "targetIdParam": { "type": "string" },
+        "queryDefaults": { "type": "object" }
+      }
+    },
+
+    "dataSources": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/dataSource" }
+    },
+
+    "actions": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/action" }
+    },
+
+    "layout": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sections"],
+      "properties": {
+        "containerClass": { "type": "string" },
+        "sections": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/component" }
+        }
+      }
+    },
+
+    "notes": { "type": "string" }
+  },
+
+  "$defs": {
+    "textOrBind": {
+      "anyOf": [
+        { "type": "string" },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["bind"],
+          "properties": { "bind": { "type": "string" } }
+        }
+      ]
+    },
+
+    "dataSource": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "kind", "method", "keyName"],
+      "properties": {
+        "id": { "type": "string" },
+        "kind": { "type": "string", "enum": ["apiData"] },
+        "runOn": { "type": "string", "enum": ["pageLoad"] },
+        "method": { "type": "string" },
+        "keyName": { "type": "string" },
+        "keyGet": { "type": "string" },
+        "params": { "type": "object" },
+        "options": { "type": "object" },
+        "note": { "type": "string" }
+      }
+    },
+
+    "action": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "event", "method", "keyName"],
+      "properties": {
+        "id": { "type": "string" },
+        "event": { "type": "string", "enum": ["click", "change", "submit"] },
+        "method": { "type": "string" },
+        "keyName": { "type": "string" },
+        "keyGet": { "type": "string" },
+        "params": { "type": "object" },
+        "options": { "type": "object" },
+        "confirmMessage": { "type": "string" }
+      }
+    },
+
+    "component": {
+      "anyOf": [
+        { "$ref": "#/$defs/hero" },
+        { "$ref": "#/$defs/textBlock" },
+        { "$ref": "#/$defs/image" },
+        { "$ref": "#/$defs/cta" },
+        { "$ref": "#/$defs/productGrid" },
+        { "$ref": "#/$defs/productCard" },
+        { "$ref": "#/$defs/filters" },
+        { "$ref": "#/$defs/spacer" }
+      ]
+    },
+
+    "hero": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "id", "props"],
+      "properties": {
+        "type": { "const": "Hero" },
+        "id": { "type": "string" },
+        "class": { "type": "string" },
+        "actions": { "type": "array", "items": { "type": "string" } },
+        "props": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["title"],
+          "properties": {
+            "title": { "$ref": "#/$defs/textOrBind" },
+            "subtitle": { "$ref": "#/$defs/textOrBind" }
+          }
+        }
+      }
+    },
+
+    "textBlock": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "id", "props"],
+      "properties": {
+        "type": { "const": "TextBlock" },
+        "id": { "type": "string" },
+        "class": { "type": "string" },
+        "props": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["text"],
+          "properties": { "text": { "$ref": "#/$defs/textOrBind" } }
+        }
+      }
+    },
+
+    "image": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "id", "props"],
+      "properties": {
+        "type": { "const": "Image" },
+        "id": { "type": "string" },
+        "class": { "type": "string" },
+        "props": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["src", "alt"],
+          "properties": {
+            "src": { "$ref": "#/$defs/textOrBind" },
+            "alt": { "$ref": "#/$defs/textOrBind" }
+          }
+        }
+      }
+    },
+
+    "cta": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "id", "props"],
+      "properties": {
+        "type": { "const": "CTA" },
+        "id": { "type": "string" },
+        "class": { "type": "string" },
+        "props": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["text", "cta"],
+          "properties": {
+            "text": { "$ref": "#/$defs/textOrBind" },
+            "cta": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["label", "href"],
+              "properties": {
+                "label": { "type": "string" },
+                "href": { "type": "string" }
+              }
+            }
+          }
+        }
+      }
+    },
+
+    "productGrid": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "id", "props"],
+      "properties": {
+        "type": { "const": "ProductGrid" },
+        "id": { "type": "string" },
+        "class": { "type": "string" },
+        "children": { "type": "array", "items": { "type": "object" } },
+        "props": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["sourceKey", "columns"],
+          "properties": {
+            "sourceKey": { "type": "string" },
+            "columns": { "type": "integer" },
+            "emptyText": { "$ref": "#/$defs/textOrBind" }
+          }
+        }
+      }
+    },
+
+    "productCard": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "id", "props"],
+      "properties": {
+        "type": { "const": "ProductCard" },
+        "id": { "type": "string" },
+        "class": { "type": "string" },
+        "props": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["titlePath", "imagePath", "linkTo"],
+          "properties": {
+            "titlePath": { "type": "string" },
+            "pricePath": { "type": "string" },
+            "imagePath": { "type": "string" },
+            "linkTo": { "type": "string" }
+          }
+        }
+      }
+    },
+
+    "filters": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "id", "props"],
+      "properties": {
+        "type": { "const": "Filters" },
+        "id": { "type": "string" },
+        "class": { "type": "string" },
+        "actions": { "type": "array", "items": { "type": "string" } },
+        "props": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["sourceKey", "fields"],
+          "properties": {
+            "sourceKey": { "type": "string" },
+            "fields": { "type": "array", "items": { "type": "object" } }
+          }
+        }
+      }
+    },
+
+    "spacer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "id", "props"],
+      "properties": {
+        "type": { "const": "Spacer" },
+        "id": { "type": "string" },
+        "class": { "type": "string" },
+        "props": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["size"],
+          "properties": { "size": { "type": "string" } }
+        }
+      }
+    }
+  }
+}

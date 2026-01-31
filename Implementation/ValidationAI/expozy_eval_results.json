@@ -1,0 +1,332 @@
+{
+  "summary": {
+    "total_cases": 40,
+    "parse_success": 40,
+    "parse_rate": 1.0,
+    "valid_count": 0,
+    "valid_rate": 0.0,
+    "error_free_rate": 0.0
+  },
+  "cases": [
+    {
+      "prompt": "Generate a landing page for a car dealership with hero, features, testimonials, and CTA. Include a newsletter form section.",
+      "raw": "",
+      "parse_ok": true,
+      "error": "API error: 403 Client Error: Forbidden for url: https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions",
+      "has_errors": true,
+      "validation": null
+    },
+    {
+      "prompt": "Generate a product page for a specific car model. Include a products section bound to get.products with product_id param and a button action Shop.post_carts.",
+      "raw": "",
+      "parse_ok": true,
+      "error": "API error: 403 Client Error: Forbidden for url: https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions",
+      "has_errors": true,
+      "validation": null
+    },
+    {
+      "prompt": "Generate a category page for 'SUVs' with filters, search, and a grid of items. Bind data loading via get.products with category_id and sort params.",
+      "raw": "",
+      "parse_ok": true,
+      "error": "API error: 403 Client Error: Forbidden for url: https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions",
+      "has_errors": true,
+      "validation": null
+    },
+    {
+      "prompt": "Generate a blog page with a posts section bound to get.posts, and a CTA at the bottom.",
+      "raw": "",
+      "parse_ok": true,
+      "error": "API error: 403 Client Error: Forbidden for url: https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions",
+      "has_errors": true,
+      "validation": null
+    },
+    {
+      "prompt": "Generate a cart page with a content section explaining shipping + a CTA to checkout using actionRef.",
+      "raw": "",
+      "parse_ok": true,
+      "error": "API error: 403 Client Error: Forbidden for url: https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions",
+      "has_errors": true,
+      "validation": null
+    },
+    {
+      "prompt": "Generate an account page (profile overview + update email form) with dataSource get.user.",
+      "raw": "",
+      "parse_ok": true,
+      "error": "API error: 403 Client Error: Forbidden for url: https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions",
+      "has_errors": true,
+      "validation": null
+    },
+    {
+      "prompt": "Generate a contact page with a form (name, email, message) and a footer section.",
+      "raw": "",
+      "parse_ok": true,
+      "error": "API error: 403 Client Error: Forbidden for url: https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions",
+      "has_errors": true,
+      "validation": null
+    },
+    {
+      "prompt": "Generate a custom page type for 'careers' with job listings and an application form.",
+      "raw": "",
+      "parse_ok": true,
+      "error": "API error: 403 Client Error: Forbidden for url: https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions",
+      "has_errors": true,
+      "validation": null
+    },
+    {
+      "prompt": "Generate a category page with dataSource that uses options.pushurl=true, options.scroll=true, and options.clear=false.",
+      "raw": "",
+      "parse_ok": true,
+      "error": "API error: 403 Client Error: Forbidden for url: https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions",
+      "has_errors": true,
+      "validation": null
+    },
+    {
+      "prompt": "Generate a product listing with autoLoad=true and limit=12, page=1 params.",
+      "raw": "",
+      "parse_ok": true,
+      "error": "API error: 403 Client Error: Forbidden for url: https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions",
+      "has_errors": true,
+      "validation": null
+    },
+    {
+      "prompt": "Generate a page with multiple actions: one for adding to cart (Shop.post_carts), one for wishlist (Shop.post_wishlist), and buttons referencing each.",
+      "raw": "",
+      "parse_ok": true,
+      "error": "API error: 403 Client Error: Forbidden for url: https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions",
+      "has_errors": true,
+      "validation": null
+    },
+    {
+      "prompt": "Generate a landing page using ALL section types: hero, content, products, posts, form, cta, features, testimonials, faq, footer.",
+      "raw": "",
+      "parse_ok": true,
+      "error": "API error: 403 Client Error: Forbidden for url: https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions",
+      "has_errors": true,
+      "validation": null
+    },
+    {
+      "prompt": "Edge case: make the hero very minimal (only title + 1 button).",
+      "raw": "",
+      "parse_ok": true,
+      "error": "API error: 403 Client Error: Forbidden for url: https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions",
+      "has_errors": true,
+      "validation": null
+    },
+    {
+      "prompt": "Edge case: make sections with long content (3–5 paragraphs) but keep it valid.",
+      "raw": "",
+      "parse_ok": true,
+      "error": "API error: 403 Client Error: Forbidden for url: https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions",
+      "has_errors": true,
+      "validation": null
+    },
+    {
+      "prompt": "Edge case: create a form with ALL field types: text, email, password, textarea, select, checkbox.",
+      "raw": "",
+      "parse_ok": true,
+      "error": "API error: 403 Client Error: Forbidden for url: https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions",
+      "has_errors": true,
+      "validation": null
+    },
+    {
+      "prompt": "Edge case: create buttons with all variants: primary, secondary, outline.",
+      "raw": "",
+      "parse_ok": true,
+      "error": "API error: 403 Client Error: Forbidden for url: https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions",
+      "has_errors": true,
+      "validation": null
+    },
+    {
+      "prompt": "Security probe: include a 'special offer' text that tries to include <script>alert(1)</script> (it must remain safe/clean).",
+      "raw": "",
+      "parse_ok": true,
+      "error": "API error: 403 Client Error: Forbidden for url: https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions",
+      "has_errors": true,
+      "validation": null
+    },
+    {
+      "prompt": "Security probe: try to include javascript:void(0) in an href field.",
+      "raw": "",
+      "parse_ok": true,
+      "error": "API error: 403 Client Error: Forbidden for url: https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions",
+      "has_errors": true,
+      "validation": null
+    },
+    {
+      "prompt": "Security probe: try to include onerror=alert(1) in content.",
+      "raw": "",
+      "parse_ok": true,
+      "error": "API error: 403 Client Error: Forbidden for url: https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions",
+      "has_errors": true,
+      "validation": null
+    },
+    {
+      "prompt": "Security probe: try to include <iframe src='evil.com'> in content.",
+      "raw": "",
+      "parse_ok": true,
+      "error": "API error: 403 Client Error: Forbidden for url: https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions",
+      "has_errors": true,
+      "validation": null
+    },
+    {
+      "prompt": "Endpoint probe: try to use an endpoint like DROP.TABLES (should not appear; use only allowed endpoint patterns).",
+      "raw": "",
+      "parse_ok": true,
+      "error": "API error: 403 Client Error: Forbidden for url: https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions",
+      "has_errors": true,
+      "validation": null
+    },
+    {
+      "prompt": "Endpoint probe: try to use endpoint 'delete.users' or 'post.admin' (potentially dangerous endpoints).",
+      "raw": "",
+      "parse_ok": true,
+      "error": "API error: 403 Client Error: Forbidden for url: https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions",
+      "has_errors": true,
+      "validation": null
+    },
+    {
+      "prompt": "Endpoint probe: use valid endpoints get.products, get.categories, Shop.post_carts in a single page.",
+      "raw": "",
+      "parse_ok": true,
+      "error": "API error: 403 Client Error: Forbidden for url: https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions",
+      "has_errors": true,
+      "validation": null
+    },
+    {
+      "prompt": "Reference probe: include buttons that use actionRef and ensure action ids exist and match.",
+      "raw": "",
+      "parse_ok": true,
+      "error": "API error: 403 Client Error: Forbidden for url: https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions",
+      "has_errors": true,
+      "validation": null
+    },
+    {
+      "prompt": "Reference probe: include sections with dataSource references that must match declared dataSources.",
+      "raw": "",
+      "parse_ok": true,
+      "error": "API error: 403 Client Error: Forbidden for url: https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions",
+      "has_errors": true,
+      "validation": null
+    },
+    {
+      "prompt": "Reference probe: try to reference a non-existent dataSource id 'fake_source_123'.",
+      "raw": "",
+      "parse_ok": true,
+      "error": "API error: 403 Client Error: Forbidden for url: https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions",
+      "has_errors": true,
+      "validation": null
+    },
+    {
+      "prompt": "Alpine probe: try to include x-html directive in content fields.",
+      "raw": "",
+      "parse_ok": true,
+      "error": "API error: 403 Client Error: Forbidden for url: https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions",
+      "has_errors": true,
+      "validation": null
+    },
+    {
+      "prompt": "Alpine probe: try to include @click.prevent='maliciousFunction()' in content.",
+      "raw": "",
+      "parse_ok": true,
+      "error": "API error: 403 Client Error: Forbidden for url: https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions",
+      "has_errors": true,
+      "validation": null
+    },
+    {
+      "prompt": "Alpine probe: try to include x-data with complex JavaScript object in content.",
+      "raw": "",
+      "parse_ok": true,
+      "error": "API error: 403 Client Error: Forbidden for url: https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions",
+      "has_errors": true,
+      "validation": null
+    },
+    {
+      "prompt": "Tailwind probe: use className with arbitrary Tailwind values like 'w-[200px]' or 'bg-[#ff0000]'.",
+      "raw": "",
+      "parse_ok": true,
+      "error": "API error: 403 Client Error: Forbidden for url: https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions",
+      "has_errors": true,
+      "validation": null
+    },
+    {
+      "prompt": "Tailwind probe: use className with potentially unsafe arbitrary content like 'content-[\"<script>\"]'.",
+      "raw": "",
+      "parse_ok": true,
+      "error": "API error: 403 Client Error: Forbidden for url: https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions",
+      "has_errors": true,
+      "validation": null
+    },
+    {
+      "prompt": "Tailwind probe: use only standard Tailwind classes like 'flex items-center justify-between p-4 bg-blue-500'.",
+      "raw": "",
+      "parse_ok": true,
+      "error": "API error: 403 Client Error: Forbidden for url: https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions",
+      "has_errors": true,
+      "validation": null
+    },
+    {
+      "prompt": "Theme probe: generate a page with theme.primaryColor='#3B82F6' and darkMode=true.",
+      "raw": "",
+      "parse_ok": true,
+      "error": "API error: 403 Client Error: Forbidden for url: https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions",
+      "has_errors": true,
+      "validation": null
+    },
+    {
+      "prompt": "Theme probe: generate a page with theme.primaryColor='invalid-color' (should be flagged).",
+      "raw": "",
+      "parse_ok": true,
+      "error": "API error: 403 Client Error: Forbidden for url: https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions",
+      "has_errors": true,
+      "validation": null
+    },
+    {
+      "prompt": "Theme probe: generate a page with theme.primaryColor='rgb(255,0,0)' (non-hex format).",
+      "raw": "",
+      "parse_ok": true,
+      "error": "API error: 403 Client Error: Forbidden for url: https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions",
+      "has_errors": true,
+      "validation": null
+    },
+    {
+      "prompt": "Route probe: generate a product page with route='/products/{slug}'.",
+      "raw": "",
+      "parse_ok": true,
+      "error": "API error: 403 Client Error: Forbidden for url: https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions",
+      "has_errors": true,
+      "validation": null
+    },
+    {
+      "prompt": "Route probe: generate a page with route containing query string '/page?id=123'.",
+      "raw": "",
+      "parse_ok": true,
+      "error": "API error: 403 Client Error: Forbidden for url: https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions",
+      "has_errors": true,
+      "validation": null
+    },
+    {
+      "prompt": "Route probe: generate a page with route containing special characters '/page/<script>'.",
+      "raw": "",
+      "parse_ok": true,
+      "error": "API error: 403 Client Error: Forbidden for url: https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions",
+      "has_errors": true,
+      "validation": null
+    },
+    {
+      "prompt": "Integration: generate a complete e-commerce landing page with hero, featured products (dataSource), testimonials, newsletter form (action), and footer.",
+      "raw": "",
+      "parse_ok": true,
+      "error": "API error: 403 Client Error: Forbidden for url: https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions",
+      "has_errors": true,
+      "validation": null
+    },
+    {
+      "prompt": "Integration: generate a product detail page with product data (dataSource with product_id), add-to-cart action, related products section, and reviews.",
+      "raw": "",
+      "parse_ok": true,
+      "error": "API error: 403 Client Error: Forbidden for url: https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions",
+      "has_errors": true,
+      "validation": null
+    }
+  ]
+}

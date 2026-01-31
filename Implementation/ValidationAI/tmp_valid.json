@@ -1,0 +1,8 @@
+﻿{
+  "schemaVersion": "1",
+  "pageType": "landing",
+  "meta": { "name": "Test", "slug": "test", "lang": "en" },
+  "dataSources": [],
+  "actions": [],
+  "layout": { "sections": [] }
+}
