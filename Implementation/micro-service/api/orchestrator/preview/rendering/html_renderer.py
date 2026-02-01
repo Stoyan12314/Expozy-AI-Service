@@ -1,10 +1,7 @@
 """
 HTML renderer for preview bundles.
 
-Pure function: takes a validated/sanitized template dict and returns HTML string.
-No DB, no queue, no settings, no side effects.
 """
-
 from __future__ import annotations
 
 import html as _html
@@ -19,9 +16,24 @@ def render_template_to_html(template: Dict[str, Any]) -> str:
     Supports section types:
     hero, features, products, testimonials, cta, form, footer (+ fallback).
     """
-    metadata = template.get("metadata", {}) or {}
-    theme = template.get("theme", {}) or {}
-    sections = template.get("sections", []) or []
+
+    # Support both "metadata" and "meta" (depending on schema version)
+    metadata = template.get("metadata") or template.get("meta") or {}
+    if not isinstance(metadata, dict):
+        metadata = {}
+
+    theme = template.get("theme") or {}
+    if not isinstance(theme, dict):
+        theme = {}
+
+    # Support both "sections" and "layout.sections"
+    sections = template.get("sections")
+    if not isinstance(sections, list):
+        layout = template.get("layout") or {}
+        if isinstance(layout, dict):
+            sections = layout.get("sections")
+    if not isinstance(sections, list):
+        sections = []
 
     primary_color = theme.get("primaryColor", "#3B82F6")
     dark_mode = bool(theme.get("darkMode", False))
@@ -38,24 +50,36 @@ def render_template_to_html(template: Dict[str, Any]) -> str:
         return s
 
     def safe_url(u: object) -> str:
-        """Allow http(s) only. Return empty string if unsafe."""
+        """Allow http(s) + relative (#,/). Return empty string if unsafe."""
         u = "" if u is None else str(u).strip()
         if not u:
             return ""
+
+        # Allow relative URLs
+        if u.startswith("/") or u.startswith("#"):
+            return u.replace('"', "%22").replace("'", "%27")
+
+        # Allow absolute http(s)
         try:
             p = urlparse(u)
             if p.scheme in ("http", "https"):
                 return u.replace('"', "%22").replace("'", "%27")
         except Exception:
             pass
+
         return ""
 
     def render_buttons(buttons: list) -> str:
         out = []
         for btn in buttons or []:
+            if not isinstance(btn, dict):
+                continue
+
             variant = (btn.get("variant") or "primary").lower()
             label = btn.get("text") or btn.get("label") or "Button"
-            href = btn.get("href") or "#"
+
+            raw_href = btn.get("href") or "#"
+            href = safe_url(raw_href) or "#"
 
             btn_class = "btn-secondary" if variant in ("outline", "secondary") else "btn-primary"
             out.append(f'<a href="{esc(href)}" class="btn {btn_class}">{esc(label)}</a>')
@@ -95,6 +119,8 @@ def render_template_to_html(template: Dict[str, Any]) -> str:
 
         cards = []
         for item in items:
+            if not isinstance(item, dict):
+                continue
             it_title = item.get("title", "")
             it_content = item.get("content", "")
             it_icon = item.get("icon", "")
@@ -128,6 +154,8 @@ def render_template_to_html(template: Dict[str, Any]) -> str:
         cards = []
         if isinstance(items, list) and items:
             for item in items:
+                if not isinstance(item, dict):
+                    continue
                 it_title = item.get("title") or item.get("name") or ""
                 it_sub = item.get("subtitle") or item.get("role") or item.get("price") or ""
                 it_content = item.get("content") or item.get("text") or item.get("description") or ""
@@ -178,6 +206,8 @@ def render_template_to_html(template: Dict[str, Any]) -> str:
 
         form_fields = []
         for f in fields:
+            if not isinstance(f, dict):
+                continue
             name = f.get("name") or "field"
             label = f.get("label") or name
             ftype = f.get("type") or "text"
@@ -205,12 +235,17 @@ def render_template_to_html(template: Dict[str, Any]) -> str:
     def render_footer(section: dict) -> str:
         content = section.get("content", "")
         items = section.get("items", []) or []
+
         links = []
         for it in items:
+            if not isinstance(it, dict):
+                continue
             t = it.get("title") or ""
-            href = it.get("href") or "#"
+            raw_href = it.get("href") or "#"
+            href = safe_url(raw_href) or "#"
             if t:
                 links.append(f'<a class="footer-link" href="{esc(href)}">{esc(t)}</a>')
+
         return f"""
         <footer class="section section-footer {safe_class(section.get('className'))}">
             <div class="footer-inner">
@@ -236,6 +271,9 @@ def render_template_to_html(template: Dict[str, Any]) -> str:
 
     sections_html = []
     for section in sections:
+        if not isinstance(section, dict):
+            continue
+
         sec_type = (section.get("type") or "content").lower()
         if sec_type == "hero":
             sections_html.append(render_hero(section))
