@@ -1,0 +1,1222 @@
+{
+  "schema_version": "2.1",
+  "catalog_reference": "component_catalog.json v7.2",
+  "description": "Page type definitions for EXPOZY AI page generator. References components by ID from the component catalog. Contains page layouts, AI fill instructions, generation workflow, and runtime state.",
+  "generation_workflow": {
+    "description": "The AI generation pipeline follows these steps in order.",
+    "steps": [
+      {
+        "step": 1,
+        "name": "analyze_prompt",
+        "description": "AI reads the user prompt and extracts: business type, company name, services offered, location, contact details, language, tone. Outputs a structured brief.",
+        "output": "business_context object"
+      },
+      {
+        "step": 2,
+        "name": "select_pages",
+        "description": "AI analyzes the user prompt and business context to decide which pages to generate. The AI has full control over page selection — no pages are forced. Each page type has selection_guidance that helps the AI decide.",
+        "output": "selected_page_ids array",
+        "rules": {
+          "selection_method": "ai_decides",
+          "constraints": [
+            "blog_post requires blog_listing (always paired together)",
+            "header and footer are always generated (structural, not content pages)",
+            "At minimum the AI should select homepage + at least the legal pages relevant to the business"
+          ],
+          "guidance": "Each page_type has a selection_guidance field. The AI reads all of them and picks the set that best fits the business."
+        }
+      },
+      {
+        "step": 3,
+        "name": "generate_pages",
+        "description": "AI generates HTML for each selected page using the component catalog. Each page follows its page_type definition. Pages are generated in the order defined by generation_order.",
+        "output": "page HTML files"
+      },
+      {
+        "step": 4,
+        "name": "generate_header",
+        "description": "AI generates the header AFTER pages are decided. The navigation links reflect which pages were selected. The header uses the site_header component from the catalog with nav items matching the selected pages.",
+        "output": "header.html",
+        "depends_on": "selected_page_ids from step 2"
+      },
+      {
+        "step": 5,
+        "name": "generate_footer",
+        "description": "AI generates the footer AFTER pages are decided. Footer nav columns and legal links reflect the selected pages. Uses the site_footer component from the catalog.",
+        "output": "footer.html",
+        "depends_on": "selected_page_ids from step 2"
+      }
+    ],
+    "generation_order": [
+      "homepage",
+      "about",
+      "blog_listing",
+      "blog_post",
+      "contacts",
+      "cookie_policy",
+      "gdpr_policy",
+      "terms_conditions",
+      "login",
+      "userpage",
+      "checkout",
+      "header",
+      "footer"
+    ]
+  },
+  "business_context": {
+    "description": "Structured data extracted from the user prompt in step 1. The orchestrator injects this into each page type's content_placeholders.",
+    "fields": {
+      "company_name": {
+        "type": "string",
+        "required": true,
+        "example": "DentaPro Ltd"
+      },
+      "company_legal_name": {
+        "type": "string",
+        "required": true,
+        "example": "\"DENTAPRO\" Ltd"
+      },
+      "company_id": {
+        "type": "string",
+        "required": true,
+        "description": "Company registration number (UIC)",
+        "example": "204567890"
+      },
+      "vat_number": {
+        "type": "string",
+        "required": false,
+        "example": "BG204567890"
+      },
+      "website_url": {
+        "type": "string",
+        "required": true,
+        "example": "www.dentapro.bg"
+      },
+      "business_type": {
+        "type": "string",
+        "required": true,
+        "example": "Dental clinic"
+      },
+      "business_description": {
+        "type": "string",
+        "required": true,
+        "max_length": 500
+      },
+      "services": {
+        "type": "array_of_strings",
+        "required": false,
+        "example": [
+          "Dental implants",
+          "Teeth whitening",
+          "Orthodontics"
+        ]
+      },
+      "location": {
+        "city": {
+          "type": "string",
+          "example": "Burgas"
+        },
+        "address": {
+          "type": "string",
+          "example": "42 Aleksandrovska St."
+        },
+        "country": {
+          "type": "string",
+          "default": "Bulgaria"
+        }
+      },
+      "contact": {
+        "phone": {
+          "type": "string",
+          "example": "+359 56 123 456"
+        },
+        "email": {
+          "type": "string",
+          "example": "info@dentapro.bg"
+        },
+        "gdpr_email": {
+          "type": "string",
+          "example": "gdpr@dentapro.bg"
+        }
+      },
+      "languages": {
+        "type": "array",
+        "default": [
+          {
+            "code": "bg",
+            "label": "Bulgarian"
+          },
+          {
+            "code": "en",
+            "label": "English"
+          }
+        ]
+      },
+      "tone": {
+        "type": "string",
+        "default": "professional",
+        "values": [
+          "professional",
+          "friendly",
+          "corporate",
+          "creative"
+        ]
+      },
+      "primary_language": {
+        "type": "string",
+        "default": "bg"
+      }
+    }
+  },
+  "page_types": {
+    "homepage": {
+      "id": "homepage",
+      "output_file": "homepage.html",
+      "route": "/",
+      "name": "Homepage",
+      "description": "Main landing page. First impression — hero section, value proposition, services overview, social proof, newsletter, and CTA with optional meeting booking.",
+      "sections": [
+        {
+          "order": 1,
+          "component": "hero_section",
+          "required": true,
+          "wrapper": "standard",
+          "wrapper_config": {
+            "padding": "!py-20",
+            "bg": "bg-gradient-to-br from-gray-50 via-white to-gray-50"
+          },
+          "ai_fills": {
+            "badge.text": "Short trust signal from business context (e.g. '20+ years of experience', '1000+ satisfied clients')",
+            "title": "Main value proposition headline based on business_type and services",
+            "description": "Supporting paragraph explaining what the business does",
+            "primary_cta.text": "Action text (e.g. 'Explore our services', 'Book now')",
+            "primary_cta.href": "#services or link to relevant page",
+            "secondary_cta.text": "Secondary action (e.g. 'Contact us', 'Learn more')",
+            "secondary_cta.href": "/bg/contacts or /bg/about",
+            "trust_indicators": "2-3 short metrics from business context",
+            "image_src": "/static/images/product.webp",
+            "image_alt": "Descriptive alt text for the business"
+          },
+          "section_id": "hero"
+        },
+        {
+          "order": 2,
+          "component": "icon_feature_grid",
+          "required": true,
+          "wrapper": "standard",
+          "wrapper_config": {
+            "padding": "!py-20"
+          },
+          "ai_fills": {
+            "heading": "Section heading (e.g. 'Why choose us')",
+            "subheading": "Brief supporting text",
+            "items": "3 feature cards with SVG icons, titles, descriptions — derived from business strengths"
+          },
+          "section_id": "features"
+        },
+        {
+          "order": 3,
+          "component": "service_cards",
+          "required": true,
+          "wrapper": "standard",
+          "wrapper_config": {
+            "padding": "!py-20",
+            "bg": "bg-gray-50"
+          },
+          "ai_fills": {
+            "heading": "Section heading (e.g. 'Our services')",
+            "subheading": "Brief text about service range",
+            "items": "2-4 service cards with images, titles, descriptions, links — from business_context.services"
+          },
+          "section_id": "services"
+        },
+        {
+          "order": 4,
+          "component": "stats_counter",
+          "required": false,
+          "wrapper": "standard",
+          "wrapper_config": {
+            "padding": "!py-10",
+            "bg": "bg-gray-900"
+          },
+          "ai_fills": {
+            "items": "3-4 stat items (e.g. '500+ Projects', '98% Satisfaction'). Derive from business context or use plausible defaults."
+          },
+          "section_id": "stats"
+        },
+        {
+          "order": 5,
+          "component": "newsletter_signup",
+          "required": false,
+          "wrapper": "plain_section",
+          "ai_fills": {
+            "heading": "Newsletter heading (e.g. 'Subscribe to our newsletter')",
+            "subheading": "What subscribers get",
+            "privacy_note": "Privacy assurance text"
+          },
+          "section_id": "newsletter"
+        },
+        {
+          "order": 6,
+          "component": "cta_section",
+          "required": true,
+          "wrapper": "standard",
+          "wrapper_config": {
+            "padding": "!py-20",
+            "bg": "bg-gray-50"
+          },
+          "endpoint_on_wrapper": "get.meeting_calendars",
+          "ai_fills": {
+            "heading": "CTA heading (e.g. 'Ready to get started?')",
+            "description": "Encouraging text to take action",
+            "primary_button.text": "Main CTA (e.g. 'Book an online consultation')",
+            "primary_button.action": "modal",
+            "primary_button.modal_name": "meeting",
+            "secondary_button.text": "Secondary link text",
+            "secondary_button.href": "/bg/about"
+          },
+          "section_id": "cta"
+        },
+        {
+          "order": 7,
+          "component": "meeting_booking_modal",
+          "required": false,
+          "note": "Rendered at page level outside section wrappers. Only if cta_section uses modal action.",
+          "ai_fills": {
+            "heading": "Modal title (e.g. 'Book a meeting')",
+            "Labels and placeholders": "Localized form labels"
+          },
+          "section_id": "cta"
+        }
+      ],
+      "endpoints_used": [
+        "get.meeting_calendars",
+        "post.meetings",
+        "Newsletter.post_newsletter"
+      ],
+      "meta": {
+        "title": "{company_name}",
+        "description": "AI generates meta description from business context"
+      },
+      "component_interactions": [
+        {
+          "source": "cta_section.primary_button",
+          "target": "meeting_booking_modal",
+          "trigger": "@click callModal",
+          "action": "Opens booking modal with data-modal='meeting'"
+        },
+        {
+          "source": "meeting_booking_modal.submit",
+          "target": "meeting_booking_modal.success_modal",
+          "trigger": "@success",
+          "action": "Opens success confirmation with data-modal='meetingSuccess'"
+        },
+        {
+          "source": "newsletter_signup.submit",
+          "target": "EXPOZY platform",
+          "trigger": "@click",
+          "action": "alpineListeners('Newsletter.post_newsletter', $event) with options-clear"
+        }
+      ],
+      "alpine_page_state": {
+        "data.meeting_calendars": "Calendar objects with days and time_slots",
+        "data.modals.meeting": "Booking modal visibility",
+        "data.modals.meetingSuccess": "Success modal visibility",
+        "data.meetingSuccess": "Booking response (calendar_id)",
+        "data.openMobileMenu": "Header mobile menu state"
+      },
+      "selection_guidance": "The main landing page. Should almost always be included — it's the entry point for every website. Skip only if the user explicitly asks for a single-page app or non-standard structure.",
+      "priority": "high"
+    },
+    "about": {
+      "id": "about",
+      "output_file": "about.html",
+      "route": "/bg/about",
+      "name": "About Page",
+      "description": "Company story, values, team credibility, gallery of work, and testimonials.",
+      "sections": [
+        {
+          "order": 1,
+          "component_group": "hero_with_features",
+          "required": true,
+          "wrapper": "standard",
+          "wrapper_config": {
+            "bg": "bg-gradient-to-br from-slate-50 to-slate-100"
+          },
+          "layout": "two_column",
+          "left_column": {
+            "width": "w-full lg:w-1/2",
+            "components": [
+              {
+                "component": "hero_banner",
+                "ai_fills": {
+                  "title": "About page headline (e.g. company name or mission)",
+                  "subtitle": "Brief company description"
+                }
+              },
+              {
+                "component": "feature_cards",
+                "ai_fills": {
+                  "items": "3-5 company values or strengths with icons and descriptions"
+                }
+              }
+            ]
+          },
+          "right_column": {
+            "width": "hidden lg:flex lg:w-1/2",
+            "components": [
+              {
+                "component": "image_showcase",
+                "ai_fills": {
+                  "image_src": "/static/images/product.webp",
+                  "alt_text": "Company or team photo"
+                }
+              }
+            ]
+          },
+          "after_columns": [
+            {
+              "component": "section_divider"
+            },
+            {
+              "component": "brand_logos",
+              "required": false,
+              "ai_fills": {
+                "heading": "Section heading (e.g. 'Our Partners')"
+              }
+            },
+            {
+              "component": "section_divider"
+            },
+            {
+              "component": "gallery_tabs",
+              "required": false,
+              "note": "Only if business has gallery content (e.g. portfolio, before/after, projects)"
+            }
+          ]
+        },
+        {
+          "order": 2,
+          "component": "testimonials",
+          "required": false,
+          "wrapper": "standard",
+          "ai_fills": {
+            "heading": "Testimonials section heading",
+            "subheading": "Brief supporting text"
+          }
+        }
+      ],
+      "endpoints_used": [
+        "get.gallery_categories",
+        "get.testimonials",
+        "get.our_brands"
+      ],
+      "meta": {
+        "title": "{company_name} - About Us"
+      },
+      "selection_guidance": "Company story and credibility page. Include for most businesses. Skip if the user explicitly says no about page, or if the business is purely transactional (e.g. simple tool/utility).",
+      "priority": "high"
+    },
+    "blog_listing": {
+      "id": "blog_listing",
+      "output_file": "blog.html",
+      "route": "/bg/blog",
+      "name": "Blog Listing Page",
+      "description": "Blog index with sidebar filters and post grid. Structure is fixed — AI does NOT generate blog content, only the page layout/chrome.",
+      "sections": [
+        {
+          "order": 1,
+          "layout": "sidebar_content",
+          "wrapper_classes": "w-full flex py-10 bg-slate-50",
+          "sidebar": {
+            "component": "blog_sidebar",
+            "width": "lg:w-2/5 xl:w-1/5"
+          },
+          "content": {
+            "component": "blog_post_grid",
+            "width": "w-full lg:w-3/5 xl:w-4/5"
+          }
+        }
+      ],
+      "ai_fills": {
+        "note": "This page is almost entirely data-driven. AI generates only the structural HTML wrapper. Blog posts come from API."
+      },
+      "endpoints_used": [
+        "get.blogCategories",
+        "get.blogPosts",
+        "get.blogPosts_filters"
+      ],
+      "meta": {
+        "title": "{company_name} - Blog"
+      },
+      "component_interactions": [
+        {
+          "source": "blog_sidebar.search_bar",
+          "target": "blog_post_grid",
+          "trigger": "@input"
+        },
+        {
+          "source": "blog_sidebar.category_list",
+          "target": "blog_post_grid",
+          "trigger": "@click"
+        },
+        {
+          "source": "blog_sidebar.tag_filter",
+          "target": "blog_post_grid",
+          "trigger": "@click"
+        },
+        {
+          "source": "blog_post_grid.pagination",
+          "target": "blog_post_grid",
+          "trigger": "@click"
+        }
+      ],
+      "alpine_page_state": {
+        "data.blogPosts_filters": "Tags",
+        "data.blogCategories": "Categories",
+        "data.blogPosts": "Posts + pagination",
+        "data.corePage.target_id": "Category ID",
+        "data.pageUrl.tag": "Active tag"
+      },
+      "selection_guidance": "Blog index page. Include if the business benefits from content marketing, news, articles, industry updates, or if the user mentions blog/news. Skip for businesses that don't produce written content.",
+      "priority": "medium"
+    },
+    "blog_post": {
+      "id": "blog_post",
+      "output_file": "post.html",
+      "route": "/bg/blog/{slug}",
+      "route_type": "dynamic",
+      "name": "Blog Post Detail Page",
+      "description": "Single article view. Fully data-driven — AI generates the page structure, not the post content. Always included if blog_listing is selected.",
+      "sections": [
+        {
+          "order": 1,
+          "component": "blog_post_detail",
+          "required": true,
+          "note": "Single component manages entire page layout. No section wrappers."
+        }
+      ],
+      "ai_fills": {
+        "note": "Structure-only generation. All content comes from get.blogPosts API. AI fills: social link choices, label translations, comment form labels."
+      },
+      "endpoints_used": [
+        "get.blogPosts",
+        "Reviews.get_blog_comments",
+        "Reviews.post_blog_comments"
+      ],
+      "meta": {
+        "title": "{post_title} - {company_name}"
+      },
+      "auto_fetched_endpoints": [
+        {
+          "ref": "get.blogPosts",
+          "key_name": "sameCategoryPosts",
+          "trigger": "x-init inside article content",
+          "description": "Fetches posts from same category"
+        },
+        {
+          "ref": "get.blogPosts",
+          "key_name": "newestPosts",
+          "trigger": "x-init in sidebar",
+          "extra_attributes": {
+            "data-sort": "newest"
+          },
+          "description": "Fetches newest posts for sidebar"
+        },
+        {
+          "ref": "Reviews.get_blog_comments",
+          "key_name": "blogReviews",
+          "trigger": "apidata attribute on comments wrapper",
+          "dynamic_attributes": {
+            ":data-subject_id": "data.corePage.target_id"
+          },
+          "description": "Fetches comments for this post"
+        }
+      ],
+      "component_interactions": [
+        {
+          "source": "blog_post_detail.category_badge",
+          "target": "category page",
+          "trigger": "@click",
+          "action": "href(data.post.category.url)"
+        },
+        {
+          "source": "blog_post_detail.post_tags",
+          "target": "blog listing filtered",
+          "trigger": "@click",
+          "action": "href('/bg/blog?tags[]='+tag)"
+        },
+        {
+          "source": "blog_post_detail.same_category_posts",
+          "target": "other post",
+          "trigger": "@click",
+          "action": "href(sameCategoryPosts.url)"
+        },
+        {
+          "source": "blog_post_detail.sidebar_related_posts",
+          "target": "other post",
+          "trigger": "@click",
+          "action": "href(related.url)"
+        },
+        {
+          "source": "blog_post_detail.sidebar_newest_posts",
+          "target": "other post",
+          "trigger": "@click",
+          "action": "href(newestPosts.url)"
+        },
+        {
+          "source": "blog_post_detail.comment_form",
+          "target": "EXPOZY platform",
+          "trigger": "@click",
+          "action": "alpineListeners('Reviews.post_blog_comments', $event)"
+        }
+      ],
+      "alpine_page_state": {
+        "data.post": "Single post object with full content",
+        "data.post.description": "HTML article body",
+        "data.post.tags": "Tag strings",
+        "data.post.related_posts": "Embedded related posts",
+        "data.post.category": "Category {id, title, url}",
+        "data.sameCategoryPosts": "Same-category posts (auto-fetched)",
+        "data.newestPosts": "Newest posts (auto-fetched)",
+        "data.blogReviews": "Comments array",
+        "data.corePage.target_id": "Current post ID",
+        "data.user.email": "Logged-in user email",
+        "data.user.names": "Logged-in user name"
+      },
+      "page_endpoints": [
+        {
+          "ref": "get.blogPosts",
+          "binding": "apidata",
+          "attached_to": "root_wrapper",
+          "key_name": "post",
+          "dynamic_attributes": {
+            ":data-id": "data.corePage.target_id"
+          },
+          "description": "Fetches the single post. The post data includes embedded related_posts and tags arrays."
+        }
+      ],
+      "selection_guidance": "Individual blog article page. MUST be included if blog_listing is selected — they are paired. Never include without blog_listing.",
+      "priority": "medium"
+    },
+    "contacts": {
+      "id": "contacts",
+      "output_file": "contacts.html",
+      "route": "/bg/contacts",
+      "name": "Contacts Page",
+      "description": "Contact page with Google Map embed, contact information cards, and contact form.",
+      "sections": [
+        {
+          "order": 1,
+          "component": "google_map",
+          "required": true,
+          "wrapper": "box",
+          "ai_fills": {
+            "location_query": "Derived from business_context.location (e.g. 'Burgas, 42 Aleksandrovska St.')",
+            "zoom": "14-16 for street level, 10-12 for city level",
+            "language": "bg"
+          }
+        },
+        {
+          "order": 2,
+          "layout": "two_column_grid",
+          "wrapper": "standard",
+          "wrapper_config": {
+            "inner_layout": "grid grid-cols-1 lg:grid-cols-2 gap-12"
+          },
+          "left": {
+            "component": "contact_info_cards",
+            "ai_fills": {
+              "heading": "Contact info heading",
+              "subheading": "Encouraging text",
+              "items": "Contact cards from business_context.contact — phone (tel: link), email (mailto: link), address (plain text)"
+            }
+          },
+          "right": {
+            "component": "contact_form",
+            "ai_fills": {
+              "heading": "Form heading (e.g. 'Send us a message')",
+              "field labels": "Localized labels"
+            }
+          }
+        }
+      ],
+      "endpoints_used": [
+        "Contacts.post_contacts"
+      ],
+      "meta": {
+        "title": "{company_name} - Contacts"
+      },
+      "component_interactions": [
+        {
+          "source": "contact_form.submit",
+          "target": "EXPOZY",
+          "action": "alpineListeners('Contacts.post_contacts')"
+        }
+      ],
+      "selection_guidance": "Contact page with map, info cards, and form. Include if the business has a physical location, phone number, email, or wants customers to reach out. Skip for purely online businesses that don't want direct contact.",
+      "priority": "high"
+    },
+    "cookie_policy": {
+      "id": "cookie_policy",
+      "output_file": "cookies.html",
+      "route": "/bg/cookie-policy",
+      "name": "Cookie Policy Page",
+      "description": "Legal page with cookie usage information. Always included. AI generates the full legal text using the static_content_block component.",
+      "sections": [
+        {
+          "order": 1,
+          "component": "static_content_block",
+          "required": true,
+          "wrapper": "fullpage_box",
+          "inner_variant": "page_section",
+          "ai_fills": {
+            "title": "Cookie policy title",
+            "content_blocks": "Full cookie policy text. AI generates GDPR-compliant cookie policy using business_context placeholders."
+          }
+        }
+      ],
+      "content_placeholders": {
+        "{company_name}": "business_context.company_legal_name",
+        "{company_id}": "business_context.company_id",
+        "{tax_id}": "business_context.vat_number",
+        "{gdpr_email}": "business_context.contact.gdpr_email",
+        "{website_url}": "business_context.website_url"
+      },
+      "required_sections": [
+        "Title and intro",
+        "What are cookies",
+        "Types of cookies used",
+        "How this site uses cookies",
+        "Personal data and cookies",
+        "Other tracking technologies",
+        "How to block cookies",
+        "Browser-specific instructions",
+        "Cookie list grouped by purpose"
+      ],
+      "endpoints_used": [],
+      "meta": {
+        "title": "{company_name} - Cookies"
+      },
+      "selection_guidance": "Legal requirement for EU/Bulgarian businesses operating websites. Include for any business that serves EU users or uses cookies. Can be skipped only for non-EU businesses or if user explicitly opts out of legal pages.",
+      "priority": "medium"
+    },
+    "gdpr_policy": {
+      "id": "gdpr_policy",
+      "output_file": "gdpr.html",
+      "route": "/bg/gdpr",
+      "name": "GDPR Privacy Policy Page",
+      "description": "Legal page with privacy policy. Always included. AI generates GDPR-compliant privacy policy.",
+      "sections": [
+        {
+          "order": 1,
+          "component": "static_content_block",
+          "required": true,
+          "wrapper": "fullpage_box",
+          "inner_variant": "text_page",
+          "ai_fills": {
+            "title": "Privacy policy title (e.g. 'Privacy Policy')",
+            "content_blocks": "Full GDPR privacy policy text."
+          }
+        }
+      ],
+      "content_placeholders": {
+        "{company_name}": "business_context.company_legal_name",
+        "{company_id}": "business_context.company_id",
+        "{website_url}": "business_context.website_url",
+        "{contact_email}": "business_context.contact.email",
+        "{gdpr_email}": "business_context.contact.gdpr_email",
+        "{phone}": "business_context.contact.phone",
+        "{min_age}": "13"
+      },
+      "required_sections": [
+        "1. Data controller identity and contact",
+        "2. Data categories with purpose and legal basis",
+        "3. Sensitive data disclaimer",
+        "4. Collection methods",
+        "5. Marketing communications",
+        "6. Data sharing",
+        "7. Data security measures",
+        "8. Data retention periods",
+        "9. Your rights",
+        "10. Third-party links disclaimer",
+        "11. Cookies reference"
+      ],
+      "endpoints_used": [],
+      "meta": {
+        "title": "{company_name} - Privacy Policy"
+      },
+      "selection_guidance": "Privacy policy — legal requirement under GDPR for businesses handling personal data (forms, accounts, newsletters). Include for any business with user data collection. Can be skipped if no personal data is collected.",
+      "priority": "medium"
+    },
+    "terms_conditions": {
+      "id": "terms_conditions",
+      "output_file": "terms-conditions.html",
+      "route": "/bg/terms-conditions",
+      "name": "Terms and Conditions Page",
+      "description": "Legal page with e-commerce terms. Always included. AI generates Bulgarian law-compliant T&C.",
+      "sections": [
+        {
+          "order": 1,
+          "component": "static_content_block",
+          "required": true,
+          "wrapper": "fullpage_box",
+          "inner_variant": "titled_text_page",
+          "ai_fills": {
+            "title": "GENERAL TERMS AND CONDITIONS (centered, h1)",
+            "content_blocks": "Full terms and conditions text with numbered articles (Art.) and Roman numeral sections."
+          }
+        }
+      ],
+      "content_placeholders": {
+        "{company_name}": "business_context.company_legal_name",
+        "{company_id}": "business_context.company_id",
+        "{website_url}": "business_context.website_url",
+        "{company_address}": "business_context.location.address",
+        "{contact_email}": "business_context.contact.email",
+        "{contact_phone}": "business_context.contact.phone",
+        "{vat_number}": "business_context.vat_number",
+        "{effective_date}": "Current date or specified date"
+      },
+      "required_sections": [
+        "I. Subject",
+        "II. Provider data",
+        "III. Platform characteristics",
+        "IV. Registration",
+        "V. Technical steps for purchase",
+        "VI. Contract content",
+        "VII. Consumer clauses",
+        "VIII. Contract performance",
+        "IX. Personal data protection",
+        "X. Amendments to T&C",
+        "XI. Termination",
+        "XII. Liability",
+        "XIII. Warranty and complaints",
+        "XIV. Other conditions",
+        "Appendix 1: Standard withdrawal form",
+        "Appendix 2: Withdrawal information"
+      ],
+      "endpoints_used": [],
+      "meta": {
+        "title": "{company_name} - Terms and Conditions"
+      },
+      "content_guidelines": {
+        "description": "AI generates e-commerce terms and conditions compliant with Bulgarian law (Consumer Protection Act, E-Commerce Act, Electronic Communications Act). Content uses numbered articles (Art.) and Roman numeral sections.",
+        "formatting_notes": [
+          "Sections numbered with Roman numerals (I, II, III...)",
+          "Articles numbered as Art. 1, Art. 2... with sub-paragraphs as (1), (2)...",
+          "Section headings use <p><strong>SECTION TITLE</strong></p> pattern",
+          "Article references use <p><strong>Art. N. (M)</strong> text</p> pattern",
+          "Withdrawal form uses <table> elements",
+          "Some headings centered via text-center class or <h2> tags for appendices"
+        ]
+      },
+      "selection_guidance": "Terms of service — legal requirement for e-commerce and service businesses in Bulgaria (Consumer Protection Act). Include for any business selling products/services online. Can be skipped for purely informational sites.",
+      "priority": "medium"
+    },
+    "login": {
+      "id": "login",
+      "output_file": "login.html",
+      "route": "/bg/login",
+      "name": "Login Page",
+      "description": "User authentication page. Always included. Full-screen centered card with email/password form.",
+      "sections": [
+        {
+          "order": 1,
+          "component": "login_form",
+          "required": true,
+          "wrapper": "auth_page",
+          "ai_fills": {
+            "heading": "Login",
+            "subheading": "Sign in to your account",
+            "field labels": "Localized (Email, Password)",
+            "submit_text": "Sign In",
+            "register_link.prompt_text": "Don't have an account?",
+            "register_link.link_text": "Register",
+            "forgot_password_link.text": "Forgot password"
+          }
+        }
+      ],
+      "endpoints_used": [
+        "User.login"
+      ],
+      "meta": {
+        "title": "{company_name} - Login"
+      },
+      "component_interactions": [
+        {
+          "source": "login_form.submit",
+          "target": "EXPOZY platform",
+          "trigger": "@click",
+          "action": "alpineListeners('User.login', $event) with keyName='user'"
+        },
+        {
+          "source": "login_form.register_link",
+          "target": "registration page",
+          "trigger": "@click",
+          "action": "href('/bg/registration')"
+        },
+        {
+          "source": "login_form.forgot_link",
+          "target": "forgotten password page",
+          "trigger": "@click",
+          "action": "href('/bg/forgotten-password')"
+        }
+      ],
+      "selection_guidance": "User authentication page. Include if the business needs user accounts (e-commerce, bookings, memberships, dashboards). Skip for simple informational/brochure sites with no user accounts.",
+      "priority": "medium"
+    },
+    "userpage": {
+      "id": "userpage",
+      "output_file": "userpage.html",
+      "route": "/bg/customer/account",
+      "name": "User Dashboard Page",
+      "description": "User account management. Always included. 8-tab dashboard with profile, orders, addresses, etc. Mostly data-driven — AI generates structure and labels.",
+      "requires_auth": true,
+      "sections": [
+        {
+          "order": 1,
+          "component": "user_dashboard",
+          "required": true,
+          "note": "Single component manages entire page layout. No section wrappers.",
+          "ai_fills": {
+            "tab labels": "Localized tab names (Profile, Invoice, Orders, etc.)",
+            "form labels": "Localized field labels for all tab forms",
+            "button texts": "Localized button labels (Save changes, etc.)",
+            "logout text": "Sign Out"
+          }
+        }
+      ],
+      "endpoints_used": [
+        "User.get_accounts",
+        "User.put_accounts",
+        "get.my_company",
+        "put.company",
+        "Countries.get_countries",
+        "Shop.get_orders",
+        "get.my_addresses",
+        "User.post_user_address",
+        "User.delete_user_address"
+      ],
+      "meta": {
+        "title": "{company_name} - My Account"
+      },
+      "component_interactions": [
+        {
+          "source": "tab_profile.submit",
+          "target": "EXPOZY",
+          "action": "User.put_accounts (updates name/phone)"
+        },
+        {
+          "source": "tab_invoice.submit",
+          "target": "EXPOZY",
+          "action": "put.company (updates invoice data)"
+        },
+        {
+          "source": "tab_addresses.add",
+          "target": "EXPOZY",
+          "action": "User.post_user_address (creates address)"
+        },
+        {
+          "source": "tab_addresses.delete",
+          "target": "EXPOZY",
+          "action": "User.delete_user_address (deletes address)"
+        },
+        {
+          "source": "tab_passwords.submit",
+          "target": "EXPOZY",
+          "action": "User.put_accounts (updates password)"
+        },
+        {
+          "source": "sidebar.logout",
+          "target": "/logout",
+          "action": "Regular link navigation"
+        }
+      ],
+      "alpine_page_state": {
+        "tab": "Active tab ID (local Alpine state)",
+        "data.user": "User profile + loyalty balance",
+        "data.my_company": "Invoice/company data",
+        "data.countries": "Country list for selects",
+        "data.orders": "Order history",
+        "data.services": "Service/digital product orders",
+        "data.my_addresses": "Saved addresses"
+      },
+      "selection_guidance": "User dashboard with profile, orders, addresses. Include if login is selected AND the business has e-commerce, appointments, or account management. Skip if login is not included or accounts are minimal.",
+      "priority": "low"
+    },
+    "checkout": {
+      "id": "checkout",
+      "output_file": "checkout.html",
+      "route": "/bg/checkout",
+      "name": "Checkout Page",
+      "description": "Order placement page. Full two-column layout: left side has numbered step cards (customer data, delivery, payment, GDPR/terms), right side is a sticky dark cart panel with order summary, promo code, and totals. Standalone full-screen layout — no is-section wrappers. Four standalone apiData loader divs must appear before the main x-data wrapper.",
+      "requires_auth": false,
+      "sections": [
+        {
+          "order": 1,
+          "component": "checkout",
+          "required": true,
+          "note": "Single component manages the entire page. No section wrappers (section_wrapper_override: none). Four standalone top-level apiData divs must appear BEFORE the main x-data wrapper div.",
+          "ai_fills": {
+            "submit_text": "Localized order submit button text (e.g. 'Приключване на поръчката')",
+            "cart_heading": "Localized cart panel heading (e.g. 'Вашата поръчка')",
+            "step_1_heading": "Customer data step heading (e.g. 'Данни за клиента')",
+            "step_2_heading": "Delivery step heading (e.g. 'Доставка')",
+            "step_3_heading": "Payment step heading (e.g. 'Начин на плащане')",
+            "delivery_address_label": "Address delivery toggle label (e.g. 'До адрес')",
+            "delivery_office_label": "Office delivery toggle label (e.g. 'До офис')",
+            "invoice_toggle_label": "Invoice checkbox label (e.g. 'Желая фактура')",
+            "terms_label": "Terms checkbox label with link to /bg/terms-conditions",
+            "gdpr_label": "GDPR checkbox label with link to /bg/gdpr",
+            "econt_placeholder": "Econt office picker placeholder (e.g. 'Изберете офис на Еконт')",
+            "speedy_placeholder": "Speedy office picker placeholder (e.g. 'Изберете офис на Спиди')",
+            "comment_placeholder": "Cart comment textarea placeholder (e.g. 'Добавете бележка към поръчката')",
+            "promo_placeholder": "Promo code input placeholder (e.g. 'Имате промокод?')",
+            "promo_apply_text": "Apply promo button text (e.g. 'Приложи')"
+          }
+        }
+      ],
+      "endpoints_used": [
+        "Payments.get_payment_methods",
+        "Econt.get_offices",
+        "Speedy.get_speedy",
+        "User.get_my_addresses",
+        "Shop.post_orders",
+        "Shop.post_promocode",
+        "Shop.delete_promocode"
+      ],
+      "platform_data_used": [
+        "data.cart — available globally, platform loads cart on all pages for logged-in users",
+        "data.user — available globally, platform loads user profile on all pages"
+      ],
+      "meta": {
+        "title": "{company_name} - Checkout"
+      },
+      "component_interactions": [
+        {
+          "source": "delivery_step.address_picker",
+          "target": "selectedAddress (local state)",
+          "trigger": "@click in x-for loop over data.my_addresses",
+          "action": "selectedAddress = address; pickAddress = false; addAddress = false"
+        },
+        {
+          "source": "delivery_step.geo_form",
+          "target": "platform geolocation plugin",
+          "trigger": "Plugin auto-attaches to id='address' (input), id='location' (button), id='map' (div)",
+          "action": "Populates data.location.* automatically. NO <script> tags needed — platform loads the plugin globally."
+        },
+        {
+          "source": "delivery_step.econt_dropdown",
+          "target": "data.econt_offices",
+          "trigger": "Local x-data text filter",
+          "action": "x-show=\"office.address.toLowerCase().includes(text.toLowerCase())\""
+        },
+        {
+          "source": "delivery_step.speedy_dropdown",
+          "target": "data.speedy_offices",
+          "trigger": "Local x-data text filter",
+          "action": "x-show=\"office.address.toLowerCase().includes(text.toLowerCase())\""
+        },
+        {
+          "source": "cart_sidebar.promo_apply",
+          "target": "data.cart",
+          "trigger": "@click",
+          "action": "alpineListeners('Shop.post_promocode', $event) keyname='cart' — refreshes cart data"
+        },
+        {
+          "source": "cart_sidebar.promo_remove",
+          "target": "data.cart",
+          "trigger": "@click",
+          "action": "alpineListeners('Shop.delete_promocode', $event) keyname='cart'"
+        },
+        {
+          "source": "checkout.submit_button",
+          "target": "EXPOZY platform",
+          "trigger": "@click",
+          "action": "alpineListeners('Shop.post_orders', $event)"
+        }
+      ],
+      "alpine_page_state": {
+        "local_x_data": {
+          "shipTo": "'address' — delivery mode (address or office)",
+          "courier": "'econt' — selected courier",
+          "comment": "'' — order comment, also bound to hidden input[name=comment]",
+          "wantInvoice": "false — invoice fields toggle",
+          "pickAddress": "false — address picker list toggle",
+          "addAddress": "false — new address form toggle",
+          "selectedAddress": "undefined — selected address object from data.my_addresses"
+        },
+        "data.cart": "Cart object, globally available",
+        "data.cart.products": "Array of cart product objects",
+        "data.cart.subtotal": "string",
+        "data.cart.discount": "string",
+        "data.cart.total": "number",
+        "data.cart.promocode_id": "number — 0 if no promo active",
+        "data.cart.promocode_info.promocode": "string — active promo code label",
+        "data.payment_methods": "From Payments.get_payment_methods",
+        "data.econt_offices": "From Econt.get_offices",
+        "data.speedy_offices": "From Speedy.get_speedy",
+        "data.my_addresses": "From User.get_my_addresses",
+        "data.location.country/city/post_code/streetName/streetNumber": "Populated by geolocation plugin",
+        "data.user.first_name/last_name/email/phone": "Pre-fills customer data inputs",
+        "data.user.company.*": "Pre-fills invoice fields",
+        "data.settings.logo": "Used as cart product image fallback"
+      },
+      "generation_notes": [
+        "Do NOT output <script> or <link> tags for Google Maps or the geolocation plugin — the platform loads them globally. See component_catalog common_mistakes #13.",
+        "The four apiData loader divs MUST appear before the main x-data wrapper: Payments.get_payment_methods (combined with x-init redirect guard), Econt.get_offices, Speedy.get_speedy, User.get_my_addresses.",
+        "keyname attribute on promo actions is lowercase: keyname='cart' (not keyName).",
+        "Cart product image field is product.images[0].image_10x10 — NOT url_10x10.",
+        "data.cart and data.user do NOT need their own apiData loader — they are globally available."
+      ],
+      "selection_guidance": "Order checkout page. Include if the business has an online shop (e-commerce). Should be paired with login and userpage. Skip for service businesses, brochure sites, or any business without an online storefront.",
+      "priority": "high"
+    }
+  },
+  "global_types": {
+    "header": {
+      "id": "header",
+      "output_file": "header.html",
+      "name": "Site Header",
+      "description": "Global navigation header. Generated AFTER page selection to reflect the correct nav links.",
+      "component": "site_header",
+      "generation_phase": "post_page_selection",
+      "ai_fills": {
+        "brand_name": "business_context.company_name (short form for nav)",
+        "static_home_link": "{ text: 'Home', href: '/' }",
+        "languages": "From business_context.languages array",
+        "cta_button": {
+          "text": "CTA text (e.g. 'Contact us')",
+          "href": "/bg/contacts (only if contacts page was selected, otherwise first relevant page)"
+        }
+      },
+      "dynamic_nav_generation": {
+        "description": "The AI generates the static home link. Dynamic menu items come from get.menu API endpoint at runtime.",
+        "endpoint": "get.menu",
+        "nav_items_source": "API — the platform populates menu items from the CMS. The AI does NOT hardcode navigation links except the static home link and CTA.",
+        "cta_target_priority": [
+          "contacts",
+          "about",
+          "homepage"
+        ]
+      },
+      "endpoints_used": [
+        "get.menu"
+      ],
+      "meta": {
+        "note": "Rendered on every page by site shell"
+      }
+    },
+    "footer": {
+      "id": "footer",
+      "output_file": "footer.html",
+      "name": "Site Footer",
+      "description": "Global footer. Generated AFTER page selection to include correct nav and legal links.",
+      "component": "site_footer",
+      "generation_phase": "post_page_selection",
+      "ai_fills": {
+        "brand_column.title": "business_context.company_name",
+        "brand_column.tagline": "Short company tagline from business context",
+        "nav_columns": "1-3 link columns. Links MUST only reference pages that were selected in step 2.",
+        "contact_column": "Contact details from business_context.contact",
+        "bottom_bar.copyright": "© {year} {company_name}. All rights reserved.",
+        "bottom_bar.legal_links": "Links to cookie, gdpr, terms pages — only those that were generated"
+      },
+      "link_validation": {
+        "description": "Every href in the footer MUST correspond to a page that was selected in step 2.",
+        "rule": "For each link, check: is the target route in selected_page_ids? If not, remove the link."
+      },
+      "endpoints_used": [],
+      "meta": {
+        "note": "Rendered on every page by site shell"
+      }
+    }
+  },
+  "output_manifest": {
+    "description": "After generation, the orchestrator produces this manifest listing all generated files.",
+    "schema": {
+      "generation_id": "string (unique job ID)",
+      "prompt": "string (original user prompt)",
+      "business_context": "object (extracted context)",
+      "selected_pages": [
+        "array of page_type IDs"
+      ],
+      "files": [
+        {
+          "page_type_id": "string",
+          "output_file": "string (filename)",
+          "route": "string",
+          "status": "success | error",
+          "validation_passed": "boolean"
+        }
+      ],
+      "generated_at": "ISO timestamp"
+    }
+  },
+  "validation_rules": {
+    "description": "Rules applied after generation to validate AI output against the component catalog.",
+    "checks": [
+      {
+        "id": "components_match_catalog",
+        "description": "Every component used in generated HTML must exist in component_catalog.json",
+        "severity": "error"
+      },
+      {
+        "id": "endpoints_match_catalog",
+        "description": "Every apiData/apidata attribute must reference an endpoint defined in the catalog",
+        "severity": "error"
+      },
+      {
+        "id": "alpine_directives_allowed",
+        "description": "All Alpine.js directives must be in validation_rules.alpine_js.directives_allowed",
+        "severity": "error"
+      },
+      {
+        "id": "listeners_allowed",
+        "description": "All alpineListeners() calls must reference listeners in validation_rules.alpine_js.listeners_allowed",
+        "severity": "error"
+      },
+      {
+        "id": "section_wrappers_valid",
+        "description": "Every section must use a wrapper type defined in global.section_wrappers",
+        "severity": "error"
+      },
+      {
+        "id": "no_external_resources",
+        "description": "No external scripts, stylesheets, or images except allowed exceptions",
+        "severity": "error"
+      },
+      {
+        "id": "no_inline_scripts",
+        "description": "No <script> tags. Only inline Alpine handlers allowed.",
+        "severity": "error"
+      },
+      {
+        "id": "footer_links_valid",
+        "description": "All footer hrefs must point to pages in selected_pages",
+        "severity": "warning"
+      },
+      {
+        "id": "header_cta_valid",
+        "description": "Header CTA href must point to a page in selected_pages",
+        "severity": "warning"
+      },
+      {
+        "id": "images_have_alt",
+        "description": "All <img> tags must have alt attributes",
+        "severity": "warning"
+      },
+      {
+        "id": "required_components_present",
+        "description": "All components marked required:true in the page type must be present in output",
+        "severity": "error"
+      },
+      {
+        "id": "legal_pages_complete",
+        "description": "Cookie, GDPR, and Terms pages must contain all required_sections",
+        "severity": "warning"
+      }
+    ]
+  }
+}

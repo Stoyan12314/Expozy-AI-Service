@@ -1,0 +1,234 @@
+{
+  "catalog_version": "7.0",
+  "platform": "EXPOZY",
+  "description": "AI generation rules, global config, and validation rules for EXPOZY page generation. Component definitions are in components_catalog.json.",
+  "ai_generation_rules": {
+    "system_role": "You are an EXPOZY template generator for the EXPOZY headless e-commerce CMS.",
+    "output_format": {
+      "description": "CRITICAL: You must output ONLY standard HTML elements. The component catalog below is a BLUEPRINT — not a web component library.",
+      "allowed_html_elements": [
+        "div", "section", "nav", "header", "footer", "main", "article",
+        "h1", "h2", "h3", "p", "a", "span", "img", "br", "strong", "em",
+        "form", "input", "button", "select", "option", "textarea", "label",
+        "ul", "li", "ol", "table", "thead", "tbody", "tr", "td", "th",
+        "iframe", "template", "svg", "path", "circle", "i"
+      ],
+      "forbidden_patterns": [
+        "NEVER output <expozy-*>, <component-*>, or ANY custom/non-standard HTML element tags",
+        "NEVER wrap content in tags named after catalog component IDs",
+        "NEVER use <expozy-section>, <expozy-item>, <expozy-component-*> or similar"
+      ],
+      "how_to_read_catalog": {
+        "properties": "Tells you WHAT content to generate (text, images, data values). Fill with AI-generated content matching the business context.",
+        "structure": "Tells you HOW to build the HTML. Dot-notation = CSS classes: 'div.md:flex.gap-6' → <div class=\"md:flex gap-6\">",
+        "structure.elements": "Nested element tree using shorthand: '>' = child, '+' = sibling, '[]' = repeat per item, '?' = optional",
+        "endpoints": "Which apiData/alpineListeners attributes to place on wrapper elements. Copy ref values exactly.",
+        "ai_fills": "Instructions for what content the AI should generate for each property."
+      },
+      "example": {
+        "given": "component 'feature_cards' with structure.per_item: 'div.md:flex.md:items-start.md:gap-6' and elements: ['span.p-4.bg-amber-500.rounded-2xl > svg', 'div > h2 + p']",
+        "correct": "<div class=\"md:flex md:items-start md:gap-6\"><span class=\"p-4 bg-gradient-to-br from-amber-500 to-amber-600 rounded-2xl\"><svg>...</svg></span><div><h2>Title here</h2><p>Description here</p></div></div>",
+        "wrong": "<expozy-component-feature_cards><expozy-item title=\"Title\" description=\"Description\"></expozy-item></expozy-component-feature_cards>"
+      }
+    },
+    "styling_rules": [
+      "Use Tailwind CSS utility classes for ALL styling.",
+      "Use FontAwesome 6 classes for icons (fa-solid, fa-regular, fa-brands).",
+      "Dark mode support: always include dark: variants for backgrounds and text."
+    ],
+    "content_rules": [
+      "All text MUST use vocabulary specific to the business type.",
+      "Tailor headings, descriptions, CTAs to the industry.",
+      "Write in the language specified in the business context.",
+      "Every text field MUST contain actual content — never empty."
+    ],
+    "security_rules": [
+      "No <script> tags (only Alpine.js inline handlers like x-data, x-on, @click).",
+      "No external resources except Google Maps iframe where specified.",
+      "Images: /static/images/ prefix or Helpers.image() fallback. All <img> need alt."
+    ],
+    "common_mistakes": {
+      "description": "CRITICAL: The AI MUST avoid these patterns. Every violation listed here has occurred in past generations and MUST NOT be repeated.",
+      "1_no_vanilla_js": {
+        "rule": "NEVER use document.getElementById, document.querySelector, addEventListener, or any vanilla JS DOM manipulation. ALL interactivity MUST use Alpine.js directives.",
+        "wrong": "<script>document.getElementById('mobile-menu-button').addEventListener('click', function() { ... });</script>",
+        "correct": "<div x-data=\"{ open: false }\"><button @click=\"open = !open\"><i :class=\"open ? 'fa-xmark' : 'fa-bars'\" class=\"fa-solid text-xl\"></i></button><div x-show=\"open\" x-transition class=\"md:hidden\">...</div></div>",
+        "applies_to": ["site_header mobile menu", "any toggle/accordion/dropdown"]
+      },
+      "2_no_hardcoded_nav": {
+        "rule": "The site_header component MUST use apiData='get.menu' to load navigation dynamically. Only the static home link is hardcoded. All other nav items come from x-for='menu in data.menu'.",
+        "wrong": "<nav><a href='./about.html'>За нас</a><a href='./contacts.html'>Контакти</a></nav>",
+        "correct": "<nav apiData='get.menu' keyName='menu'><a href='/'>Начало</a><template x-for='menu in data.menu' :key='menu.link'><a :href='menu.link' x-text='menu.title' class='px-4 py-2 text-sm font-medium'></a></template></nav>",
+        "applies_to": ["site_header desktop_nav", "site_header mobile_menu"]
+      },
+      "3_follow_page_sections_exactly": {
+        "rule": "Each page type defines its sections with specific components in a specific order. The AI MUST follow this structure EXACTLY. Do NOT improvise layouts, skip defined components, or add components not listed in the page definition.",
+        "example": "If the about page defines: section 1 = hero_banner + feature_cards (left column) + image_showcase (right column), then after_columns = section_divider + brand_logos + gallery_tabs, then section 2 = testimonials — generate EXACTLY that structure. Do not replace hero_banner with a custom hero. Do not skip image_showcase. Do not add sections not in the definition.",
+        "applies_to": ["all page types — check the page_types definition before generating"]
+      },
+      "4_use_catalog_iframe_template": {
+        "rule": "The google_map component defines an iframe_src_template. ALWAYS use it: 'https://maps.google.com/maps?q={location_query}&hl={language}&t=m&z={zoom}&output=embed'. NEVER use Google Maps embed URLs copied from the web or invented URLs with pb= parameters.",
+        "wrong": "<iframe src='https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2938...'></iframe>",
+        "correct": "<iframe src='https://maps.google.com/maps?q=Sofia,+ul.+Tsarigradsko+shose+123&hl=bg&t=m&z=15&output=embed' class='w-full h-full' loading='lazy'></iframe>",
+        "applies_to": ["google_map component", "contacts page"]
+      },
+      "5_complete_all_html": {
+        "rule": "NEVER truncate HTML output. Every opened tag MUST be closed. Every SVG MUST be complete. If approaching token limits, reduce the NUMBER of repeated items (fewer testimonials, fewer features) rather than truncating the HTML of existing items.",
+        "strategy": "If generating 3 testimonial cards and running low on tokens, generate 2 COMPLETE cards rather than 3 broken ones. A page with 2 perfect sections is better than 4 broken sections.",
+        "applies_to": ["testimonials", "feature_cards", "service_cards", "any component with repeated items"]
+      },
+      "6_no_script_tags": {
+        "rule": "ABSOLUTELY NO <script> tags anywhere in generated HTML. This includes: mobile menu toggles, year display in footer, counters, animations, DOMContentLoaded handlers. Use Alpine.js directives instead.",
+        "wrong_examples": [
+          "<script>document.getElementById('year').textContent = new Date().getFullYear();</script>",
+          "<script>document.addEventListener('DOMContentLoaded', function() { ... });</script>",
+          "<script>document.addEventListener('alpine:init', () => { ... });</script>"
+        ],
+        "correct_examples": [
+          "<span x-data x-text='new Date().getFullYear()'></span>",
+          "<div x-data='{ open: false }'><button @click='open = !open'>Toggle</button><div x-show='open'>Content</div></div>"
+        ],
+        "applies_to": ["footer year display", "mobile menu toggle", "any interactive behavior"]
+      },
+      "7_always_use_section_wrappers": {
+        "rule": "Every content section MUST use an EXPOZY section wrapper from global.section_wrappers. NEVER use plain <div class='container mx-auto'> as a section root.",
+        "wrong": "<div class='container mx-auto px-4 py-12'>content here</div>",
+        "correct_standard": "<div class='is-section is-section-auto section'><div class='is-overlay'><div class='is-overlay-bg'></div></div><div class='!container is-container v2'>content here</div></div>",
+        "correct_box": "<div class='is-section is-box is-section-60 max-h-[400px] box-autofit last-box scroll-target'><div class='is-overlay'><div class='is-overlay-bg'></div></div><div class='is-container v2 !w-full is-content-none !px-0'>iframe here</div></div>",
+        "correct_fullpage_box": "<div class='is-section is-box is-section-100 box-autofit last-box scroll-target type-poppins'><div class='is-overlay'><div class='is-overlay-bg'></div></div><div class='is-container v2 is-content-1600'>legal content here</div></div>",
+        "wrapper_selection": {
+          "standard": "Most content sections (features, services, testimonials, CTA, stats)",
+          "box": "Google Maps iframe, full-width embedded content",
+          "fullpage_box": "Legal pages (cookie policy, GDPR, terms and conditions)",
+          "plain_section": "Newsletter signup (standalone section with lock class)",
+          "auth_page": "Login, register, forgotten password pages",
+          "none": "Header and footer only (they render their own root element)"
+        },
+        "applies_to": ["every section in every page"]
+      }
+    }
+  },
+  "global": {
+    "css_framework": "tailwindcss",
+    "js_framework": "alpine.js",
+    "color_scheme": {
+      "primary": "amber-500 to amber-600",
+      "text_primary": "slate-900 / gray-900",
+      "text_secondary": "slate-600 / gray-600",
+      "bg_light": "slate-50 / gray-50 / white",
+      "bg_dark": "gray-900 / slate-900",
+      "accent": "amber-500"
+    },
+    "section_wrappers": {
+      "standard": {
+        "description": "Default section wrapper for most content sections",
+        "required_classes": ["is-section", "is-section-auto", "section"],
+        "container_classes": ["!container", "is-container", "v2"],
+        "has_overlay": true,
+        "optional_padding": "!py-10 | !py-20"
+      },
+      "box": {
+        "description": "Full-width box for embedded content like maps",
+        "required_classes": ["is-section", "is-box", "is-section-60"],
+        "container_classes": ["is-container", "v2", "!w-full", "is-content-none", "!px-0"],
+        "has_overlay": true,
+        "extra_classes": ["max-h-[400px]", "box-autofit", "last-box", "scroll-target"]
+      },
+      "fullpage_box": {
+        "description": "Full-height box for static content pages (legal, policies)",
+        "required_classes": ["is-section", "is-box", "is-section-100"],
+        "container_classes": ["is-container", "v2", "is-content-1600"],
+        "has_overlay": true,
+        "extra_classes": ["box-autofit", "last-box", "scroll-target", "type-poppins"]
+      },
+      "plain_section": {
+        "description": "Standalone <section> with lock class. No is-section. For newsletter etc.",
+        "required_classes": ["w-full", "lock"],
+        "root_element": "section",
+        "container_classes": ["max-w-4xl", "mx-auto", "px-4", "sm:px-6", "lg:px-8"]
+      },
+      "auth_page": {
+        "description": "Full-screen standalone <section> for auth pages. Gradient background, centered card layout with min-h-screen. No is-section wrapper.",
+        "required_classes": ["w-full", "min-h-screen"],
+        "root_element": "section",
+        "bg_classes": "bg-gradient-to-br from-slate-50 to-slate-100 dark:from-gray-950 dark:to-slate-900",
+        "container_classes": ["flex", "flex-col", "items-center", "justify-center", "px-6", "py-8", "mx-auto", "md:h-screen", "lg:py-0"]
+      },
+      "none": {
+        "description": "No wrapper. Component renders own root element. For global components (nav, footer)."
+      }
+    },
+    "image_base_url": "/static/images/",
+    "allowed_image_formats": ["webp", "png", "jpg", "svg"],
+    "icon_library": "font-awesome",
+    "icon_prefix": ["fa-solid", "fa-regular"],
+    "global_components": {
+      "description": "Components on EVERY page, outside per-page section system.",
+      "components": ["site_header", "site_footer"]
+    }
+  },
+  "validation_rules": {
+    "structural": {
+      "required_section_wrapper": "Every section must use a wrapper from global.section_wrappers.",
+      "max_heading_depth": "h3. Exception: static_content_block.",
+      "no_inline_scripts": "No <script> tags.",
+      "x_html_usage": "x-html only for CMS content (data.post.description). Never user-submitted.",
+      "no_external_resources": "Exceptions: Google Maps iframe, Google Calendar URL."
+    },
+    "data_binding": {
+      "all_endpoints_must_match": "Only refs in component.endpoints or page.page_endpoints",
+      "all_data_fields_must_exist": "Every x-text, :src, :class must match endpoint returns",
+      "cross_component_communication": "Via alpineListeners(), data.*, callModal(), @success"
+    },
+    "alpine_js": {
+      "directives_allowed": [
+        "x-data", "x-init", "x-if", "x-for", "x-text", "x-html",
+        "x-show", "x-bind", "x-on", "x-cloak", "x-model", "x-transition",
+        "x-amount", "@click", "@click.prevent", "@click.outside",
+        "@input", "@change", "@success", "@mouseenter", "@mouseleave",
+        ":class", ":src", ":href", ":value", ":selected", ":alt",
+        ":data-id", ":data-subject_id", ":data-tag", ":data-page", ":data-category_id"
+      ],
+      "listeners_allowed": [
+        "Gallery.open", "get.blogPosts", "Contacts.post_contacts",
+        "Newsletter.post_newsletter", "post.meetings", "User.login",
+        "Reviews.get_blog_comments", "Reviews.post_blog_comments",
+        "User.get_accounts", "User.put_accounts", "User.post_user_address",
+        "User.delete_user_address", "get.my_company", "put.company",
+        "Countries.get_countries", "Shop.get_orders", "get.my_addresses"
+      ],
+      "navigation_allowed": ["href(url)", "changeLang(code)"],
+      "helpers_allowed": ["Helpers.image(key)", "DateHelper.date(config)", "callModal($el)", "$nextTick(fn)"],
+      "custom_directives": { "x-amount": "Formats monetary values." },
+      "listener_options": {
+        "options-clear": "Clears inputs after success",
+        "options-pushurl": "Updates browser URL",
+        "data-sort": "Sort order",
+        "data-product_type": "Product type filter"
+      },
+      "auto_fetch_pattern": "x-init=\"alpineListeners('{endpoint}', $el)\" keyName=\"{keyName}\""
+    },
+    "modals": {
+      "trigger_pattern": "@click=\"callModal($el)\" data-modal=\"{modal_name}\"",
+      "state_pattern": "data.modals.{modal_name}",
+      "success_pattern": "@success=\"callModal($el)\" data-modal=\"{success_modal_name}\"",
+      "backdrop": "backdrop-blur bg-gray-950/70 fixed z-50"
+    },
+    "images": {
+      "sources_allowed": ["image_base_url", "API URLs", "Helpers.image()"],
+      "must_have_alt": true
+    },
+    "iframes": {
+      "allowed_domains": ["maps.google.com"],
+      "only_in_components": ["google_map"]
+    },
+    "static_content": {
+      "allowed_in_components": ["static_content_block"],
+      "allowed_html": ["h1", "h2", "h3", "p", "a", "span", "br", "strong"]
+    },
+    "global_components": {
+      "rendered_outside_page_sections": true,
+      "no_duplication": true
+    }
+  }
+}

@@ -1,0 +1,4501 @@
+{
+  "meta": {
+    "catalog_version": "7.1",
+    "pages_schema_version": "2.0",
+    "platform": "EXPOZY",
+    "description": "Combined EXPOZY catalog. Auto-generated from component_catalog.json + page_types.json. Do NOT edit — edit the source files instead."
+  },
+  "ai_generation_rules": {
+    "system_role": "You are an EXPOZY template generator for the EXPOZY headless e-commerce CMS (Alpine-Expozy-StoreFront).",
+    "technology_contract": {
+      "stack": [
+        "Alpine.js (reactivity in templates via x-*, @click, :bind)",
+        "Global reactive object named `data` (persisted between page transitions)",
+        "TailwindCSS utility classes only (no build step; dynamic class generator)",
+        "Core API integration via HTML attributes: apiData + keyName + data-* params",
+        "Universal action handler: alpineListeners('METHOD.endpoint', $event)",
+        "SPA routing replaces only <main> content; no full page reload"
+      ],
+      "template_scope": {
+        "page_template_mode": "CRITICAL: Generate ONLY the HTML fragment that will be injected into <main>. Do NOT output <!DOCTYPE>, <html>, <head>, or <body>.",
+        "header_footer_mode": "If generating header/footer templates, output ONLY the header/nav/footer fragment (still no external assets)."
+      },
+      "framework_functions": {
+        "routing": "Use href('/bg/...') for internal navigation (SPA). Recommended pattern: <a href='/bg/x' @click.prevent=\"href('/bg/x')\">...</a>",
+        "language_switching": "Use changeLang('bg') / changeLang('en') for language switching.",
+        "api_calls": "Use apiData=\"get.something\" keyName=\"something\" and pass request params via attributes starting with data-.",
+        "actions": "Use @click=\"alpineListeners('post.something', $event)\" (PLURAL: alpineListeners). Optionally use @success and @error hooks."
+      }
+    },
+    "output_format": {
+      "description": "CRITICAL: You must output ONLY standard HTML elements. The component catalog below is a BLUEPRINT — not a web component library.",
+      "allowed_html_elements": [
+        "div",
+        "section",
+        "nav",
+        "header",
+        "footer",
+        "main",
+        "article",
+        "h1",
+        "h2",
+        "h3",
+        "p",
+        "a",
+        "span",
+        "img",
+        "br",
+        "strong",
+        "em",
+        "form",
+        "input",
+        "button",
+        "select",
+        "option",
+        "textarea",
+        "label",
+        "ul",
+        "li",
+        "ol",
+        "table",
+        "thead",
+        "tbody",
+        "tr",
+        "td",
+        "th",
+        "iframe",
+        "template",
+        "svg",
+        "path",
+        "circle",
+        "i"
+      ],
+      "forbidden_patterns": [
+        "NEVER output <!DOCTYPE>, <html>, <head>, <body> in page templates",
+        "NEVER output <script>, <style>, or <link rel='stylesheet'> in templates",
+        "NEVER include CDN assets (tailwindcdn, jsdelivr, cdnjs, etc.) in templates",
+        "NEVER output <expozy-*>, <component-*>, or ANY custom/non-standard HTML element tags",
+        "NEVER wrap content in tags named after catalog component IDs",
+        "NEVER use <expozy-section>, <expozy-item>, <expozy-component-*> or similar"
+      ],
+      "how_to_read_catalog": {
+        "properties": "Tells you WHAT content to generate (text, images, data values). Fill with AI-generated content matching the business context.",
+        "structure": "Tells you HOW to build the HTML. Dot-notation = CSS classes: 'div.md:flex.gap-6' → <div class=\"md:flex gap-6\">",
+        "structure.elements": "Nested element tree using shorthand: '>' = child, '+' = sibling, '[]' = repeat per item, '?' = optional",
+        "endpoints": "Which apiData/alpineListeners attributes to place on wrapper elements. Copy ref values exactly.",
+        "ai_fills": "Instructions for what content the AI should generate for each property."
+      },
+      "example": {
+        "given": "component 'feature_cards' with structure.per_item: 'div.md:flex.md:items-start.md:gap-6' and elements: ['span.p-4.bg-amber-500.rounded-2xl > svg', 'div > h2 + p']",
+        "correct": "<div class=\"md:flex md:items-start md:gap-6\"><span class=\"p-4 bg-gradient-to-br from-amber-500 to-amber-600 rounded-2xl\"><svg>...</svg></span><div><h2>Title here</h2><p>Description here</p></div></div>",
+        "wrong": "<expozy-component-feature_cards><expozy-item title=\"Title\" description=\"Description\"></expozy-item></expozy-component-feature_cards>"
+      }
+    },
+    "styling_rules": [
+      "Use Tailwind CSS utility classes for ALL styling.",
+      "Use FontAwesome 6 classes for icons (fa-solid, fa-regular, fa-brands).",
+      "Dark mode support: always include dark: variants for backgrounds and text.",
+      "Use inline <svg> for decorative feature icons (hero badges, feature cards, service cards, CTA buttons). Use FontAwesome <i> classes for star ratings, contact info icons, and UI icons (close, menu, arrows in nav).",
+      "For star ratings ALWAYS use FontAwesome: <i class='fa-solid fa-star text-amber-500'></i> — NEVER use inline <svg> star paths. For contact cards use FontAwesome (fa-phone, fa-envelope, fa-location-dot).",
+      "For brand/partner logos, use the brand_logos component with apiData binding — do NOT hardcode SVG logos."
+    ],
+    "content_rules": [
+      "All text MUST use vocabulary specific to the business type.",
+      "Tailor headings, descriptions, CTAs to the industry.",
+      "Write in the language specified in the business context.",
+      "Every text field MUST contain actual content — never empty.",
+      "ALL testimonials MUST use the testimonials component with apiData and x-for loops — NEVER hardcode static testimonial cards.",
+      "ALL brand/partner logos MUST use apiData='get.our_brands' with x-for loop — NEVER hardcode logo images or SVGs.",
+      "Content MUST match the business_context. If business_type is 'car service', write about car repairs — NOT generic template text."
+    ],
+    "security_rules": [
+      "ABSOLUTELY NO <script> tags anywhere in generated templates.",
+      "No vanilla JS DOM manipulation in templates.",
+      "No external resources except Google Maps iframe where specified by the catalog.",
+      "Images must use /static/images/ prefix or Helpers.image() fallback. All <img> need meaningful alt."
+    ],
+    "framework_rules": [
+      "apiData elements must NOT be inside <template> tags (framework restriction).",
+      "Use alpineListeners (PLURAL) exactly as the framework defines: alpineListeners('post.carts', $event).",
+      "Use @success and @error hooks only as Alpine attributes (no scripts).",
+      "For internal navigation links, prefer SPA routing via href('/path') (with href='...' fallback)."
+    ],
+    "common_mistakes": {
+      "description": "CRITICAL: The AI MUST avoid these patterns. Every violation listed here has occurred in past generations and MUST NOT be repeated.",
+      "1_no_vanilla_js": {
+        "rule": "NEVER use document.getElementById, document.querySelector, addEventListener, or any vanilla JS DOM manipulation. ALL interactivity MUST use Alpine.js directives.",
+        "wrong": "<script>document.getElementById('mobile-menu-button').addEventListener('click', function() { ... });</script>",
+        "correct": "<div x-data=\"{ open: false }\"><button @click=\"open = !open\"><i :class=\"open ? 'fa-xmark' : 'fa-bars'\" class=\"fa-solid text-xl\"></i></button><div x-show=\"open\" x-transition class=\"md:hidden\">...</div></div>",
+        "applies_to": [
+          "site_header mobile menu",
+          "any toggle/accordion/dropdown"
+        ]
+      },
+      "2_no_external_assets_or_full_document": {
+        "rule": "In page templates, NEVER output full HTML documents or external assets. No <!DOCTYPE>, <html>, <head>, <body>, <script>, <link>, <style>, or CDN URLs. The framework loads assets globally.",
+        "applies_to": [
+          "all page templates in /pages"
+        ]
+      },
+      "3_use_alpineListeners_plural": {
+        "rule": "Use alpineListeners (PLURAL). Do NOT use alpineListener (SINGULAR).",
+        "wrong": "@click=\"alpineListener('post.carts', $event)\"",
+        "correct": "@click=\"alpineListeners('post.carts', $event)\"",
+        "applies_to": [
+          "all actions"
+        ]
+      },
+      "4_no_hardcoded_nav": {
+        "rule": "The site_header component MUST use apiData='get.menu' to load navigation dynamically. Only the static home link is hardcoded. All other nav items come from x-for='menu in data.menu'.",
+        "wrong": "<nav><a href='./about.html'>За нас</a><a href='./contacts.html'>Контакти</a></nav>",
+        "correct": "<nav apiData='get.menu' keyName='menu'><a href='/' @click.prevent=\"href('/')\">Начало</a><template x-for='menu in data.menu' :key='menu.link'><a :href='menu.link' @click.prevent=\"href(menu.link)\" x-text='menu.title' class='px-4 py-2 text-sm font-medium'></a></template></nav>",
+        "applies_to": [
+          "site_header desktop_nav",
+          "site_header mobile_menu"
+        ]
+      },
+      "5_follow_page_sections_exactly": {
+        "rule": "Each page type defines its sections with specific components in a specific order. The AI MUST follow this structure EXACTLY. Do NOT improvise layouts, skip defined components, or add components not listed in the page definition.",
+        "applies_to": [
+          "all page types — check the page_types definition before generating"
+        ]
+      },
+      "6_use_catalog_iframe_template": {
+        "rule": "The google_map component defines an iframe_src_template. ALWAYS use it. NEVER use Google Maps embed URLs copied from the web or invented URLs with pb= parameters.",
+        "wrong": "<iframe src='https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2938...'></iframe>",
+        "correct": "<iframe src='https://maps.google.com/maps?q=Sofia,+ul.+Tsarigradsko+shose+123&hl=bg&t=m&z=15&output=embed' class='w-full h-full' loading='lazy'></iframe>",
+        "applies_to": [
+          "google_map component",
+          "contacts page"
+        ]
+      },
+      "7_complete_all_html": {
+        "rule": "NEVER truncate HTML output. Every opened tag MUST be closed. Every SVG MUST be complete. If approaching token limits, reduce the NUMBER of repeated items rather than truncating HTML.",
+        "applies_to": [
+          "testimonials",
+          "feature_cards",
+          "service_cards",
+          "any component with repeated items"
+        ]
+      },
+      "8_no_script_tags": {
+        "rule": "ABSOLUTELY NO <script> tags anywhere in generated HTML. This includes: mobile menu toggles, year display in footer, counters, animations, DOMContentLoaded handlers. Use Alpine.js directives instead.",
+        "wrong_examples": [
+          "<script>document.getElementById('year').textContent = new Date().getFullYear();</script>",
+          "<script>document.addEventListener('DOMContentLoaded', function() { ... });</script>",
+          "<script>document.addEventListener('alpine:init', () => { ... });</script>"
+        ],
+        "correct_examples": [
+          "<span x-data x-text='new Date().getFullYear()'></span>",
+          "<div x-data='{ open: false }'><button @click='open = !open'>Toggle</button><div x-show='open'>Content</div></div>"
+        ],
+        "applies_to": [
+          "footer year display",
+          "mobile menu toggle",
+          "any interactive behavior"
+        ]
+      },
+      "9_always_use_section_wrappers": {
+        "rule": "Every content section MUST use an EXPOZY section wrapper from global.section_wrappers. NEVER use plain <div class='container mx-auto'> as a section root.",
+        "applies_to": [
+          "every section in every page"
+        ]
+      },
+      "10_listeners_on_buttons_not_forms": {
+        "rule": "For POST/PUT/DELETE actions, alpineListeners() MUST be triggered from a clickable element (usually a <button type='button'>) using @click. DO NOT put alpineListeners() on <form @submit> or <form @submit.prevent>.",
+        "wrong": "<form @submit.prevent=\"alpineListeners('User.put_accounts', $el)\" class=\"space-y-4\">...</form>",
+        "correct": "<form class=\"space-y-4\">...<button type=\"button\" @click=\"alpineListeners('User.put_accounts', $event)\" class=\"px-4 py-2 rounded-lg bg-gray-900 text-white\">Save changes</button></form>",
+        "applies_to": [
+          "Any alpineListeners() call where the endpoint method is POST/PUT/DELETE (mutations)"
+        ]
+      },
+      "11_no_direct_module_calls": {
+        "rule": "NEVER call platform module functions directly in Alpine expressions. ALL platform calls MUST go through alpineListeners(). Direct calls like Gallery.open(url) bypass the event system and will not work.",
+        "wrong": "@click=\"Gallery.open(item.image.url)\"",
+        "correct": "@click=\"alpineListeners('Gallery.open', $event)\" :data-images=\"JSON.stringify(item.gallery)\"",
+        "applies_to": [
+          "gallery_tabs",
+          "any component calling platform module functions"
+        ]
+      },
+      "12_correct_container_classes": {
+        "rule": "Inside section wrappers (is-section), ALWAYS use '!container is-container v2' as the container class. NEVER use 'container mx-auto px-4'. The EXPOZY framework requires the is-container class for proper layout.",
+        "wrong": "<div class='container mx-auto px-4 py-16'>",
+        "correct": "<div class='!container is-container v2'>",
+        "applies_to": [
+          "every section in every page"
+        ]
+      }
+    },
+    "critical_patterns": [
+      {
+        "rule": "NEVER hardcode testimonials. ALWAYS use apiData='get.testimonials' with x-for.",
+        "WRONG": "<div class='testimonial_card'><p>'Great!'</p><h3>Иван</h3></div>",
+        "RIGHT": "<section apiData='get.testimonials' keyName='testimonials'><div class='grid md:grid-cols-3 gap-8'><template x-for='item in data.testimonials' :key='item.id'><div class='testimonial_card'><div class='flex mb-4'><template x-for='i in item.rating'><i class='fa-solid fa-star text-amber-500'></i></template></div><p x-text='item.comment'></p><div class='flex items-center'><img :src='item.image.url' :alt='item.author' class='w-12 h-12 rounded-full mr-4' /><div><h4 x-text='item.author'></h4></div></div></div></template></div></section>",
+        "id": "testimonials_api"
+      },
+      {
+        "rule": "NEVER hardcode brand logos or SVGs. ALWAYS use apiData='get.our_brands' with x-for.",
+        "WRONG": "<div class='logo_card'><svg viewBox='0 0 24 24'><path d='M12,2A10...'/></svg></div>",
+        "RIGHT": "<section apiData='get.our_brands' keyName='brands'><div class='grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6'><template x-for='brand in data.brands' :key='brand.id'><div class='logo_card bg-white dark:bg-slate-800 rounded-xl p-6 shadow-md flex items-center justify-center'><img :src='brand.image.url' :alt='brand.title' class='h-12 object-contain' /></div></template></div></section>",
+        "id": "brand_logos_api"
+      },
+      {
+        "rule": "For STAR RATINGS and CONTACT INFO icons, use FontAwesome <i> tags. Inline <svg> is fine for decorative feature icons.",
+        "WRONG": "<div class='flex'><svg class='w-5 h-5 text-amber-500' fill='currentColor' viewBox='0 0 20 20'><path d='M9.049 2.927c.3-.921...'/></svg> x5 (SVG stars)",
+        "RIGHT": "<div class='flex'><template x-for='i in item.rating'><i class='fa-solid fa-star text-amber-500'></i></template></div>",
+        "id": "icons_fontawesome"
+      },
+      {
+        "rule": "Star ratings: FontAwesome + x-for, NEVER 5 inline SVGs.",
+        "WRONG": "<svg>star</svg> x5",
+        "RIGHT": "<template x-for='i in 5'><i class='fa-solid fa-star text-amber-500'></i></template>",
+        "id": "star_ratings_fa"
+      },
+      {
+        "id": "container_classes",
+        "rule": "NEVER use 'container mx-auto'. ALWAYS use '!container is-container v2' inside section wrappers.",
+        "WRONG": "<div class='container mx-auto px-4 py-16'>",
+        "RIGHT": "<div class='!container is-container v2'>"
+      },
+      {
+        "id": "fragment_only",
+        "rule": "Output ONLY the HTML fragment for <main>. NEVER output <!DOCTYPE>, <html>, <head>, <body>, <script>, or CDN links. The platform loads all assets globally.",
+        "WRONG": "<!DOCTYPE html><html><head><script src='cdn.tailwindcss.com'></script></head><body>...",
+        "RIGHT": "<div class='is-section is-section-auto section'><!-- page content starts here -->"
+      }
+    ]
+  },
+  "global": {
+    "css_framework": "tailwindcss",
+    "js_framework": "alpine.js",
+    "color_scheme": {
+      "primary": "amber-500 to amber-600",
+      "text_primary": "slate-900 / gray-900",
+      "text_secondary": "slate-600 / gray-600",
+      "bg_light": "slate-50 / gray-50 / white",
+      "bg_dark": "gray-900 / slate-900",
+      "accent": "amber-500"
+    },
+    "section_wrappers": {
+      "standard": {
+        "description": "Default section wrapper for most content sections",
+        "required_classes": [
+          "is-section",
+          "is-section-auto",
+          "section"
+        ],
+        "container_classes": [
+          "!container",
+          "is-container",
+          "v2"
+        ],
+        "has_overlay": true,
+        "optional_padding": "!py-10 | !py-20"
+      },
+      "box": {
+        "description": "Full-width box for embedded content like maps",
+        "required_classes": [
+          "is-section",
+          "is-box",
+          "is-section-60"
+        ],
+        "container_classes": [
+          "is-container",
+          "v2",
+          "!w-full",
+          "is-content-none",
+          "!px-0"
+        ],
+        "has_overlay": true,
+        "extra_classes": [
+          "max-h-[400px]",
+          "box-autofit",
+          "last-box",
+          "scroll-target"
+        ]
+      },
+      "fullpage_box": {
+        "description": "Full-height box for static content pages (legal, policies)",
+        "required_classes": [
+          "is-section",
+          "is-box",
+          "is-section-100"
+        ],
+        "container_classes": [
+          "is-container",
+          "v2",
+          "is-content-1600"
+        ],
+        "has_overlay": true,
+        "extra_classes": [
+          "box-autofit",
+          "last-box",
+          "scroll-target",
+          "type-poppins"
+        ]
+      },
+      "plain_section": {
+        "description": "Standalone <section> with lock class. No is-section. For newsletter etc.",
+        "required_classes": [
+          "w-full",
+          "lock"
+        ],
+        "root_element": "section",
+        "container_classes": [
+          "max-w-4xl",
+          "mx-auto",
+          "px-4",
+          "sm:px-6",
+          "lg:px-8"
+        ]
+      },
+      "auth_page": {
+        "description": "Full-screen standalone <section> for auth pages (login, register, forgotten password). Gradient background, centered card layout with min-h-screen. No is-section wrapper.",
+        "required_classes": [
+          "w-full",
+          "min-h-screen"
+        ],
+        "root_element": "section",
+        "bg_classes": "bg-gradient-to-br from-slate-50 to-slate-100 dark:from-gray-950 dark:to-slate-900",
+        "container_classes": [
+          "flex",
+          "flex-col",
+          "items-center",
+          "justify-center",
+          "px-6",
+          "py-8",
+          "mx-auto",
+          "md:h-screen",
+          "lg:py-0"
+        ]
+      },
+      "none": {
+        "description": "No wrapper. Component renders own root element. For global components (nav, footer)."
+      }
+    },
+    "image_base_url": "/static/images/",
+    "allowed_image_formats": [
+      "webp",
+      "png",
+      "jpg",
+      "svg"
+    ],
+    "icon_library": "font-awesome",
+    "icon_prefix": [
+      "fa-solid",
+      "fa-regular"
+    ],
+    "global_components": {
+      "description": "Components on EVERY page, outside per-page section system.",
+      "components": [
+        "site_header",
+        "site_footer"
+      ]
+    }
+  },
+  "components": {
+    "hero_section": {
+      "id": "hero_section",
+      "name": "Hero Section",
+      "description": "Full two-column hero with badge, h1 heading, description paragraph, dual CTA buttons (primary filled + secondary outline), trust indicator chips, and a featured image with gradient glow backdrop. Right column hidden on mobile.",
+      "category": "headers",
+      "max_per_page": 1,
+      "properties": {
+        "badge": {
+          "type": "object",
+          "required": false,
+          "description": "Small pill badge above the heading (e.g. '20+ years of experience')",
+          "properties": {
+            "icon_svg": {
+              "type": "svg_icon",
+              "required": false,
+              "description": "Small SVG icon in the badge (e.g. star)"
+            },
+            "text": {
+              "type": "string",
+              "required": true,
+              "max_length": 40
+            }
+          }
+        },
+        "title": {
+          "type": "string",
+          "required": true,
+          "max_length": 100,
+          "description": "Main h1 heading, text-4xl md:text-5xl lg:text-6xl"
+        },
+        "description": {
+          "type": "string",
+          "required": true,
+          "max_length": 250,
+          "description": "Supporting paragraph, text-lg md:text-xl"
+        },
+        "primary_cta": {
+          "type": "object",
+          "required": true,
+          "properties": {
+            "text": {
+              "type": "string",
+              "required": true,
+              "max_length": 30
+            },
+            "href": {
+              "type": "string",
+              "required": true
+            },
+            "icon_svg": {
+              "type": "svg_icon",
+              "required": false
+            }
+          }
+        },
+        "secondary_cta": {
+          "type": "object",
+          "required": false,
+          "properties": {
+            "text": {
+              "type": "string",
+              "required": true,
+              "max_length": 30
+            },
+            "href": {
+              "type": "string",
+              "required": true
+            },
+            "icon_svg": {
+              "type": "svg_icon",
+              "required": false
+            }
+          }
+        },
+        "trust_indicators": {
+          "type": "array",
+          "min_items": 0,
+          "max_items": 4,
+          "description": "Small checkmark + text chips below buttons",
+          "item_properties": {
+            "text": {
+              "type": "string",
+              "required": true,
+              "max_length": 30
+            }
+          }
+        },
+        "image_src": {
+          "type": "image_path",
+          "required": true
+        },
+        "image_alt": {
+          "type": "string",
+          "required": true,
+          "max_length": 120
+        },
+        "glow_effect": {
+          "type": "boolean",
+          "default": true
+        }
+      },
+      "endpoints": [],
+      "structure": {
+        "wrapper": "Uses standard section wrapper with !py-20 and bg-gradient-to-br from-gray-50 via-white to-gray-50",
+        "layout": "grid md:grid-cols-2 gap-16 items-center",
+        "elements": [
+          "div.space-y-8 > [div.badge?.inline-flex.rounded-full.bg-gray-900.text-white, h1, p, div.flex.gap-4 > a.primary_cta + a.secondary_cta, div.trust_indicators?.flex.gap-8 > div > svg.checkmark + span]",
+          "div.relative > [div.absolute.glow.blur-2xl.opacity-30, img.rounded-2xl.shadow-2xl.hover:scale-105]"
+        ]
+      }
+    },
+    "hero_banner": {
+      "id": "hero_banner",
+      "name": "Hero Banner (Simple)",
+      "description": "Simple heading with optional subtitle and accent bar. For use in two-column layouts paired with image_showcase and feature_cards.",
+      "category": "headers",
+      "max_per_page": 1,
+      "properties": {
+        "title": {
+          "type": "string",
+          "required": true,
+          "max_length": 80
+        },
+        "subtitle": {
+          "type": "string",
+          "required": false,
+          "max_length": 200
+        },
+        "accent_bar": {
+          "type": "boolean",
+          "default": true
+        }
+      },
+      "endpoints": [],
+      "structure": {
+        "wrapper": "div",
+        "elements": [
+          "h1.text-3xl.font-bold.lg:text-4xl",
+          "div.accent_bar? > [span.w-32 + span.w-4 + span.w-2]"
+        ]
+      }
+    },
+    "feature_cards": {
+      "id": "feature_cards",
+      "name": "Feature Cards (Horizontal)",
+      "description": "Horizontal flex cards with SVG icon left, text right. For stacking in a column alongside hero_banner.",
+      "category": "content",
+      "max_per_page": 3,
+      "properties": {
+        "items": {
+          "type": "array",
+          "min_items": 1,
+          "max_items": 6,
+          "item_properties": {
+            "icon": {
+              "type": "svg_icon",
+              "required": true
+            },
+            "title": {
+              "type": "string",
+              "required": true,
+              "max_length": 60
+            },
+            "description": {
+              "type": "string",
+              "required": true,
+              "max_length": 250
+            }
+          }
+        }
+      },
+      "endpoints": [],
+      "structure": {
+        "wrapper": "div.space-y-10",
+        "per_item": "div.md:flex.md:items-start.md:gap-6",
+        "elements": [
+          "span.icon_container.p-4.bg-gradient-to-br.from-amber-500.to-amber-600.rounded-2xl > svg",
+          "div > h2 + p"
+        ]
+      }
+    },
+    "icon_feature_grid": {
+      "id": "icon_feature_grid",
+      "name": "Icon Feature Grid (Centered)",
+      "description": "Centered feature cards in a responsive grid. Each card has a large circular icon container, heading, and description. Includes section heading and subheading. Cards have hover:bg-gray-50 effect.",
+      "category": "content",
+      "max_per_page": 2,
+      "properties": {
+        "heading": {
+          "type": "string",
+          "required": true,
+          "max_length": 80
+        },
+        "subheading": {
+          "type": "string",
+          "required": false,
+          "max_length": 200
+        },
+        "items": {
+          "type": "array",
+          "min_items": 1,
+          "max_items": 6,
+          "item_properties": {
+            "icon_svg": {
+              "type": "svg_icon",
+              "required": true,
+              "description": "Stroke-based SVG, w-8 h-8 text-white, inside a w-16 h-16 bg-gray-900 rounded-full container"
+            },
+            "title": {
+              "type": "string",
+              "required": true,
+              "max_length": 40
+            },
+            "description": {
+              "type": "string",
+              "required": true,
+              "max_length": 200
+            }
+          }
+        },
+        "columns": {
+          "type": "responsive",
+          "mobile": 1,
+          "tablet_md": 3
+        }
+      },
+      "endpoints": [],
+      "structure": {
+        "wrapper": "Uses standard section wrapper with !py-20",
+        "elements": [
+          "div.text-center.mb-16 > h2.text-3xl.md:text-4xl.font-bold + p.text-lg.max-w-2xl.mx-auto",
+          "div.grid.md:grid-cols-3.gap-8 > div.text-center.p-8.rounded-lg.hover:bg-gray-50 > [div.w-16.h-16.bg-gray-900.rounded-full.mx-auto.mb-6 > svg, h3.text-xl.font-bold.mb-4, p.text-gray-600]"
+        ]
+      }
+    },
+    "service_cards": {
+      "id": "service_cards",
+      "name": "Service Cards",
+      "description": "Image-topped cards showing services. Each card has full-width image, heading, description, and 'learn more' link with arrow. Includes section heading and subheading.",
+      "category": "content",
+      "max_per_page": 1,
+      "properties": {
+        "heading": {
+          "type": "string",
+          "required": true,
+          "max_length": 80
+        },
+        "subheading": {
+          "type": "string",
+          "required": false,
+          "max_length": 200
+        },
+        "items": {
+          "type": "array",
+          "min_items": 1,
+          "max_items": 6,
+          "item_properties": {
+            "image_src": {
+              "type": "image_path",
+              "required": true
+            },
+            "image_alt": {
+              "type": "string",
+              "required": true,
+              "max_length": 80
+            },
+            "title": {
+              "type": "string",
+              "required": true,
+              "max_length": 60
+            },
+            "description": {
+              "type": "string",
+              "required": true,
+              "max_length": 300
+            },
+            "link_text": {
+              "type": "string",
+              "default": "Learn more",
+              "max_length": 30
+            },
+            "link_href": {
+              "type": "string",
+              "required": true
+            }
+          }
+        },
+        "columns": {
+          "type": "responsive",
+          "mobile": 1,
+          "tablet_md": 2
+        }
+      },
+      "endpoints": [],
+      "structure": {
+        "wrapper": "Uses standard section wrapper with !py-20 and bg-gray-50 overlay",
+        "elements": [
+          "div.text-center.mb-16 > h2 + p",
+          "div.grid.md:grid-cols-2.gap-8 > div.bg-white.rounded-lg.shadow-lg.hover:shadow-xl > [img.w-full.h-64.object-cover, div.p-8 > h3.text-2xl.font-bold.mb-4 + p.mb-6 + a.inline-flex.items-center > text + svg.arrow]"
+        ]
+      }
+    },
+    "stats_counter": {
+      "id": "stats_counter",
+      "name": "Stats Counter Bar",
+      "description": "Dark background section with 4-column grid of large numbers and labels. Used for trust-building metrics like projects count, satisfaction rate, years of experience.",
+      "category": "social_proof",
+      "max_per_page": 1,
+      "properties": {
+        "items": {
+          "type": "array",
+          "min_items": 2,
+          "max_items": 6,
+          "item_properties": {
+            "value": {
+              "type": "string",
+              "required": true,
+              "max_length": 10,
+              "description": "Display value (e.g. '500+', '98%', '24/7')"
+            },
+            "label": {
+              "type": "string",
+              "required": true,
+              "max_length": 30
+            }
+          }
+        }
+      },
+      "endpoints": [],
+      "structure": {
+        "wrapper": "Uses standard section wrapper with !py-10 and bg-gray-900 overlay",
+        "elements": [
+          "div.grid.md:grid-cols-4.gap-8.text-center > div > [div.text-4xl.md:text-5xl.font-bold.text-white.mb-2, div.text-gray-400]"
+        ]
+      }
+    },
+    "newsletter_signup": {
+      "id": "newsletter_signup",
+      "name": "Newsletter Signup",
+      "description": "Centered email subscription form with heading, subheading, email input + subscribe button, and privacy note. Submit via alpineListeners('Newsletter.post_newsletter'). Uses plain_section wrapper (standalone <section> with lock class, no is-section).",
+      "category": "forms",
+      "max_per_page": 1,
+      "properties": {
+        "heading": {
+          "type": "string",
+          "required": true,
+          "max_length": 60
+        },
+        "subheading": {
+          "type": "string",
+          "required": false,
+          "max_length": 150
+        },
+        "placeholder": {
+          "type": "string",
+          "default": "Your email address",
+          "max_length": 40
+        },
+        "button_text": {
+          "type": "string",
+          "default": "Subscribe",
+          "max_length": 20
+        },
+        "privacy_note": {
+          "type": "string",
+          "required": false,
+          "max_length": 100,
+          "description": "Small text below form (e.g. 'We will never share your email with third parties')"
+        }
+      },
+      "endpoints": [],
+      "section_wrapper_override": "plain_section",
+      "alpine_actions": {
+        "Newsletter.post_newsletter": "Submits email via alpineListeners. Uses options-clear='true' to clear input after success."
+      },
+      "structure": {
+        "root": "section.py-20.bg-white.w-full.lock",
+        "container": "div.max-w-4xl.mx-auto.text-center",
+        "elements": [
+          "h2.text-3xl.md:text-4xl.font-bold.mb-4",
+          "p.text-lg.text-gray-600.mb-8",
+          "form.flex.flex-col.sm:flex-row.gap-4.max-w-xl.mx-auto > [input[type=email][name=email].flex-1, button[type=button][@click=alpineListeners('Newsletter.post_newsletter')][options-clear=true].bg-gray-900.text-white]",
+          "p.text-sm.text-gray-500.mt-4"
+        ]
+      }
+    },
+    "cta_section": {
+      "id": "cta_section",
+      "name": "Call-to-Action Section",
+      "description": "Centered CTA block with heading, description, and dual action buttons. Primary button can trigger a modal (via callModal). Secondary is a regular link. Can optionally bind to an endpoint for modal data.",
+      "category": "content",
+      "max_per_page": 2,
+      "properties": {
+        "heading": {
+          "type": "string",
+          "required": true,
+          "max_length": 80
+        },
+        "description": {
+          "type": "string",
+          "required": false,
+          "max_length": 200
+        },
+        "primary_button": {
+          "type": "object",
+          "required": true,
+          "properties": {
+            "text": {
+              "type": "string",
+              "required": true,
+              "max_length": 40
+            },
+            "action": {
+              "type": "enum",
+              "values": [
+                "link",
+                "modal"
+              ],
+              "required": true
+            },
+            "href": {
+              "type": "string",
+              "required": false,
+              "description": "URL if action=link"
+            },
+            "modal_name": {
+              "type": "string",
+              "required": false,
+              "description": "Modal ID if action=modal (e.g. 'meeting')"
+            },
+            "icon_svg": {
+              "type": "svg_icon",
+              "required": false
+            }
+          }
+        },
+        "secondary_button": {
+          "type": "object",
+          "required": false,
+          "properties": {
+            "text": {
+              "type": "string",
+              "required": true,
+              "max_length": 40
+            },
+            "href": {
+              "type": "string",
+              "required": true
+            },
+            "icon_svg": {
+              "type": "svg_icon",
+              "required": false
+            }
+          }
+        }
+      },
+      "endpoints": [
+        {
+          "ref": "get.meeting_calendars",
+          "binding": "apiData",
+          "method": "GET",
+          "required": false,
+          "description": "Only needed if CTA triggers meeting modal. Provides calendar data for the modal.",
+          "returns": {
+            "result": [
+              {
+                "id": "number",
+                "title": "string",
+                "link": "string",
+                "days": [
+                  {
+                    "date": "string (Y-m-d)",
+                    "time_slots": [
+                      {
+                        "id": "number",
+                        "time_start": "string (HH:mm)",
+                        "time_end": "string (HH:mm)",
+                        "status_id": "number (1=available, 2=booked)"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ],
+      "alpine_actions": {
+        "callModal": "Opens a modal by name. Called as callModal($el) with data-modal attribute on the element."
+      },
+      "structure": {
+        "wrapper": "Uses standard section wrapper with !py-20 and bg-gray-50 overlay",
+        "required_attributes_conditional": {
+          "apiData": "get.meeting_calendars (only if modal needs calendar data)"
+        },
+        "elements": [
+          "div.max-w-4xl.mx-auto.text-center > [h2, p.mb-8, div.flex.gap-4.justify-center > button.primary[@click=callModal][data-modal] + a.secondary]"
+        ]
+      }
+    },
+    "meeting_booking_modal": {
+      "id": "meeting_booking_modal",
+      "name": "Meeting Booking Modal",
+      "description": "Full-featured meeting/appointment booking modal. Contains service selector (from meeting_calendars API data), name/email/phone inputs, date picker with available dates, time slot selection, message textarea, and submit. On success, shows a confirmation modal with meeting details and Google Calendar link. Triggered by cta_section via callModal.",
+      "category": "modals",
+      "max_per_page": 1,
+      "properties": {
+        "modal_name": {
+          "type": "string",
+          "default": "meeting"
+        },
+        "success_modal_name": {
+          "type": "string",
+          "default": "meetingSuccess"
+        },
+        "heading": {
+          "type": "string",
+          "default": "Book a meeting",
+          "max_length": 40
+        },
+        "service_label": {
+          "type": "string",
+          "default": "Service",
+          "max_length": 20
+        },
+        "service_placeholder": {
+          "type": "string",
+          "default": "Select a service",
+          "max_length": 30
+        },
+        "fields": {
+          "type": "array",
+          "default_fields": [
+            {
+              "name": "name",
+              "type": "text",
+              "label": "Name",
+              "col_span": 2
+            },
+            {
+              "name": "email",
+              "type": "text",
+              "label": "Email",
+              "col_span": 1
+            },
+            {
+              "name": "phone",
+              "type": "text",
+              "label": "Phone",
+              "col_span": 1
+            },
+            {
+              "name": "message",
+              "type": "textarea",
+              "label": "Additional message",
+              "rows": 4,
+              "col_span": 2
+            }
+          ]
+        },
+        "date_placeholder": {
+          "type": "string",
+          "default": "Select a date",
+          "max_length": 20
+        },
+        "submit_text": {
+          "type": "string",
+          "default": "Book now",
+          "max_length": 30
+        },
+        "success_heading": {
+          "type": "string",
+          "default": "Meeting booked successfully",
+          "max_length": 40
+        },
+        "success_subtext": {
+          "type": "string",
+          "default": "We have received your request. Below you will find the meeting details.",
+          "max_length": 120
+        },
+        "calendar_button_text": {
+          "type": "string",
+          "default": "Add to Google Calendar",
+          "max_length": 30
+        },
+        "close_button_text": {
+          "type": "string",
+          "default": "Close",
+          "max_length": 15
+        }
+      },
+      "endpoints": [
+        {
+          "ref": "post.meetings",
+          "binding": "alpineListeners",
+          "method": "POST",
+          "description": "Submits meeting booking.",
+          "submit_pattern": "@click=\"alpineListeners('post.meetings', $el)\" keyName=\"meetingSuccess\"",
+          "success_callback": "@success=\"callModal($el)\" data-modal=\"meetingSuccess\"",
+          "request_fields": [
+            "calendar_id",
+            "name",
+            "email",
+            "phone",
+            "date_start",
+            "timeSlot_id",
+            "message"
+          ]
+        }
+      ],
+      "data_source": "get.meeting_calendars (bound on cta_section, shared via data.meeting_calendars)",
+      "alpine_data": {
+        "local_scope": {
+          "selectedCalendarId": "'empty'",
+          "selectedDate": "null",
+          "selectedSlot": "null",
+          "availableDates": "[]",
+          "showCalendar": "false"
+        },
+        "platform_state": {
+          "data.modals.meeting": "Boolean, modal visibility state",
+          "data.modals.meetingSuccess": "Boolean, success modal visibility",
+          "data.meeting_calendars": "Calendar objects from get.meeting_calendars",
+          "data.meetingSuccess": "Response from post.meetings (contains calendar_id)"
+        }
+      },
+      "alpine_actions": {
+        "callModal": "Opens/closes modals by data-modal attribute",
+        "DateHelper.date": "Platform date picker component."
+      },
+      "sub_components": {
+        "booking_modal": {
+          "description": "Main booking form modal",
+          "visibility": "template x-if='data.modals.meeting' > div x-show with backdrop blur",
+          "service_select": {
+            "x-model": "selectedCalendarId",
+            "options_loop": "x-for=\"calendar in data.meeting_calendars\"",
+            "fields_used": [
+              "calendar.id — :value",
+              "calendar.title — x-text"
+            ],
+            "on_change": "Finds calendar by ID, extracts .days into availableDates, shows date picker"
+          },
+          "date_picker": {
+            "visibility": "template x-if='showCalendar'",
+            "config": "DateHelper.date({dateFormat:'Y-m-d', enable: filtered available dates, minDate:'today', maxDate:'today+29'})",
+            "on_change": "Sets selectedDate, resets selectedSlot"
+          },
+          "time_slots": {
+            "visibility": "x-show='selectedDate != empty'",
+            "loop": "x-for=\"slot in availableDates.find(obj => obj.date == selectedDate).time_slots\"",
+            "active_state": {
+              "selected": "bg-[#1d78be] text-white",
+              "booked": "bg-gray-300 cursor-not-allowed"
+            },
+            "click": "slot.status_id == 1 ? selectedSlot = slot : ''",
+            "display": "slot.time_start + ' - ' + slot.time_end",
+            "hidden_input": "input[type=hidden][name=timeSlot_id][:value=selectedSlot.id]"
+          }
+        },
+        "success_modal": {
+          "description": "Confirmation modal shown after successful booking",
+          "visibility": "x-show='data.modals.meetingSuccess' with backdrop blur",
+          "displays": {
+            "service": "Object.values(data.meeting_calendars).find(obj => obj.id == data.meetingSuccess.calendar_id).title",
+            "date": "selectedDate",
+            "time": "selectedSlot.time_start + ' – ' + selectedSlot.time_end",
+            "meeting_link": "...find(obj => obj.id == data.meetingSuccess.calendar_id).link"
+          },
+          "google_calendar_button": {
+            "url_template": "https://calendar.google.com/calendar/render?action=TEMPLATE&text={title}&dates={start}/{end}&details={link}&ctz=Europe/Sofia"
+          }
+        }
+      },
+      "structure": {
+        "wrapper": "div[x-data with local state] — sits at page level, outside section wrappers",
+        "booking_elements": [
+          "template[x-if='data.modals.meeting'] > div.backdrop > div.modal_card > [div.header.bg-gray-900.text-white, form.grid.grid-cols-2 > select + inputs + date_picker + time_slots + textarea + button]"
+        ],
+        "success_elements": [
+          "div[x-show='data.modals.meetingSuccess'] > div.modal_card > [header with check icon, content with details, google_calendar_button, close_button]"
+        ]
+      }
+    },
+    "image_showcase": {
+      "id": "image_showcase",
+      "name": "Image Showcase",
+      "description": "Single featured image with gradient glow. Hidden on mobile, shown on lg+.",
+      "category": "media",
+      "max_per_page": 2,
+      "properties": {
+        "image_src": {
+          "type": "image_path",
+          "required": true
+        },
+        "alt_text": {
+          "type": "string",
+          "required": true,
+          "max_length": 120
+        },
+        "glow_effect": {
+          "type": "boolean",
+          "default": true
+        },
+        "size": {
+          "type": "enum",
+          "values": [
+            "small",
+            "medium",
+            "large"
+          ],
+          "default": "large"
+        }
+      },
+      "endpoints": [],
+      "structure": {
+        "wrapper": "div.hidden.lg:flex.lg:items-center.lg:w-1/2.lg:justify-center",
+        "elements": [
+          "div.relative > div.glow?.blur-2xl.opacity-20",
+          "img.object-cover.rounded-3xl.shadow-2xl.ring-4"
+        ]
+      }
+    },
+    "brand_logos": {
+      "id": "brand_logos",
+      "name": "Brand Logos Bar",
+      "description": "Grid of partner/trust logos loaded dynamically from API via apiData='get.our_brands'. Logo images via x-for loop. NEVER hardcode logos or SVGs.",
+      "category": "social_proof",
+      "max_per_page": 1,
+      "properties": {
+        "heading": {
+          "type": "string",
+          "required": false,
+          "max_length": 60
+        },
+        "logos": {
+          "type": "api_driven",
+          "description": "DEPRECATED: logos come from get.our_brands API. Do NOT hardcode logos or SVGs."
+        }
+      },
+      "endpoints": [
+        {
+          "ref": "get.our_brands",
+          "binding": "apiData",
+          "method": "GET",
+          "returns": {
+            "result": [
+              {
+                "id": "number",
+                "title": "string",
+                "image": {
+                  "url": "string"
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "structure": {
+        "wrapper": "section",
+        "required_attributes": {
+          "apiData": "get.our_brands",
+          "keyName": "brands"
+        },
+        "elements": [
+          "h2.text-3xl.font-bold.text-center.mb-12?",
+          "div.grid.grid-cols-2.sm:grid-cols-3.md:grid-cols-4.lg:grid-cols-6.gap-6 > template[x-for='brand in data.brands'][:key='brand.id'] > div.logo_card.bg-white.dark:bg-slate-800.rounded-xl.p-6.shadow-md.flex.items-center.justify-center > img[:src='brand.image.url'][:alt='brand.title'].h-12.object-contain"
+        ]
+      },
+      "alpine_data": {
+        "data.brands": "Brand/partner objects from get.our_brands API"
+      },
+      "ai_fill_instructions": "NEVER hardcode brand logos, SVG icons, or placeholder images. ALWAYS use apiData='get.our_brands' keyName='brands' on the wrapper <section>, then x-for='brand in data.brands' to loop. The API provides: brand.title, brand.image.url. AI generates ONLY the section heading text."
+    },
+    "gallery_tabs": {
+      "id": "gallery_tabs",
+      "name": "Gallery with Category Tabs",
+      "description": "Tabbed image gallery from API. Tab switching, lightbox.",
+      "category": "media",
+      "max_per_page": 1,
+      "properties": {
+        "columns": {
+          "type": "responsive",
+          "mobile": 2,
+          "tablet_sm": 4,
+          "desktop_md": 5
+        },
+        "enable_lightbox": {
+          "type": "boolean",
+          "default": true
+        },
+        "fallback_image": {
+          "type": "string",
+          "default": "product"
+        }
+      },
+      "endpoints": [
+        {
+          "ref": "get.gallery_categories",
+          "binding": "apiData",
+          "method": "GET",
+          "returns": {
+            "result": [
+              {
+                "id": "string",
+                "title": "string",
+                "gallery": [
+                  {
+                    "image": {
+                      "url": "string"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ],
+      "alpine_data": {
+        "data.gallery": "API response",
+        "data.selectedGallery": "Active category",
+        "data.screenWidth": "Viewport width"
+      },
+      "alpine_actions": {
+        "Gallery.open": "Opens lightbox"
+      },
+      "structure": {
+        "wrapper": "section",
+        "required_attributes": {
+          "apiData": "get.gallery_categories",
+          "keyName": "gallery"
+        }
+      }
+    },
+    "testimonials": {
+      "id": "testimonials",
+      "name": "Testimonials Grid",
+      "description": "Grid of testimonial cards loaded dynamically from API via apiData='get.testimonials'. Stars via FontAwesome, quote, avatar, name, role — all from x-for loop. NEVER hardcode static testimonial cards.",
+      "category": "social_proof",
+      "max_per_page": 1,
+      "properties": {
+        "heading": {
+          "type": "string",
+          "required": false,
+          "max_length": 80
+        },
+        "subheading": {
+          "type": "string",
+          "required": false,
+          "max_length": 250
+        }
+      },
+      "endpoints": [
+        {
+          "ref": "get.testimonials",
+          "binding": "apiData",
+          "method": "GET",
+          "returns": {
+            "result": [
+              {
+                "id": "number",
+                "author": "string",
+                "comment": "string",
+                "rating": "number",
+                "image": {
+                  "url": "string"
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "structure": {
+        "wrapper": "section",
+        "required_attributes": {
+          "apiData": "get.testimonials",
+          "keyName": "testimonials"
+        },
+        "elements": [
+          "h2.text-3xl.font-bold.text-center.mb-4?",
+          "p.text-center.text-slate-600.mb-12?",
+          "div.grid.grid-cols-1.md:grid-cols-2.lg:grid-cols-3.gap-8 > template[x-for='item in data.testimonials'][:key='item.id'] > div.testimonial_card.bg-white.dark:bg-slate-800.rounded-2xl.p-6.shadow-lg > [div.flex.mb-4 > template[x-for='i in item.rating'] > i.fa-solid.fa-star.text-amber-500, p.italic[x-text='item.comment'], div.flex.items-center > img[:src='item.image.url'][:alt='item.author'].w-12.h-12.rounded-full.mr-4 + div > h4.font-semibold[x-text='item.author']]"
+        ]
+      },
+      "alpine_data": {
+        "data.testimonials": "Testimonial objects from get.testimonials API"
+      },
+      "ai_fill_instructions": "NEVER hardcode testimonial cards with static names/quotes. ALWAYS use apiData='get.testimonials' keyName='testimonials' on the wrapper <section>, then x-for='item in data.testimonials' to loop. The API provides: item.author, item.comment, item.rating, item.image.url. AI generates ONLY the section heading and subheading text."
+    },
+    "section_divider": {
+      "id": "section_divider",
+      "name": "Section Divider",
+      "description": "Gradient horizontal line.",
+      "category": "layout",
+      "max_per_page": 10,
+      "properties": {
+        "spacing": {
+          "type": "enum",
+          "values": [
+            "small",
+            "medium",
+            "large"
+          ],
+          "default": "large"
+        }
+      },
+      "endpoints": [],
+      "structure": {
+        "wrapper": "div.my-16",
+        "elements": [
+          "div.h-px.bg-gradient-to-r.from-transparent.via-slate-300.to-transparent"
+        ]
+      }
+    },
+    "blog_sidebar": {
+      "id": "blog_sidebar",
+      "name": "Blog Sidebar",
+      "description": "Sidebar with search, category nav, tag filters. Controls blog_post_grid.",
+      "category": "navigation",
+      "max_per_page": 1,
+      "properties": {
+        "show_search": {
+          "type": "boolean",
+          "default": true
+        },
+        "show_categories": {
+          "type": "boolean",
+          "default": true
+        },
+        "show_tags": {
+          "type": "boolean",
+          "default": true
+        }
+      },
+      "endpoints": [
+        {
+          "ref": "get.blogCategories",
+          "binding": "apiData",
+          "method": "GET",
+          "returns": {
+            "result": [
+              {
+                "id": "string",
+                "title": "string",
+                "url": "string"
+              }
+            ]
+          }
+        }
+      ],
+      "controls": {
+        "target_component": "blog_post_grid",
+        "trigger_method": "alpineListeners('get.blogPosts', $event)"
+      },
+      "sub_components": {
+        "search_bar": {
+          "alpine_event": "@input=\"alpineListeners('get.blogPosts', $event)\"",
+          "input_name": "search"
+        },
+        "category_list": {
+          "data_source": "data.blogCategories",
+          "click_logic": "href(category.url) or href('/bg/blog')",
+          "active_state": {
+            "condition": "window.location.href.includes(category.url)"
+          }
+        },
+        "tag_filter": {
+          "data_source": "data.blogPosts_filters.tags",
+          "alpine_event": "@click=\"alpineListeners('get.blogPosts', $event)\"",
+          "required_attributes": {
+            "keyName": "blogPosts",
+            ":data-tag": "tag"
+          }
+        }
+      },
+      "alpine_data": {
+        "data.blogCategories": "From endpoint",
+        "data.blogPosts_filters.tags": "From page endpoint",
+        "data.pageUrl.tag": "Active tag"
+      },
+      "structure": {
+        "wrapper": "div.lg:w-2/5.xl:w-1/5.hidden.lg:block",
+        "required_attributes": {
+          "apiData": "get.blogCategories",
+          "keyName": "blogCategories"
+        }
+      }
+    },
+    "blog_post_grid": {
+      "id": "blog_post_grid",
+      "name": "Blog Post Grid",
+      "description": "Responsive blog card grid with pagination. Filterable by blog_sidebar.",
+      "category": "content",
+      "max_per_page": 1,
+      "properties": {
+        "columns": {
+          "type": "responsive",
+          "mobile": 1,
+          "tablet_md": 2,
+          "desktop_lg": 3
+        },
+        "show_pagination": {
+          "type": "boolean",
+          "default": true
+        }
+      },
+      "endpoints": [
+        {
+          "ref": "get.blogPosts",
+          "binding": "apiData",
+          "method": "GET",
+          "options": {
+            "pushurl": true
+          },
+          "dynamic_attributes": {
+            ":data-category_id": "data.corePage.target_id != 0 ? data.corePage.target_id : 'empty'"
+          },
+          "returns": {
+            "result": [
+              {
+                "id": "string",
+                "title": "string",
+                "url": "string",
+                "seo_description": "string",
+                "created_at": "string",
+                "views": "number",
+                "read_time": "number",
+                "images": [
+                  {
+                    "url": "string"
+                  }
+                ],
+                "category": {
+                  "id": "string",
+                  "title": "string"
+                }
+              }
+            ],
+            "pagination": {
+              "total_pages": "number",
+              "current_page": "number"
+            }
+          }
+        }
+      ],
+      "controlled_by": {
+        "component": "blog_sidebar"
+      },
+      "structure": {
+        "wrapper": "div.w-full.lg:w-3/5.xl:w-4/5",
+        "required_attributes": {
+          "apiData": "get.blogPosts",
+          "keyName": "blogPosts",
+          "options-pushurl": "true"
+        }
+      }
+    },
+    "google_map": {
+      "id": "google_map",
+      "name": "Google Map Embed",
+      "description": "Full-width Google Maps iframe. Uses 'box' wrapper.",
+      "category": "media",
+      "max_per_page": 1,
+      "properties": {
+        "location_query": {
+          "type": "string",
+          "required": true,
+          "max_length": 200
+        },
+        "zoom": {
+          "type": "number",
+          "default": 10
+        },
+        "height": {
+          "type": "number",
+          "default": 400
+        },
+        "language": {
+          "type": "string",
+          "default": "en"
+        }
+      },
+      "endpoints": [],
+      "section_wrapper_override": "box",
+      "iframe_src_template": "https://maps.google.com/maps?q={location_query}&hl={language}&t=m&z={zoom}&output=embed"
+    },
+    "contact_info_cards": {
+      "id": "contact_info_cards",
+      "name": "Contact Info Cards",
+      "description": "Vertical stack of contact cards with gradient icon, label, value.",
+      "category": "content",
+      "max_per_page": 1,
+      "properties": {
+        "heading": {
+          "type": "string",
+          "required": false,
+          "max_length": 60
+        },
+        "subheading": {
+          "type": "string",
+          "required": false,
+          "max_length": 150
+        },
+        "items": {
+          "type": "array",
+          "min_items": 1,
+          "max_items": 6,
+          "item_properties": {
+            "icon": {
+              "type": "fa_icon",
+              "required": true
+            },
+            "label": {
+              "type": "string",
+              "required": true,
+              "max_length": 40
+            },
+            "value": {
+              "type": "string_or_array",
+              "required": true
+            },
+            "link_type": {
+              "type": "enum",
+              "values": [
+                "tel",
+                "mailto",
+                "none"
+              ],
+              "default": "none"
+            },
+            "link_href": {
+              "type": "string",
+              "required": false
+            }
+          }
+        }
+      },
+      "endpoints": []
+    },
+    "contact_form": {
+      "id": "contact_form",
+      "name": "Contact Form",
+      "description": "Form with fields, submit via alpineListeners('Contacts.post_contacts').",
+      "category": "forms",
+      "max_per_page": 1,
+      "properties": {
+        "heading": {
+          "type": "string",
+          "default": "Send us a message",
+          "max_length": 60
+        },
+        "fields": {
+          "type": "array",
+          "default_fields": [
+            {
+              "name": "email",
+              "type": "email",
+              "label": "Email"
+            },
+            {
+              "name": "name",
+              "type": "text",
+              "label": "Name"
+            },
+            {
+              "name": "phone",
+              "type": "tel",
+              "label": "Phone"
+            },
+            {
+              "name": "subject",
+              "type": "text",
+              "label": "Subject"
+            },
+            {
+              "name": "message",
+              "type": "textarea",
+              "label": "Message",
+              "rows": 5
+            }
+          ]
+        },
+        "submit_text": {
+          "type": "string",
+          "default": "Send message",
+          "max_length": 30
+        }
+      },
+      "endpoints": [],
+      "alpine_actions": {
+        "Contacts.post_contacts": "Submits form via alpineListeners"
+      }
+    },
+    "static_content_block": {
+      "id": "static_content_block",
+      "name": "Static Content Block",
+      "description": "Full-page static HTML for legal pages. No dynamic data. Uses 'fullpage_box' wrapper.",
+      "category": "content",
+      "max_per_page": 1,
+      "properties": {
+        "title": {
+          "type": "string",
+          "required": true,
+          "max_length": 120
+        },
+        "content_blocks": {
+          "type": "array",
+          "min_items": 1,
+          "item_properties": {
+            "type": {
+              "type": "enum",
+              "values": [
+                "paragraph",
+                "heading_h2",
+                "heading_h3",
+                "bold_paragraph",
+                "link",
+                "list",
+                "spacer"
+              ]
+            },
+            "text": {
+              "type": "string",
+              "required": false
+            },
+            "href": {
+              "type": "string",
+              "required": false
+            },
+            "items": {
+              "type": "array_of_strings",
+              "required": false
+            }
+          }
+        }
+      },
+      "endpoints": [],
+      "section_wrapper_override": "fullpage_box",
+      "allowed_html_elements": [
+        "h1",
+        "h2",
+        "h3",
+        "p",
+        "a",
+        "span",
+        "br",
+        "strong",
+        "em",
+        "table",
+        "tbody",
+        "tr",
+        "td",
+        "div"
+      ],
+      "allowed_css_classes_in_content": [
+        "font-semibold",
+        "strong",
+        "italic",
+        "not-italic",
+        "mt-0",
+        "text-page",
+        "text-center",
+        "page-section",
+        "page-section-light",
+        "page-title",
+        "white-background-wrapper"
+      ],
+      "inner_variants": {
+        "page_section": {
+          "structure": "div.row > div.page-section.page-section-light.py-5.px-5"
+        },
+        "text_page": {
+          "structure": "div.row > div.column > div.text-page"
+        },
+        "titled_text_page": {
+          "structure": "div.row > div.column > div.white-background-wrapper > [div.page-title > h1.text-center[style='font-size:32px;'] + p > br, div.text-page]"
+        }
+      }
+    },
+    "blog_post_detail": {
+      "id": "blog_post_detail",
+      "name": "Blog Post Detail",
+      "description": "Full blog post view with hero image, article content, social share, meta bar, same-category posts, tags, comment system with star ratings, and sidebar with related posts and newest posts.",
+      "category": "content",
+      "max_per_page": 1,
+      "section_wrapper_override": "none",
+      "properties": {
+        "social_links": {
+          "type": "array",
+          "default_items": [
+            {
+              "icon": "fa-brands fa-facebook",
+              "label": "Facebook",
+              "href": "#"
+            },
+            {
+              "icon": "fa-brands fa-x-twitter",
+              "label": "Twitter",
+              "href": "#"
+            },
+            {
+              "icon": "fa-brands fa-linkedin",
+              "label": "LinkedIn",
+              "href": "#"
+            }
+          ]
+        },
+        "show_read_time": {
+          "type": "boolean",
+          "default": true
+        },
+        "show_views": {
+          "type": "boolean",
+          "default": true
+        },
+        "show_date": {
+          "type": "boolean",
+          "default": true
+        },
+        "show_tags": {
+          "type": "boolean",
+          "default": true
+        },
+        "show_same_category": {
+          "type": "boolean",
+          "default": true
+        },
+        "show_comments": {
+          "type": "boolean",
+          "default": true
+        },
+        "show_related_posts": {
+          "type": "boolean",
+          "default": true
+        },
+        "show_newest_posts": {
+          "type": "boolean",
+          "default": true
+        },
+        "same_category_heading": {
+          "type": "string",
+          "default": "On the same topic",
+          "max_length": 30
+        },
+        "related_heading": {
+          "type": "string",
+          "default": "Related articles",
+          "max_length": 30
+        },
+        "newest_heading": {
+          "type": "string",
+          "default": "Recently added",
+          "max_length": 30
+        },
+        "comments_heading": {
+          "type": "string",
+          "default": "Comments",
+          "max_length": 30
+        },
+        "comment_form_heading": {
+          "type": "string",
+          "default": "Leave a comment",
+          "max_length": 30
+        },
+        "comment_submit_text": {
+          "type": "string",
+          "default": "Publish",
+          "max_length": 20
+        },
+        "fallback_image": {
+          "type": "string",
+          "default": "product"
+        }
+      },
+      "endpoints": [
+        {
+          "ref": "get.blogPosts",
+          "binding": "apiData",
+          "method": "GET",
+          "scope": "page_level",
+          "key_name": "post",
+          "dynamic_attributes": {
+            ":data-id": "data.corePage.target_id"
+          },
+          "returns": {
+            "id": "string",
+            "title": "string",
+            "url": "string",
+            "seo_description": "string",
+            "description": "string (HTML)",
+            "date_created": "string",
+            "views": "number",
+            "read_time": "number",
+            "images": [
+              {
+                "url": "string",
+                "url_10x10": "string"
+              }
+            ],
+            "category": {
+              "id": "string",
+              "title": "string",
+              "url": "string"
+            },
+            "tags": [
+              "string"
+            ],
+            "related_posts": [
+              {
+                "id": "string",
+                "title": "string",
+                "url": "string",
+                "seo_description": "string",
+                "date_publish": "string",
+                "images": [
+                  {
+                    "url_10x10": "string"
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "ref": "Reviews.get_blog_comments",
+          "binding": "apiData",
+          "method": "GET",
+          "scope": "component_level",
+          "key_name": "blogReviews",
+          "dynamic_attributes": {
+            ":data-subject_id": "data.corePage.target_id"
+          },
+          "returns": [
+            {
+              "user_name": "string",
+              "email": "string",
+              "date": "string",
+              "rating": "number",
+              "comment": "string"
+            }
+          ]
+        },
+        {
+          "ref": "Reviews.post_blog_comments",
+          "binding": "alpineListeners",
+          "method": "POST",
+          "submit_pattern": "@click=\"alpineListeners('Reviews.post_blog_comments', $event)\" options-clear=\"true\"",
+          "request_fields": [
+            "subject_id",
+            "email",
+            "user_name",
+            "comment",
+            "rating"
+          ]
+        }
+      ],
+      "auto_fetched_data": {
+        "sameCategoryPosts": {
+          "trigger": "x-init=\"alpineListeners('get.blogPosts', $el)\"",
+          "key_name": "sameCategoryPosts",
+          "data_path": "data.sameCategoryPosts.result"
+        },
+        "newestPosts": {
+          "trigger": "x-init=\"alpineListeners('get.blogPosts', $el)\" data-sort=\"newest\"",
+          "key_name": "newestPosts",
+          "data_path": "data.newestPosts.result"
+        }
+      },
+      "alpine_data": {
+        "data.post": "Single blog post object",
+        "data.sameCategoryPosts": "Posts from same category",
+        "data.newestPosts": "Newest posts",
+        "data.blogReviews": "Comments",
+        "data.corePage.target_id": "Current post ID",
+        "data.user.email": "Logged-in user email",
+        "data.user.names": "Logged-in user name"
+      },
+      "sub_components": {
+        "post_hero": {
+          "description": "Full-width darkened hero image with gradient overlay, category badge, title, description."
+        },
+        "meta_bar": {
+          "description": "Social links (left) and stats (right) — read_time, views, date."
+        },
+        "article_body": {
+          "description": "HTML content via x-html with prose classes.",
+          "render": "x-html=\"data.post.description\""
+        },
+        "same_category_posts": {
+          "description": "List of posts from same category, auto-fetched via x-init."
+        },
+        "post_tags": {
+          "description": "Clickable tag badges."
+        },
+        "comments_list": {
+          "description": "Comments with star ratings."
+        },
+        "comment_form": {
+          "description": "Expandable comment form with star rating widget."
+        },
+        "sidebar_related_posts": {
+          "description": "Related posts from embedded data."
+        },
+        "sidebar_newest_posts": {
+          "description": "Newest posts auto-fetched in sidebar."
+        }
+      },
+      "structure": {
+        "root": "div.w-full.dark:bg-gray-900.dark:text-gray-200",
+        "required_attributes": {
+          "apiData": "get.blogPosts",
+          "keyName": "post",
+          ":data-id": "data.corePage.target_id"
+        },
+        "layout": [
+          "div.hero > [img, gradient_overlay, category_badge + h1 + p]",
+          "div.mt-[-350px].container > div.bg-white.rounded-xl.shadow-2xl > div.flex.flex-wrap > [",
+          "  div.w-full.lg:w-2/3.p-10 (main) > [meta_bar, article_body, same_category_posts, post_tags, comments]",
+          "  div.w-full.lg:w-1/3.p-10.bg-slate-50 (sidebar) > [related_posts, newest_posts]",
+          "]"
+        ]
+      }
+    },
+    "user_dashboard": {
+      "id": "user_dashboard",
+      "name": "User Dashboard",
+      "description": "Full user account page with sidebar tab navigation and 8 content panels.",
+      "category": "account",
+      "max_per_page": 1,
+      "section_wrapper_override": "none",
+      "properties": {
+        "default_tab": {
+          "type": "string",
+          "default": "profile"
+        },
+        "tabs": {
+          "type": "array",
+          "default_items": [
+            {
+              "id": "profile",
+              "label": "Profile",
+              "icon": "fa-solid fa-user"
+            },
+            {
+              "id": "invoice",
+              "label": "Invoice",
+              "icon": "fa-solid fa-file-invoice"
+            },
+            {
+              "id": "orders",
+              "label": "Orders",
+              "icon": "fa-solid fa-bag-shopping"
+            },
+            {
+              "id": "addresses",
+              "label": "Addresses",
+              "icon": "fa-solid fa-location-dot"
+            },
+            {
+              "id": "passwords",
+              "label": "Passwords",
+              "icon": "fa-solid fa-lock"
+            },
+            {
+              "id": "loyalCard",
+              "label": "Loyalty Card",
+              "icon": "fa-solid fa-certificate"
+            },
+            {
+              "id": "services",
+              "label": "Services",
+              "icon": "fa-solid fa-tag"
+            },
+            {
+              "id": "digital",
+              "label": "Digital Products",
+              "icon": "fa-solid fa-download"
+            }
+          ]
+        },
+        "logout_link": {
+          "type": "object",
+          "properties": {
+            "text": {
+              "default": "Sign Out"
+            },
+            "href": {
+              "default": "/logout"
+            },
+            "icon": {
+              "default": "fa-solid fa-right-from-bracket"
+            }
+          }
+        }
+      },
+      "endpoints": [
+        {
+          "ref": "User.get_accounts",
+          "binding": "apiData",
+          "method": "GET",
+          "scope": "tab:profile",
+          "key_name": "user",
+          "returns": {
+            "email": "string",
+            "phone": "string",
+            "first_name": "string",
+            "last_name": "string",
+            "balance": "number"
+          }
+        },
+        {
+          "ref": "User.put_accounts",
+          "binding": "alpineListeners",
+          "method": "PUT",
+          "scope": "tab:profile,passwords"
+        },
+        {
+          "ref": "get.my_company",
+          "binding": "apiData",
+          "method": "GET",
+          "scope": "tab:invoice",
+          "key_name": "my_company",
+          "returns": {
+            "name": "string",
+            "country_id": "number",
+            "city": "string",
+            "address": "string",
+            "phone": "string",
+            "mol": "string",
+            "vat": "string",
+            "vat_registered": "number"
+          }
+        },
+        {
+          "ref": "put.company",
+          "binding": "alpineListeners",
+          "method": "PUT",
+          "scope": "tab:invoice"
+        },
+        {
+          "ref": "Countries.get_countries",
+          "binding": "apiData",
+          "method": "GET",
+          "scope": "tab:invoice,addresses",
+          "key_name": "countries",
+          "returns": [
+            {
+              "id": "number",
+              "title": "string"
+            }
+          ]
+        },
+        {
+          "ref": "Shop.get_orders",
+          "binding": "apiData",
+          "method": "GET",
+          "scope": "tab:orders,services,digital",
+          "returns": [
+            {
+              "number": "string",
+              "price": "string",
+              "total_price": "string",
+              "date_created": "string",
+              "currency": {
+                "symbol": "string"
+              },
+              "payment_method": {
+                "title": "string"
+              },
+              "status": {
+                "title": "string"
+              },
+              "products": [
+                {
+                  "title": "string",
+                  "quantity": "number",
+                  "total": "string"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "ref": "get.my_addresses",
+          "binding": "apiData",
+          "method": "GET",
+          "scope": "tab:addresses",
+          "key_name": "my_addresses",
+          "returns": [
+            {
+              "id": "number",
+              "country": {
+                "title": "string"
+              },
+              "city": "string",
+              "post_code": "string",
+              "shipping_address": "string"
+            }
+          ]
+        },
+        {
+          "ref": "User.post_user_address",
+          "binding": "alpineListeners",
+          "method": "POST",
+          "scope": "tab:addresses"
+        },
+        {
+          "ref": "User.delete_user_address",
+          "binding": "alpineListeners",
+          "method": "DELETE",
+          "scope": "tab:addresses"
+        }
+      ],
+      "alpine_data": {
+        "local_scope": {
+          "tab": "'profile'"
+        },
+        "platform_state": {
+          "data.user": "User profile",
+          "data.my_company": "Invoice data",
+          "data.countries": "Country list",
+          "data.orders": "Orders",
+          "data.services": "Service orders",
+          "data.my_addresses": "Addresses"
+        }
+      },
+      "sub_components": {
+        "sidebar": {
+          "description": "User info card + tab nav buttons + logout link."
+        },
+        "tab_profile": {
+          "description": "Profile form: email (disabled), phone, first_name, last_name."
+        },
+        "tab_invoice": {
+          "description": "Company invoice form with country select, VAT checkbox."
+        },
+        "tab_orders": {
+          "description": "Expandable order cards with accordion."
+        },
+        "tab_addresses": {
+          "description": "Address cards + add-new form."
+        },
+        "tab_passwords": {
+          "description": "Password change form."
+        },
+        "tab_loyalCard": {
+          "description": "Loyalty card display with points."
+        },
+        "tab_services": {
+          "description": "Service product cards from orders."
+        },
+        "tab_digital": {
+          "description": "Digital product cards with download button."
+        }
+      },
+      "structure": {
+        "root": "div.bg-slate-50.dark:bg-slate-900.w-full",
+        "root_alpine": "x-data=\"{ tab: 'profile' }\"",
+        "layout": "div.container.mx-auto.px-4.md:flex.pb-16.gap-8",
+        "elements": [
+          "div.md:w-1/4.lg:w-1/5 (sidebar)",
+          "div.flex-1 (tab panels with x-show)"
+        ]
+      }
+    },
+    "login_form": {
+      "id": "login_form",
+      "name": "Login Form",
+      "description": "Full-screen centered login card with email/password, submit via User.login, register and forgot password links.",
+      "category": "forms",
+      "max_per_page": 1,
+      "section_wrapper_override": "auth_page",
+      "properties": {
+        "heading": {
+          "type": "string",
+          "default": "Login",
+          "max_length": 30
+        },
+        "subheading": {
+          "type": "string",
+          "default": "Sign in to your account",
+          "max_length": 60
+        },
+        "fields": {
+          "type": "array",
+          "default_fields": [
+            {
+              "name": "email",
+              "type": "email",
+              "label": "Email",
+              "icon": "fa-solid fa-envelope"
+            },
+            {
+              "name": "password",
+              "type": "password",
+              "label": "Password",
+              "icon": "fa-solid fa-lock"
+            }
+          ]
+        },
+        "submit_text": {
+          "type": "string",
+          "default": "Sign In",
+          "max_length": 20
+        },
+        "register_link": {
+          "type": "object",
+          "properties": {
+            "prompt_text": {
+              "default": "Don't have an account?"
+            },
+            "link_text": {
+              "default": "Register"
+            },
+            "href": {
+              "default": "/bg/registration"
+            }
+          }
+        },
+        "forgot_password_link": {
+          "type": "object",
+          "properties": {
+            "text": {
+              "default": "Forgot password"
+            },
+            "href": {
+              "default": "/bg/forgotten-password"
+            }
+          }
+        }
+      },
+      "endpoints": [],
+      "alpine_actions": {
+        "User.login": "Submits login via alpineListeners('User.login', $event)."
+      },
+      "structure": {
+        "root": "section.bg-gradient-to-br.from-slate-50.to-slate-100.w-full.min-h-screen",
+        "container": "div.flex.flex-col.items-center.justify-center.px-6.py-8.mx-auto.md:h-screen",
+        "card": "div.w-full.bg-white.rounded-2xl.shadow-2xl.sm:max-w-md > div.p-8.space-y-6",
+        "elements": [
+          "h1 + p",
+          "form > [icon inputs, submit button, register + forgot links]"
+        ]
+      }
+    },
+    "site_header": {
+      "id": "site_header",
+      "name": "Site Header / Navigation",
+      "description": "Global sticky nav with brand, dynamic menu from API, language switcher, CTA, mobile hamburger.",
+      "category": "global",
+      "max_per_page": 1,
+      "is_global": true,
+      "section_wrapper_override": "none",
+      "properties": {
+        "brand_name": {
+          "type": "string",
+          "required": true,
+          "max_length": 30
+        },
+        "static_home_link": {
+          "type": "object",
+          "properties": {
+            "text": {
+              "default": "Home"
+            },
+            "href": {
+              "default": "/"
+            }
+          }
+        },
+        "languages": {
+          "type": "array",
+          "min_items": 1,
+          "max_items": 10,
+          "item_properties": {
+            "code": {
+              "type": "string"
+            },
+            "label": {
+              "type": "string",
+              "max_length": 30
+            }
+          }
+        },
+        "cta_button": {
+          "type": "object",
+          "required": false,
+          "properties": {
+            "text": {
+              "default": "Contact us"
+            },
+            "href": {
+              "default": "/bg/contacts"
+            }
+          }
+        }
+      },
+      "endpoints": [
+        {
+          "ref": "get.menu",
+          "binding": "apiData",
+          "method": "GET",
+          "returns": {
+            "result": [
+              {
+                "link": "string",
+                "title": "string"
+              }
+            ]
+          }
+        }
+      ],
+      "alpine_data": {
+        "data.menu": "Menu items",
+        "data.openMobileMenu": "Boolean"
+      },
+      "alpine_actions": {
+        "changeLang": "Platform language switcher"
+      },
+      "sub_components": {
+        "desktop_nav": {
+          "visibility": "hidden md:flex",
+          "menu_loop": "x-for=\"menu in data.menu\""
+        },
+        "language_switcher": {
+          "local_state": "x-data=\"{openLang:false}\""
+        },
+        "mobile_menu": {
+          "visibility": "md:hidden",
+          "toggle": "data.openMobileMenu"
+        }
+      },
+      "structure": {
+        "root": "nav.bg-white.border-b.sticky.top-0.z-50.w-full.shadow-sm",
+        "required_attributes": {
+          "apiData": "get.menu",
+          "keyName": "menu"
+        }
+      }
+    },
+    "site_footer": {
+      "id": "site_footer",
+      "name": "Site Footer",
+      "description": "Global dark footer with 4-column grid and bottom bar.",
+      "category": "global",
+      "max_per_page": 1,
+      "is_global": true,
+      "section_wrapper_override": "none",
+      "properties": {
+        "brand_column": {
+          "type": "object",
+          "required": true,
+          "properties": {
+            "title": {
+              "type": "string",
+              "max_length": 40
+            },
+            "tagline": {
+              "type": "string",
+              "max_length": 120
+            }
+          }
+        },
+        "nav_columns": {
+          "type": "array",
+          "min_items": 1,
+          "max_items": 3,
+          "item_properties": {
+            "heading": {
+              "type": "string",
+              "max_length": 30
+            },
+            "links": {
+              "type": "array",
+              "item_properties": {
+                "text": {
+                  "type": "string"
+                },
+                "href": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "contact_column": {
+          "type": "object",
+          "required": false
+        },
+        "bottom_bar": {
+          "type": "object",
+          "required": true,
+          "properties": {
+            "copyright": {
+              "type": "string",
+              "max_length": 80
+            },
+            "legal_links": {
+              "type": "array"
+            }
+          }
+        }
+      },
+      "endpoints": [],
+      "structure": {
+        "root": "footer.bg-gray-900.text-white.py-12.w-full",
+        "layout": "grid md:grid-cols-4 gap-8"
+      }
+    }
+  },
+  "generation_workflow": {
+    "description": "The AI generation pipeline follows these steps in order.",
+    "steps": [
+      {
+        "step": 1,
+        "name": "analyze_prompt",
+        "description": "AI reads the user prompt and extracts: business type, company name, services offered, location, contact details, language, tone. Outputs a structured brief.",
+        "output": "business_context object"
+      },
+      {
+        "step": 2,
+        "name": "select_pages",
+        "description": "AI analyzes the user prompt and business context to decide which pages to generate. The AI has full control over page selection — no pages are forced. Each page type has selection_guidance that helps the AI decide.",
+        "output": "selected_page_ids array",
+        "rules": {
+          "selection_method": "ai_decides",
+          "constraints": [
+            "blog_post requires blog_listing (always paired together)",
+            "header and footer are always generated (structural, not content pages)",
+            "At minimum the AI should select homepage + at least the legal pages relevant to the business"
+          ],
+          "guidance": "Each page_type has a selection_guidance field. The AI reads all of them and picks the set that best fits the business."
+        }
+      },
+      {
+        "step": 3,
+        "name": "generate_pages",
+        "description": "AI generates HTML for each selected page using the component catalog. Each page follows its page_type definition. Pages are generated in the order defined by generation_order.",
+        "output": "page HTML files"
+      },
+      {
+        "step": 4,
+        "name": "generate_header",
+        "description": "AI generates the header AFTER pages are decided. The navigation links reflect which pages were selected. The header uses the site_header component from the catalog with nav items matching the selected pages.",
+        "output": "header.html",
+        "depends_on": "selected_page_ids from step 2"
+      },
+      {
+        "step": 5,
+        "name": "generate_footer",
+        "description": "AI generates the footer AFTER pages are decided. Footer nav columns and legal links reflect the selected pages. Uses the site_footer component from the catalog.",
+        "output": "footer.html",
+        "depends_on": "selected_page_ids from step 2"
+      }
+    ],
+    "generation_order": [
+      "homepage",
+      "about",
+      "blog_listing",
+      "blog_post",
+      "contacts",
+      "cookie_policy",
+      "gdpr_policy",
+      "terms_conditions",
+      "login",
+      "userpage",
+      "header",
+      "footer"
+    ]
+  },
+  "business_context": {
+    "description": "Structured data extracted from the user prompt in step 1. The orchestrator injects this into each page type's content_placeholders.",
+    "fields": {
+      "company_name": {
+        "type": "string",
+        "required": true,
+        "example": "DentaPro Ltd"
+      },
+      "company_legal_name": {
+        "type": "string",
+        "required": true,
+        "example": "\"DENTAPRO\" Ltd"
+      },
+      "company_id": {
+        "type": "string",
+        "required": true,
+        "description": "Company registration number (UIC)",
+        "example": "204567890"
+      },
+      "vat_number": {
+        "type": "string",
+        "required": false,
+        "example": "BG204567890"
+      },
+      "website_url": {
+        "type": "string",
+        "required": true,
+        "example": "www.dentapro.bg"
+      },
+      "business_type": {
+        "type": "string",
+        "required": true,
+        "example": "Dental clinic"
+      },
+      "business_description": {
+        "type": "string",
+        "required": true,
+        "max_length": 500
+      },
+      "services": {
+        "type": "array_of_strings",
+        "required": false,
+        "example": [
+          "Dental implants",
+          "Teeth whitening",
+          "Orthodontics"
+        ]
+      },
+      "location": {
+        "city": {
+          "type": "string",
+          "example": "Burgas"
+        },
+        "address": {
+          "type": "string",
+          "example": "42 Aleksandrovska St."
+        },
+        "country": {
+          "type": "string",
+          "default": "Bulgaria"
+        }
+      },
+      "contact": {
+        "phone": {
+          "type": "string",
+          "example": "+359 56 123 456"
+        },
+        "email": {
+          "type": "string",
+          "example": "info@dentapro.bg"
+        },
+        "gdpr_email": {
+          "type": "string",
+          "example": "gdpr@dentapro.bg"
+        }
+      },
+      "languages": {
+        "type": "array",
+        "default": [
+          {
+            "code": "bg",
+            "label": "Bulgarian"
+          },
+          {
+            "code": "en",
+            "label": "English"
+          }
+        ]
+      },
+      "tone": {
+        "type": "string",
+        "default": "professional",
+        "values": [
+          "professional",
+          "friendly",
+          "corporate",
+          "creative"
+        ]
+      },
+      "primary_language": {
+        "type": "string",
+        "default": "bg"
+      }
+    }
+  },
+  "page_types": {
+    "homepage": {
+      "id": "homepage",
+      "output_file": "homepage.html",
+      "route": "/",
+      "name": "Homepage",
+      "description": "Main landing page. First impression — hero section, value proposition, services overview, social proof, newsletter, and CTA with optional meeting booking.",
+      "sections": [
+        {
+          "order": 1,
+          "component": "hero_section",
+          "required": true,
+          "wrapper": "standard",
+          "wrapper_config": {
+            "padding": "!py-20",
+            "bg": "bg-gradient-to-br from-gray-50 via-white to-gray-50"
+          },
+          "ai_fills": {
+            "badge.text": "Short trust signal from business context (e.g. '20+ years of experience', '1000+ satisfied clients')",
+            "title": "Main value proposition headline based on business_type and services",
+            "description": "Supporting paragraph explaining what the business does",
+            "primary_cta.text": "Action text (e.g. 'Explore our services', 'Book now')",
+            "primary_cta.href": "#services or link to relevant page",
+            "secondary_cta.text": "Secondary action (e.g. 'Contact us', 'Learn more')",
+            "secondary_cta.href": "/bg/contacts or /bg/about",
+            "trust_indicators": "2-3 short metrics from business context",
+            "image_src": "/static/images/product.webp",
+            "image_alt": "Descriptive alt text for the business"
+          },
+          "section_id": "hero"
+        },
+        {
+          "order": 2,
+          "component": "icon_feature_grid",
+          "required": true,
+          "wrapper": "standard",
+          "wrapper_config": {
+            "padding": "!py-20"
+          },
+          "ai_fills": {
+            "heading": "Section heading (e.g. 'Why choose us')",
+            "subheading": "Brief supporting text",
+            "items": "3 feature cards with SVG icons, titles, descriptions — derived from business strengths"
+          },
+          "section_id": "features"
+        },
+        {
+          "order": 3,
+          "component": "service_cards",
+          "required": true,
+          "wrapper": "standard",
+          "wrapper_config": {
+            "padding": "!py-20",
+            "bg": "bg-gray-50"
+          },
+          "ai_fills": {
+            "heading": "Section heading (e.g. 'Our services')",
+            "subheading": "Brief text about service range",
+            "items": "2-4 service cards with images, titles, descriptions, links — from business_context.services"
+          },
+          "section_id": "services"
+        },
+        {
+          "order": 4,
+          "component": "stats_counter",
+          "required": false,
+          "wrapper": "standard",
+          "wrapper_config": {
+            "padding": "!py-10",
+            "bg": "bg-gray-900"
+          },
+          "ai_fills": {
+            "items": "3-4 stat items (e.g. '500+ Projects', '98% Satisfaction'). Derive from business context or use plausible defaults."
+          },
+          "section_id": "stats"
+        },
+        {
+          "order": 5,
+          "component": "newsletter_signup",
+          "required": false,
+          "wrapper": "plain_section",
+          "ai_fills": {
+            "heading": "Newsletter heading (e.g. 'Subscribe to our newsletter')",
+            "subheading": "What subscribers get",
+            "privacy_note": "Privacy assurance text"
+          },
+          "section_id": "newsletter"
+        },
+        {
+          "order": 6,
+          "component": "cta_section",
+          "required": true,
+          "wrapper": "standard",
+          "wrapper_config": {
+            "padding": "!py-20",
+            "bg": "bg-gray-50"
+          },
+          "endpoint_on_wrapper": "get.meeting_calendars",
+          "ai_fills": {
+            "heading": "CTA heading (e.g. 'Ready to get started?')",
+            "description": "Encouraging text to take action",
+            "primary_button.text": "Main CTA (e.g. 'Book an online consultation')",
+            "primary_button.action": "modal",
+            "primary_button.modal_name": "meeting",
+            "secondary_button.text": "Secondary link text",
+            "secondary_button.href": "/bg/about"
+          },
+          "section_id": "cta"
+        },
+        {
+          "order": 7,
+          "component": "meeting_booking_modal",
+          "required": false,
+          "note": "Rendered at page level outside section wrappers. Only if cta_section uses modal action.",
+          "ai_fills": {
+            "heading": "Modal title (e.g. 'Book a meeting')",
+            "Labels and placeholders": "Localized form labels"
+          },
+          "section_id": "cta"
+        }
+      ],
+      "endpoints_used": [
+        "get.meeting_calendars",
+        "post.meetings",
+        "Newsletter.post_newsletter"
+      ],
+      "meta": {
+        "title": "{company_name}",
+        "description": "AI generates meta description from business context"
+      },
+      "component_interactions": [
+        {
+          "source": "cta_section.primary_button",
+          "target": "meeting_booking_modal",
+          "trigger": "@click callModal",
+          "action": "Opens booking modal with data-modal='meeting'"
+        },
+        {
+          "source": "meeting_booking_modal.submit",
+          "target": "meeting_booking_modal.success_modal",
+          "trigger": "@success",
+          "action": "Opens success confirmation with data-modal='meetingSuccess'"
+        },
+        {
+          "source": "newsletter_signup.submit",
+          "target": "EXPOZY platform",
+          "trigger": "@click",
+          "action": "alpineListeners('Newsletter.post_newsletter', $event) with options-clear"
+        }
+      ],
+      "alpine_page_state": {
+        "data.meeting_calendars": "Calendar objects with days and time_slots",
+        "data.modals.meeting": "Booking modal visibility",
+        "data.modals.meetingSuccess": "Success modal visibility",
+        "data.meetingSuccess": "Booking response (calendar_id)",
+        "data.openMobileMenu": "Header mobile menu state"
+      },
+      "selection_guidance": "The main landing page. Should almost always be included — it's the entry point for every website. Skip only if the user explicitly asks for a single-page app or non-standard structure.",
+      "priority": "high",
+      "_resolved_components": [
+        "cta_section",
+        "hero_section",
+        "icon_feature_grid",
+        "meeting_booking_modal",
+        "newsletter_signup",
+        "service_cards",
+        "stats_counter"
+      ]
+    },
+    "about": {
+      "id": "about",
+      "output_file": "about.html",
+      "route": "/bg/about",
+      "name": "About Page",
+      "description": "Company story, values, team credibility, gallery of work, and testimonials.",
+      "sections": [
+        {
+          "order": 1,
+          "component_group": "hero_with_features",
+          "required": true,
+          "wrapper": "standard",
+          "wrapper_config": {
+            "bg": "bg-gradient-to-br from-slate-50 to-slate-100"
+          },
+          "layout": "two_column",
+          "left_column": {
+            "width": "w-full lg:w-1/2",
+            "components": [
+              {
+                "component": "hero_banner",
+                "ai_fills": {
+                  "title": "About page headline (e.g. company name or mission)",
+                  "subtitle": "Brief company description"
+                }
+              },
+              {
+                "component": "feature_cards",
+                "ai_fills": {
+                  "items": "3-5 company values or strengths with icons and descriptions"
+                }
+              }
+            ]
+          },
+          "right_column": {
+            "width": "hidden lg:flex lg:w-1/2",
+            "components": [
+              {
+                "component": "image_showcase",
+                "ai_fills": {
+                  "image_src": "/static/images/product.webp",
+                  "alt_text": "Company or team photo"
+                }
+              }
+            ]
+          },
+          "after_columns": [
+            {
+              "component": "section_divider"
+            },
+            {
+              "component": "brand_logos",
+              "required": false,
+              "ai_fills": {
+                "heading": "Section heading (e.g. 'Our Partners')"
+              }
+            },
+            {
+              "component": "section_divider"
+            },
+            {
+              "component": "gallery_tabs",
+              "required": false,
+              "note": "Only if business has gallery content (e.g. portfolio, before/after, projects)"
+            }
+          ]
+        },
+        {
+          "order": 2,
+          "component": "testimonials",
+          "required": false,
+          "wrapper": "standard",
+          "ai_fills": {
+            "heading": "Testimonials section heading",
+            "subheading": "Brief supporting text"
+          }
+        }
+      ],
+      "endpoints_used": [
+        "get.gallery_categories",
+        "get.testimonials",
+        "get.our_brands"
+      ],
+      "meta": {
+        "title": "{company_name} - About Us"
+      },
+      "selection_guidance": "Company story and credibility page. Include for most businesses. Skip if the user explicitly says no about page, or if the business is purely transactional (e.g. simple tool/utility).",
+      "priority": "high",
+      "_resolved_components": [
+        "brand_logos",
+        "feature_cards",
+        "gallery_tabs",
+        "hero_banner",
+        "image_showcase",
+        "section_divider",
+        "testimonials"
+      ]
+    },
+    "blog_listing": {
+      "id": "blog_listing",
+      "output_file": "blog.html",
+      "route": "/bg/blog",
+      "name": "Blog Listing Page",
+      "description": "Blog index with sidebar filters and post grid. Structure is fixed — AI does NOT generate blog content, only the page layout/chrome.",
+      "sections": [
+        {
+          "order": 1,
+          "layout": "sidebar_content",
+          "wrapper_classes": "w-full flex py-10 bg-slate-50",
+          "sidebar": {
+            "component": "blog_sidebar",
+            "width": "lg:w-2/5 xl:w-1/5"
+          },
+          "content": {
+            "component": "blog_post_grid",
+            "width": "w-full lg:w-3/5 xl:w-4/5"
+          }
+        }
+      ],
+      "ai_fills": {
+        "note": "This page is almost entirely data-driven. AI generates only the structural HTML wrapper. Blog posts come from API."
+      },
+      "endpoints_used": [
+        "get.blogCategories",
+        "get.blogPosts",
+        "get.blogPosts_filters"
+      ],
+      "meta": {
+        "title": "{company_name} - Blog"
+      },
+      "component_interactions": [
+        {
+          "source": "blog_sidebar.search_bar",
+          "target": "blog_post_grid",
+          "trigger": "@input"
+        },
+        {
+          "source": "blog_sidebar.category_list",
+          "target": "blog_post_grid",
+          "trigger": "@click"
+        },
+        {
+          "source": "blog_sidebar.tag_filter",
+          "target": "blog_post_grid",
+          "trigger": "@click"
+        },
+        {
+          "source": "blog_post_grid.pagination",
+          "target": "blog_post_grid",
+          "trigger": "@click"
+        }
+      ],
+      "alpine_page_state": {
+        "data.blogPosts_filters": "Tags",
+        "data.blogCategories": "Categories",
+        "data.blogPosts": "Posts + pagination",
+        "data.corePage.target_id": "Category ID",
+        "data.pageUrl.tag": "Active tag"
+      },
+      "selection_guidance": "Blog index page. Include if the business benefits from content marketing, news, articles, industry updates, or if the user mentions blog/news. Skip for businesses that don't produce written content.",
+      "priority": "medium",
+      "_resolved_components": [
+        "blog_post_grid",
+        "blog_sidebar"
+      ]
+    },
+    "blog_post": {
+      "id": "blog_post",
+      "output_file": "post.html",
+      "route": "/bg/blog/{slug}",
+      "route_type": "dynamic",
+      "name": "Blog Post Detail Page",
+      "description": "Single article view. Fully data-driven — AI generates the page structure, not the post content. Always included if blog_listing is selected.",
+      "sections": [
+        {
+          "order": 1,
+          "component": "blog_post_detail",
+          "required": true,
+          "note": "Single component manages entire page layout. No section wrappers."
+        }
+      ],
+      "ai_fills": {
+        "note": "Structure-only generation. All content comes from get.blogPosts API. AI fills: social link choices, label translations, comment form labels."
+      },
+      "endpoints_used": [
+        "get.blogPosts",
+        "Reviews.get_blog_comments",
+        "Reviews.post_blog_comments"
+      ],
+      "meta": {
+        "title": "{post_title} - {company_name}"
+      },
+      "auto_fetched_endpoints": [
+        {
+          "ref": "get.blogPosts",
+          "key_name": "sameCategoryPosts",
+          "trigger": "x-init inside article content",
+          "description": "Fetches posts from same category"
+        },
+        {
+          "ref": "get.blogPosts",
+          "key_name": "newestPosts",
+          "trigger": "x-init in sidebar",
+          "extra_attributes": {
+            "data-sort": "newest"
+          },
+          "description": "Fetches newest posts for sidebar"
+        },
+        {
+          "ref": "Reviews.get_blog_comments",
+          "key_name": "blogReviews",
+          "trigger": "apidata attribute on comments wrapper",
+          "dynamic_attributes": {
+            ":data-subject_id": "data.corePage.target_id"
+          },
+          "description": "Fetches comments for this post"
+        }
+      ],
+      "component_interactions": [
+        {
+          "source": "blog_post_detail.category_badge",
+          "target": "category page",
+          "trigger": "@click",
+          "action": "href(data.post.category.url)"
+        },
+        {
+          "source": "blog_post_detail.post_tags",
+          "target": "blog listing filtered",
+          "trigger": "@click",
+          "action": "href('/bg/blog?tags[]='+tag)"
+        },
+        {
+          "source": "blog_post_detail.same_category_posts",
+          "target": "other post",
+          "trigger": "@click",
+          "action": "href(sameCategoryPosts.url)"
+        },
+        {
+          "source": "blog_post_detail.sidebar_related_posts",
+          "target": "other post",
+          "trigger": "@click",
+          "action": "href(related.url)"
+        },
+        {
+          "source": "blog_post_detail.sidebar_newest_posts",
+          "target": "other post",
+          "trigger": "@click",
+          "action": "href(newestPosts.url)"
+        },
+        {
+          "source": "blog_post_detail.comment_form",
+          "target": "EXPOZY platform",
+          "trigger": "@click",
+          "action": "alpineListeners('Reviews.post_blog_comments', $event)"
+        }
+      ],
+      "alpine_page_state": {
+        "data.post": "Single post object with full content",
+        "data.post.description": "HTML article body",
+        "data.post.tags": "Tag strings",
+        "data.post.related_posts": "Embedded related posts",
+        "data.post.category": "Category {id, title, url}",
+        "data.sameCategoryPosts": "Same-category posts (auto-fetched)",
+        "data.newestPosts": "Newest posts (auto-fetched)",
+        "data.blogReviews": "Comments array",
+        "data.corePage.target_id": "Current post ID",
+        "data.user.email": "Logged-in user email",
+        "data.user.names": "Logged-in user name"
+      },
+      "page_endpoints": [
+        {
+          "ref": "get.blogPosts",
+          "binding": "apidata",
+          "attached_to": "root_wrapper",
+          "key_name": "post",
+          "dynamic_attributes": {
+            ":data-id": "data.corePage.target_id"
+          },
+          "description": "Fetches the single post. The post data includes embedded related_posts and tags arrays."
+        }
+      ],
+      "selection_guidance": "Individual blog article page. MUST be included if blog_listing is selected — they are paired. Never include without blog_listing.",
+      "priority": "medium",
+      "_resolved_components": [
+        "blog_post_detail"
+      ]
+    },
+    "contacts": {
+      "id": "contacts",
+      "output_file": "contacts.html",
+      "route": "/bg/contacts",
+      "name": "Contacts Page",
+      "description": "Contact page with Google Map embed, contact information cards, and contact form.",
+      "sections": [
+        {
+          "order": 1,
+          "component": "google_map",
+          "required": true,
+          "wrapper": "box",
+          "ai_fills": {
+            "location_query": "Derived from business_context.location (e.g. 'Burgas, 42 Aleksandrovska St.')",
+            "zoom": "14-16 for street level, 10-12 for city level",
+            "language": "bg"
+          }
+        },
+        {
+          "order": 2,
+          "layout": "two_column_grid",
+          "wrapper": "standard",
+          "wrapper_config": {
+            "inner_layout": "grid grid-cols-1 lg:grid-cols-2 gap-12"
+          },
+          "left": {
+            "component": "contact_info_cards",
+            "ai_fills": {
+              "heading": "Contact info heading",
+              "subheading": "Encouraging text",
+              "items": "Contact cards from business_context.contact — phone (tel: link), email (mailto: link), address (plain text)"
+            }
+          },
+          "right": {
+            "component": "contact_form",
+            "ai_fills": {
+              "heading": "Form heading (e.g. 'Send us a message')",
+              "field labels": "Localized labels"
+            }
+          }
+        }
+      ],
+      "endpoints_used": [
+        "Contacts.post_contacts"
+      ],
+      "meta": {
+        "title": "{company_name} - Contacts"
+      },
+      "component_interactions": [
+        {
+          "source": "contact_form.submit",
+          "target": "EXPOZY",
+          "action": "alpineListeners('Contacts.post_contacts')"
+        }
+      ],
+      "selection_guidance": "Contact page with map, info cards, and form. Include if the business has a physical location, phone number, email, or wants customers to reach out. Skip for purely online businesses that don't want direct contact.",
+      "priority": "high",
+      "_resolved_components": [
+        "contact_form",
+        "contact_info_cards",
+        "google_map"
+      ]
+    },
+    "cookie_policy": {
+      "id": "cookie_policy",
+      "output_file": "cookies.html",
+      "route": "/bg/cookie-policy",
+      "name": "Cookie Policy Page",
+      "description": "Legal page with cookie usage information. Always included. AI generates the full legal text using the static_content_block component.",
+      "sections": [
+        {
+          "order": 1,
+          "component": "static_content_block",
+          "required": true,
+          "wrapper": "fullpage_box",
+          "inner_variant": "page_section",
+          "ai_fills": {
+            "title": "Cookie policy title",
+            "content_blocks": "Full cookie policy text. AI generates GDPR-compliant cookie policy using business_context placeholders."
+          }
+        }
+      ],
+      "content_placeholders": {
+        "{company_name}": "business_context.company_legal_name",
+        "{company_id}": "business_context.company_id",
+        "{tax_id}": "business_context.vat_number",
+        "{gdpr_email}": "business_context.contact.gdpr_email",
+        "{website_url}": "business_context.website_url"
+      },
+      "required_sections": [
+        "Title and intro",
+        "What are cookies",
+        "Types of cookies used",
+        "How this site uses cookies",
+        "Personal data and cookies",
+        "Other tracking technologies",
+        "How to block cookies",
+        "Browser-specific instructions",
+        "Cookie list grouped by purpose"
+      ],
+      "endpoints_used": [],
+      "meta": {
+        "title": "{company_name} - Cookies"
+      },
+      "selection_guidance": "Legal requirement for EU/Bulgarian businesses operating websites. Include for any business that serves EU users or uses cookies. Can be skipped only for non-EU businesses or if user explicitly opts out of legal pages.",
+      "priority": "medium",
+      "_resolved_components": [
+        "static_content_block"
+      ]
+    },
+    "gdpr_policy": {
+      "id": "gdpr_policy",
+      "output_file": "gdpr.html",
+      "route": "/bg/gdpr",
+      "name": "GDPR Privacy Policy Page",
+      "description": "Legal page with privacy policy. Always included. AI generates GDPR-compliant privacy policy.",
+      "sections": [
+        {
+          "order": 1,
+          "component": "static_content_block",
+          "required": true,
+          "wrapper": "fullpage_box",
+          "inner_variant": "text_page",
+          "ai_fills": {
+            "title": "Privacy policy title (e.g. 'Privacy Policy')",
+            "content_blocks": "Full GDPR privacy policy text."
+          }
+        }
+      ],
+      "content_placeholders": {
+        "{company_name}": "business_context.company_legal_name",
+        "{company_id}": "business_context.company_id",
+        "{website_url}": "business_context.website_url",
+        "{contact_email}": "business_context.contact.email",
+        "{gdpr_email}": "business_context.contact.gdpr_email",
+        "{phone}": "business_context.contact.phone",
+        "{min_age}": "13"
+      },
+      "required_sections": [
+        "1. Data controller identity and contact",
+        "2. Data categories with purpose and legal basis",
+        "3. Sensitive data disclaimer",
+        "4. Collection methods",
+        "5. Marketing communications",
+        "6. Data sharing",
+        "7. Data security measures",
+        "8. Data retention periods",
+        "9. Your rights",
+        "10. Third-party links disclaimer",
+        "11. Cookies reference"
+      ],
+      "endpoints_used": [],
+      "meta": {
+        "title": "{company_name} - Privacy Policy"
+      },
+      "selection_guidance": "Privacy policy — legal requirement under GDPR for businesses handling personal data (forms, accounts, newsletters). Include for any business with user data collection. Can be skipped if no personal data is collected.",
+      "priority": "medium",
+      "_resolved_components": [
+        "static_content_block"
+      ]
+    },
+    "terms_conditions": {
+      "id": "terms_conditions",
+      "output_file": "terms-conditions.html",
+      "route": "/bg/terms-conditions",
+      "name": "Terms and Conditions Page",
+      "description": "Legal page with e-commerce terms. Always included. AI generates Bulgarian law-compliant T&C.",
+      "sections": [
+        {
+          "order": 1,
+          "component": "static_content_block",
+          "required": true,
+          "wrapper": "fullpage_box",
+          "inner_variant": "titled_text_page",
+          "ai_fills": {
+            "title": "GENERAL TERMS AND CONDITIONS (centered, h1)",
+            "content_blocks": "Full terms and conditions text with numbered articles (Art.) and Roman numeral sections."
+          }
+        }
+      ],
+      "content_placeholders": {
+        "{company_name}": "business_context.company_legal_name",
+        "{company_id}": "business_context.company_id",
+        "{website_url}": "business_context.website_url",
+        "{company_address}": "business_context.location.address",
+        "{contact_email}": "business_context.contact.email",
+        "{contact_phone}": "business_context.contact.phone",
+        "{vat_number}": "business_context.vat_number",
+        "{effective_date}": "Current date or specified date"
+      },
+      "required_sections": [
+        "I. Subject",
+        "II. Provider data",
+        "III. Platform characteristics",
+        "IV. Registration",
+        "V. Technical steps for purchase",
+        "VI. Contract content",
+        "VII. Consumer clauses",
+        "VIII. Contract performance",
+        "IX. Personal data protection",
+        "X. Amendments to T&C",
+        "XI. Termination",
+        "XII. Liability",
+        "XIII. Warranty and complaints",
+        "XIV. Other conditions",
+        "Appendix 1: Standard withdrawal form",
+        "Appendix 2: Withdrawal information"
+      ],
+      "endpoints_used": [],
+      "meta": {
+        "title": "{company_name} - Terms and Conditions"
+      },
+      "content_guidelines": {
+        "description": "AI generates e-commerce terms and conditions compliant with Bulgarian law (Consumer Protection Act, E-Commerce Act, Electronic Communications Act). Content uses numbered articles (Art.) and Roman numeral sections.",
+        "formatting_notes": [
+          "Sections numbered with Roman numerals (I, II, III...)",
+          "Articles numbered as Art. 1, Art. 2... with sub-paragraphs as (1), (2)...",
+          "Section headings use <p><strong>SECTION TITLE</strong></p> pattern",
+          "Article references use <p><strong>Art. N. (M)</strong> text</p> pattern",
+          "Withdrawal form uses <table> elements",
+          "Some headings centered via text-center class or <h2> tags for appendices"
+        ]
+      },
+      "selection_guidance": "Terms of service — legal requirement for e-commerce and service businesses in Bulgaria (Consumer Protection Act). Include for any business selling products/services online. Can be skipped for purely informational sites.",
+      "priority": "medium",
+      "_resolved_components": [
+        "static_content_block"
+      ]
+    },
+    "login": {
+      "id": "login",
+      "output_file": "login.html",
+      "route": "/bg/login",
+      "name": "Login Page",
+      "description": "User authentication page. Always included. Full-screen centered card with email/password form.",
+      "sections": [
+        {
+          "order": 1,
+          "component": "login_form",
+          "required": true,
+          "wrapper": "auth_page",
+          "ai_fills": {
+            "heading": "Login",
+            "subheading": "Sign in to your account",
+            "field labels": "Localized (Email, Password)",
+            "submit_text": "Sign In",
+            "register_link.prompt_text": "Don't have an account?",
+            "register_link.link_text": "Register",
+            "forgot_password_link.text": "Forgot password"
+          }
+        }
+      ],
+      "endpoints_used": [
+        "User.login"
+      ],
+      "meta": {
+        "title": "{company_name} - Login"
+      },
+      "component_interactions": [
+        {
+          "source": "login_form.submit",
+          "target": "EXPOZY platform",
+          "trigger": "@click",
+          "action": "alpineListeners('User.login', $event) with keyName='user'"
+        },
+        {
+          "source": "login_form.register_link",
+          "target": "registration page",
+          "trigger": "@click",
+          "action": "href('/bg/registration')"
+        },
+        {
+          "source": "login_form.forgot_link",
+          "target": "forgotten password page",
+          "trigger": "@click",
+          "action": "href('/bg/forgotten-password')"
+        }
+      ],
+      "selection_guidance": "User authentication page. Include if the business needs user accounts (e-commerce, bookings, memberships, dashboards). Skip for simple informational/brochure sites with no user accounts.",
+      "priority": "medium",
+      "_resolved_components": [
+        "login_form"
+      ]
+    },
+    "userpage": {
+      "id": "userpage",
+      "output_file": "userpage.html",
+      "route": "/bg/customer/account",
+      "name": "User Dashboard Page",
+      "description": "User account management. Always included. 8-tab dashboard with profile, orders, addresses, etc. Mostly data-driven — AI generates structure and labels.",
+      "requires_auth": true,
+      "sections": [
+        {
+          "order": 1,
+          "component": "user_dashboard",
+          "required": true,
+          "note": "Single component manages entire page layout. No section wrappers.",
+          "ai_fills": {
+            "tab labels": "Localized tab names (Profile, Invoice, Orders, etc.)",
+            "form labels": "Localized field labels for all tab forms",
+            "button texts": "Localized button labels (Save changes, etc.)",
+            "logout text": "Sign Out"
+          }
+        }
+      ],
+      "endpoints_used": [
+        "User.get_accounts",
+        "User.put_accounts",
+        "get.my_company",
+        "put.company",
+        "Countries.get_countries",
+        "Shop.get_orders",
+        "get.my_addresses",
+        "User.post_user_address",
+        "User.delete_user_address"
+      ],
+      "meta": {
+        "title": "{company_name} - My Account"
+      },
+      "component_interactions": [
+        {
+          "source": "tab_profile.submit",
+          "target": "EXPOZY",
+          "action": "User.put_accounts (updates name/phone)"
+        },
+        {
+          "source": "tab_invoice.submit",
+          "target": "EXPOZY",
+          "action": "put.company (updates invoice data)"
+        },
+        {
+          "source": "tab_addresses.add",
+          "target": "EXPOZY",
+          "action": "User.post_user_address (creates address)"
+        },
+        {
+          "source": "tab_addresses.delete",
+          "target": "EXPOZY",
+          "action": "User.delete_user_address (deletes address)"
+        },
+        {
+          "source": "tab_passwords.submit",
+          "target": "EXPOZY",
+          "action": "User.put_accounts (updates password)"
+        },
+        {
+          "source": "sidebar.logout",
+          "target": "/logout",
+          "action": "Regular link navigation"
+        }
+      ],
+      "alpine_page_state": {
+        "tab": "Active tab ID (local Alpine state)",
+        "data.user": "User profile + loyalty balance",
+        "data.my_company": "Invoice/company data",
+        "data.countries": "Country list for selects",
+        "data.orders": "Order history",
+        "data.services": "Service/digital product orders",
+        "data.my_addresses": "Saved addresses"
+      },
+      "selection_guidance": "User dashboard with profile, orders, addresses. Include if login is selected AND the business has e-commerce, appointments, or account management. Skip if login is not included or accounts are minimal.",
+      "priority": "low",
+      "_resolved_components": [
+        "user_dashboard"
+      ]
+    }
+  },
+  "global_types": {
+    "header": {
+      "id": "header",
+      "output_file": "header.html",
+      "name": "Site Header",
+      "description": "Global navigation header. Generated AFTER page selection to reflect the correct nav links.",
+      "component": "site_header",
+      "generation_phase": "post_page_selection",
+      "ai_fills": {
+        "brand_name": "business_context.company_name (short form for nav)",
+        "static_home_link": "{ text: 'Home', href: '/' }",
+        "languages": "From business_context.languages array",
+        "cta_button": {
+          "text": "CTA text (e.g. 'Contact us')",
+          "href": "/bg/contacts (only if contacts page was selected, otherwise first relevant page)"
+        }
+      },
+      "dynamic_nav_generation": {
+        "description": "The AI generates the static home link. Dynamic menu items come from get.menu API endpoint at runtime.",
+        "endpoint": "get.menu",
+        "nav_items_source": "API — the platform populates menu items from the CMS. The AI does NOT hardcode navigation links except the static home link and CTA.",
+        "cta_target_priority": [
+          "contacts",
+          "about",
+          "homepage"
+        ]
+      },
+      "endpoints_used": [
+        "get.menu"
+      ],
+      "meta": {
+        "note": "Rendered on every page by site shell"
+      },
+      "_resolved_component": "site_header"
+    },
+    "footer": {
+      "id": "footer",
+      "output_file": "footer.html",
+      "name": "Site Footer",
+      "description": "Global footer. Generated AFTER page selection to include correct nav and legal links.",
+      "component": "site_footer",
+      "generation_phase": "post_page_selection",
+      "ai_fills": {
+        "brand_column.title": "business_context.company_name",
+        "brand_column.tagline": "Short company tagline from business context",
+        "nav_columns": "1-3 link columns. Links MUST only reference pages that were selected in step 2.",
+        "contact_column": "Contact details from business_context.contact",
+        "bottom_bar.copyright": "© {year} {company_name}. All rights reserved.",
+        "bottom_bar.legal_links": "Links to cookie, gdpr, terms pages — only those that were generated"
+      },
+      "link_validation": {
+        "description": "Every href in the footer MUST correspond to a page that was selected in step 2.",
+        "rule": "For each link, check: is the target route in selected_page_ids? If not, remove the link."
+      },
+      "endpoints_used": [],
+      "meta": {
+        "note": "Rendered on every page by site shell"
+      },
+      "_resolved_component": "site_footer"
+    }
+  },
+  "output_manifest": {
+    "description": "After generation, the orchestrator produces this manifest listing all generated files.",
+    "schema": {
+      "generation_id": "string (unique job ID)",
+      "prompt": "string (original user prompt)",
+      "business_context": "object (extracted context)",
+      "selected_pages": [
+        "array of page_type IDs"
+      ],
+      "files": [
+        {
+          "page_type_id": "string",
+          "output_file": "string (filename)",
+          "route": "string",
+          "status": "success | error",
+          "validation_passed": "boolean"
+        }
+      ],
+      "generated_at": "ISO timestamp"
+    }
+  },
+  "validation_rules": {
+    "structural": {
+      "required_section_wrapper": "Every section must use a wrapper from global.section_wrappers.",
+      "max_heading_depth": "h3. Exception: static_content_block.",
+      "no_inline_scripts": "No <script> tags.",
+      "x_html_usage": "x-html only for CMS content (data.post.description). Never user-submitted.",
+      "no_external_resources": "Exceptions: Google Maps iframe, Google Calendar URL."
+    },
+    "data_binding": {
+      "all_endpoints_must_match": "Only refs in component.endpoints or page.page_endpoints",
+      "all_data_fields_must_exist": "Every x-text, :src, :class must match endpoint returns",
+      "cross_component_communication": "Via alpineListeners(), data.*, callModal(), @success"
+    },
+    "alpine_js": {
+      "directives_allowed": [
+        "x-data",
+        "x-init",
+        "x-if",
+        "x-for",
+        "x-text",
+        "x-html",
+        "x-show",
+        "x-bind",
+        "x-on",
+        "x-cloak",
+        "x-model",
+        "x-transition",
+        "x-amount",
+        "@click",
+        "@click.prevent",
+        "@click.outside",
+        "@input",
+        "@change",
+        "@success",
+        "@mouseenter",
+        "@mouseleave",
+        "@submit",
+        "@submit.prevent",
+        ":class",
+        ":src",
+        ":href",
+        ":value",
+        ":selected",
+        ":alt",
+        ":data-id",
+        ":data-subject_id",
+        ":data-tag",
+        ":data-page",
+        ":data-category_id",
+        ":key"
+      ],
+      "listeners_allowed": [
+        "Gallery.open",
+        "get.blogPosts",
+        "Contacts.post_contacts",
+        "Newsletter.post_newsletter",
+        "post.meetings",
+        "User.login",
+        "Reviews.get_blog_comments",
+        "Reviews.post_blog_comments",
+        "User.get_accounts",
+        "User.put_accounts",
+        "User.post_user_address",
+        "User.delete_user_address",
+        "get.my_company",
+        "put.company",
+        "Countries.get_countries",
+        "Shop.get_orders",
+        "get.my_addresses",
+        "get.meeting_calendars",
+        "get.testimonials",
+        "get.our_brands"
+      ],
+      "navigation_allowed": [
+        "href(url)",
+        "changeLang(code)"
+      ],
+      "helpers_allowed": [
+        "Helpers.image(key)",
+        "DateHelper.date(config)",
+        "callModal($el)",
+        "$nextTick(fn)"
+      ],
+      "custom_directives": {
+        "x-amount": "Formats monetary values."
+      },
+      "listener_options": {
+        "options-clear": "Clears inputs after success",
+        "options-pushurl": "Updates browser URL",
+        "data-sort": "Sort order",
+        "data-product_type": "Product type filter"
+      },
+      "auto_fetch_pattern": "x-init=\"alpineListeners('{endpoint}', $el)\" keyName=\"{keyName}\""
+    },
+    "modals": {
+      "trigger_pattern": "@click=\"callModal($el)\" data-modal=\"{modal_name}\"",
+      "state_pattern": "data.modals.{modal_name}",
+      "success_pattern": "@success=\"callModal($el)\" data-modal=\"{success_modal_name}\"",
+      "backdrop": "backdrop-blur bg-gray-950/70 fixed z-50"
+    },
+    "images": {
+      "sources_allowed": [
+        "image_base_url",
+        "API URLs",
+        "Helpers.image()"
+      ],
+      "must_have_alt": true
+    },
+    "iframes": {
+      "allowed_domains": [
+        "maps.google.com"
+      ],
+      "only_in_components": [
+        "google_map"
+      ]
+    },
+    "static_content": {
+      "allowed_in_components": [
+        "static_content_block"
+      ],
+      "allowed_html": [
+        "h1",
+        "h2",
+        "h3",
+        "p",
+        "a",
+        "span",
+        "br",
+        "strong"
+      ]
+    },
+    "global_components": {
+      "rendered_outside_page_sections": true,
+      "no_duplication": true
+    },
+    "generation_checks": [
+      {
+        "id": "components_match_catalog",
+        "description": "Every component used in generated HTML must exist in component_catalog.json",
+        "severity": "error"
+      },
+      {
+        "id": "endpoints_match_catalog",
+        "description": "Every apiData/apidata attribute must reference an endpoint defined in the catalog",
+        "severity": "error"
+      },
+      {
+        "id": "alpine_directives_allowed",
+        "description": "All Alpine.js directives must be in validation_rules.alpine_js.directives_allowed",
+        "severity": "error"
+      },
+      {
+        "id": "listeners_allowed",
+        "description": "All alpineListeners() calls must reference listeners in validation_rules.alpine_js.listeners_allowed",
+        "severity": "error"
+      },
+      {
+        "id": "section_wrappers_valid",
+        "description": "Every section must use a wrapper type defined in global.section_wrappers",
+        "severity": "error"
+      },
+      {
+        "id": "no_external_resources",
+        "description": "No external scripts, stylesheets, or images except allowed exceptions",
+        "severity": "error"
+      },
+      {
+        "id": "no_inline_scripts",
+        "description": "No <script> tags. Only inline Alpine handlers allowed.",
+        "severity": "error"
+      },
+      {
+        "id": "footer_links_valid",
+        "description": "All footer hrefs must point to pages in selected_pages",
+        "severity": "warning"
+      },
+      {
+        "id": "header_cta_valid",
+        "description": "Header CTA href must point to a page in selected_pages",
+        "severity": "warning"
+      },
+      {
+        "id": "images_have_alt",
+        "description": "All <img> tags must have alt attributes",
+        "severity": "warning"
+      },
+      {
+        "id": "required_components_present",
+        "description": "All components marked required:true in the page type must be present in output",
+        "severity": "error"
+      },
+      {
+        "id": "legal_pages_complete",
+        "description": "Cookie, GDPR, and Terms pages must contain all required_sections",
+        "severity": "warning"
+      }
+    ]
+  },
+  "_validator": {
+    "_description": "Auto-generated by combine_catalog.py. Do NOT edit — update component_catalog.json or page_types.json instead.",
+    "allowed_alpine_directives": [
+      "x-amount",
+      "x-bind",
+      "x-cloak",
+      "x-data",
+      "x-for",
+      "x-html",
+      "x-if",
+      "x-init",
+      "x-model",
+      "x-on",
+      "x-show",
+      "x-text",
+      "x-transition"
+    ],
+    "allowed_alpine_events": [
+      "@change",
+      "@click",
+      "@input",
+      "@mouseenter",
+      "@mouseleave",
+      "@submit",
+      "@success"
+    ],
+    "allowed_alpine_bindings": [
+      ":alt",
+      ":class",
+      ":data-category_id",
+      ":data-id",
+      ":data-page",
+      ":data-subject_id",
+      ":data-tag",
+      ":href",
+      ":key",
+      ":selected",
+      ":src",
+      ":value"
+    ],
+    "allowed_html_elements": [
+      "a",
+      "abbr",
+      "article",
+      "audio",
+      "b",
+      "blockquote",
+      "body",
+      "br",
+      "button",
+      "caption",
+      "circle",
+      "cite",
+      "clippath",
+      "code",
+      "col",
+      "colgroup",
+      "datalist",
+      "dd",
+      "defs",
+      "del",
+      "details",
+      "dfn",
+      "dialog",
+      "div",
+      "dl",
+      "dt",
+      "em",
+      "fieldset",
+      "figcaption",
+      "figure",
+      "footer",
+      "form",
+      "g",
+      "h1",
+      "h2",
+      "h3",
+      "h4",
+      "h5",
+      "h6",
+      "head",
+      "header",
+      "hr",
+      "html",
+      "i",
+      "iframe",
+      "img",
+      "input",
+      "ins",
+      "kbd",
+      "label",
+      "legend",
+      "li",
+      "line",
+      "lineargradient",
+      "link",
+      "main",
+      "mark",
+      "mask",
+      "meta",
+      "nav",
+      "noscript",
+      "ol",
+      "optgroup",
+      "option",
+      "output",
+      "p",
+      "path",
+      "picture",
+      "polygon",
+      "polyline",
+      "pre",
+      "radialgradient",
+      "rect",
+      "s",
+      "samp",
+      "section",
+      "select",
+      "slot",
+      "small",
+      "source",
+      "span",
+      "stop",
+      "strong",
+      "sub",
+      "summary",
+      "sup",
+      "svg",
+      "table",
+      "tbody",
+      "td",
+      "template",
+      "text",
+      "textarea",
+      "tfoot",
+      "th",
+      "thead",
+      "time",
+      "title",
+      "tr",
+      "tspan",
+      "u",
+      "ul",
+      "use",
+      "var",
+      "video",
+      "wbr"
+    ],
+    "forbidden_html_elements": [
+      "script",
+      "object",
+      "embed",
+      "base"
+    ],
+    "allowed_iframe_domains": [
+      "maps.google.com"
+    ],
+    "js_builtin_methods": [
+      "at",
+      "charAt",
+      "charCodeAt",
+      "concat",
+      "endsWith",
+      "entries",
+      "every",
+      "fill",
+      "filter",
+      "find",
+      "findIndex",
+      "flat",
+      "flatMap",
+      "forEach",
+      "getDate",
+      "getDay",
+      "getFullYear",
+      "getHours",
+      "getMinutes",
+      "getMonth",
+      "getSeconds",
+      "getTime",
+      "hasOwnProperty",
+      "includes",
+      "indexOf",
+      "join",
+      "keys",
+      "localeCompare",
+      "map",
+      "match",
+      "normalize",
+      "padEnd",
+      "padStart",
+      "pop",
+      "push",
+      "reduce",
+      "repeat",
+      "replace",
+      "reverse",
+      "setDate",
+      "setFullYear",
+      "setMonth",
+      "shift",
+      "slice",
+      "some",
+      "sort",
+      "split",
+      "startsWith",
+      "substring",
+      "toDateString",
+      "toFixed",
+      "toISOString",
+      "toLocaleDateString",
+      "toLocaleString",
+      "toLocaleTimeString",
+      "toLowerCase",
+      "toPrecision",
+      "toString",
+      "toTimeString",
+      "toUTCString",
+      "toUpperCase",
+      "trim",
+      "valueOf",
+      "values"
+    ],
+    "helper_functions": [
+      "$nextTick",
+      "DateHelper.date",
+      "Helpers.image",
+      "callModal",
+      "changeLang",
+      "href"
+    ],
+    "required_element_attrs": {
+      "img": [
+        "alt"
+      ]
+    },
+    "allowed_api_endpoints": [
+      "Countries.get_countries",
+      "Reviews.get_blog_comments",
+      "Reviews.post_blog_comments",
+      "Shop.get_orders",
+      "User.delete_user_address",
+      "User.get_accounts",
+      "User.post_user_address",
+      "User.put_accounts",
+      "get.blogCategories",
+      "get.blogPosts",
+      "get.gallery_categories",
+      "get.meeting_calendars",
+      "get.menu",
+      "get.my_addresses",
+      "get.my_company",
+      "get.our_brands",
+      "get.testimonials",
+      "post.meetings",
+      "put.company"
+    ],
+    "implicit_keyname_endpoints": [],
+    "endpoint_keyname_map": {
+      "Countries.get_countries": "countries",
+      "Reviews.get_blog_comments": "blogReviews",
+      "User.get_accounts": "user",
+      "get.blogCategories": "blogCategories",
+      "get.blogPosts": "post",
+      "get.gallery_categories": "gallery",
+      "get.menu": "menu",
+      "get.my_addresses": "my_addresses",
+      "get.my_company": "my_company",
+      "get.our_brands": "brands",
+      "get.testimonials": "testimonials"
+    },
+    "allowed_listeners": [
+      "Contacts.post_contacts",
+      "Countries.get_countries",
+      "DateHelper.date",
+      "Gallery.open",
+      "Newsletter.post_newsletter",
+      "Reviews.get_blog_comments",
+      "Reviews.post_blog_comments",
+      "Shop.get_orders",
+      "User.delete_user_address",
+      "User.get_accounts",
+      "User.login",
+      "User.post_user_address",
+      "User.put_accounts",
+      "callModal",
+      "changeLang",
+      "get.blogPosts",
+      "get.meeting_calendars",
+      "get.my_addresses",
+      "get.my_company",
+      "get.our_brands",
+      "get.testimonials",
+      "post.meetings",
+      "put.company"
+    ],
+    "allowed_loop_sources": [
+      "data.blogCategories",
+      "data.blogCategories.result",
+      "data.blogPosts",
+      "data.blogPosts.result",
+      "data.blogPosts_filters.tags",
+      "data.blogReviews",
+      "data.blogReviews.result",
+      "data.brands",
+      "data.brands.result",
+      "data.corePage.target_id",
+      "data.countries",
+      "data.countries.result",
+      "data.gallery",
+      "data.gallery.result",
+      "data.meetingSuccess",
+      "data.meeting_calendars",
+      "data.menu",
+      "data.menu.result",
+      "data.modals.meeting",
+      "data.modals.meetingSuccess",
+      "data.my_addresses",
+      "data.my_addresses.result",
+      "data.my_company",
+      "data.my_company.result",
+      "data.newestPosts",
+      "data.newestPosts.result",
+      "data.openMobileMenu",
+      "data.orders",
+      "data.pageUrl.tag",
+      "data.post",
+      "data.post.result",
+      "data.sameCategoryPosts",
+      "data.sameCategoryPosts.result",
+      "data.screenWidth",
+      "data.selectedGallery",
+      "data.services",
+      "data.testimonials",
+      "data.testimonials.result",
+      "data.user",
+      "data.user.email",
+      "data.user.names",
+      "data.user.result"
+    ],
+    "allowed_functions": [
+      "$nextTick",
+      "Contacts.post_contacts",
+      "DateHelper.date",
+      "Gallery.open",
+      "Helpers.image",
+      "Newsletter.post_newsletter",
+      "User.login",
+      "callModal",
+      "changeLang",
+      "href"
+    ],
+    "allowed_state_vars": [
+      "availableDates",
+      "data.blogCategories",
+      "data.blogPosts_filters.tags",
+      "data.blogReviews",
+      "data.brands",
+      "data.corePage.target_id",
+      "data.countries",
+      "data.gallery",
+      "data.meetingSuccess",
+      "data.meeting_calendars",
+      "data.menu",
+      "data.modals.meeting",
+      "data.modals.meetingSuccess",
+      "data.my_addresses",
+      "data.my_company",
+      "data.newestPosts",
+      "data.openMobileMenu",
+      "data.orders",
+      "data.pageUrl.tag",
+      "data.post",
+      "data.sameCategoryPosts",
+      "data.screenWidth",
+      "data.selectedGallery",
+      "data.services",
+      "data.testimonials",
+      "data.user",
+      "data.user.email",
+      "data.user.names",
+      "selectedCalendarId",
+      "selectedDate",
+      "selectedSlot",
+      "showCalendar",
+      "tab"
+    ],
+    "loop_item_fields": {
+      "data.blogCategories": [
+        "id",
+        "title",
+        "url"
+      ],
+      "data.blogCategories.result": [
+        "id",
+        "title",
+        "url"
+      ],
+      "data.blogPosts": [
+        "category",
+        "category.id",
+        "category.title",
+        "category.url",
+        "date_created",
+        "description",
+        "id",
+        "images",
+        "images[].url",
+        "images[].url_10x10",
+        "read_time",
+        "related_posts",
+        "related_posts[].date_publish",
+        "related_posts[].id",
+        "related_posts[].images",
+        "related_posts[].seo_description",
+        "related_posts[].title",
+        "related_posts[].url",
+        "seo_description",
+        "tags",
+        "title",
+        "url",
+        "views"
+      ],
+      "data.blogPosts.result": [
+        "category",
+        "category.id",
+        "category.title",
+        "category.url",
+        "date_created",
+        "description",
+        "id",
+        "images",
+        "images[].url",
+        "images[].url_10x10",
+        "read_time",
+        "related_posts",
+        "related_posts[].date_publish",
+        "related_posts[].id",
+        "related_posts[].images",
+        "related_posts[].seo_description",
+        "related_posts[].title",
+        "related_posts[].url",
+        "seo_description",
+        "tags",
+        "title",
+        "url",
+        "views"
+      ],
+      "data.blogReviews": [
+        "comment",
+        "date",
+        "email",
+        "rating",
+        "user_name"
+      ],
+      "data.blogReviews.result": [
+        "comment",
+        "date",
+        "email",
+        "rating",
+        "user_name"
+      ],
+      "data.brands": [
+        "id",
+        "image",
+        "image.url",
+        "title"
+      ],
+      "data.brands.result": [
+        "id",
+        "image",
+        "image.url",
+        "title"
+      ],
+      "data.countries": [
+        "id",
+        "title"
+      ],
+      "data.countries.result": [
+        "id",
+        "title"
+      ],
+      "data.gallery": [
+        "gallery",
+        "gallery[].image",
+        "id",
+        "title"
+      ],
+      "data.gallery.result": [
+        "gallery",
+        "gallery[].image",
+        "id",
+        "title"
+      ],
+      "data.meeting_calendars": [
+        "days",
+        "days[].date",
+        "days[].time_slots",
+        "id",
+        "link",
+        "title"
+      ],
+      "data.meeting_calendars.result": [
+        "days",
+        "days[].date",
+        "days[].time_slots",
+        "id",
+        "link",
+        "title"
+      ],
+      "data.menu": [
+        "link",
+        "title"
+      ],
+      "data.menu.result": [
+        "link",
+        "title"
+      ],
+      "data.my_addresses": [
+        "city",
+        "country",
+        "country.title",
+        "id",
+        "post_code",
+        "shipping_address"
+      ],
+      "data.my_addresses.result": [
+        "city",
+        "country",
+        "country.title",
+        "id",
+        "post_code",
+        "shipping_address"
+      ],
+      "data.my_company": [
+        "address",
+        "city",
+        "country_id",
+        "mol",
+        "name",
+        "phone",
+        "vat",
+        "vat_registered"
+      ],
+      "data.my_company.result": [
+        "address",
+        "city",
+        "country_id",
+        "mol",
+        "name",
+        "phone",
+        "vat",
+        "vat_registered"
+      ],
+      "data.post": [
+        "category",
+        "category.id",
+        "category.title",
+        "category.url",
+        "date_created",
+        "description",
+        "id",
+        "images",
+        "images[].url",
+        "images[].url_10x10",
+        "read_time",
+        "related_posts",
+        "related_posts[].date_publish",
+        "related_posts[].id",
+        "related_posts[].images",
+        "related_posts[].seo_description",
+        "related_posts[].title",
+        "related_posts[].url",
+        "seo_description",
+        "tags",
+        "title",
+        "url",
+        "views"
+      ],
+      "data.post.result": [
+        "category",
+        "category.id",
+        "category.title",
+        "category.url",
+        "date_created",
+        "description",
+        "id",
+        "images",
+        "images[].url",
+        "images[].url_10x10",
+        "read_time",
+        "related_posts",
+        "related_posts[].date_publish",
+        "related_posts[].id",
+        "related_posts[].images",
+        "related_posts[].seo_description",
+        "related_posts[].title",
+        "related_posts[].url",
+        "seo_description",
+        "tags",
+        "title",
+        "url",
+        "views"
+      ],
+      "data.testimonials": [
+        "author",
+        "comment",
+        "id",
+        "image",
+        "image.url",
+        "rating"
+      ],
+      "data.testimonials.result": [
+        "author",
+        "comment",
+        "id",
+        "image",
+        "image.url",
+        "rating"
+      ],
+      "data.user": [
+        "balance",
+        "email",
+        "first_name",
+        "last_name",
+        "phone"
+      ],
+      "data.user.result": [
+        "balance",
+        "email",
+        "first_name",
+        "last_name",
+        "phone"
+      ]
+    },
+    "error_hints": {
+      "SEC-001": "Remove all <script> tags — use Alpine.js directives instead",
+      "SEC-002": "Remove <style>/<math> — platform loads styles globally",
+      "SEC-003": "Use only standard HTML elements from the allowed list",
+      "SEC-004": "Iframes only from maps.google.com, no srcdoc",
+      "SEC-005": "Remove javascript:/data:/vbscript: URLs",
+      "SEC-006": "Replace onclick/onerror with Alpine @click/@error",
+      "SEC-007": "Remove CSS expression()/@import/data: from style attributes",
+      "SEC-008": "Remove <meta http-equiv> — cannot override security headers",
+      "SEC-009": "Add rel=\"noopener\" to target=\"_blank\" links",
+      "SEC-010": "Form actions must use alpineListeners(), not external URLs",
+      "SEC-011": "Remove dangerous attribute values (javascript:/data:text/html)",
+      "ALP-001": "Use only allowed Alpine directives/events/bindings from the catalog",
+      "ALP-002": "Use only allowed alpineListeners() endpoints from the catalog",
+      "ALP-003": "x-html only for CMS content (data.post.description)",
+      "ALP-004": "Use href(url) for navigation, not $dispatch()",
+      "ALP-005": "Use alpineListeners() instead of direct module calls",
+      "ALP-006": "Use @submit.prevent or button @click with alpineListeners()",
+      "ALP-007": "x-for must be on <template>, not other elements",
+      "BND-001": "Use only apiData endpoints defined in the component catalog",
+      "BND-002": "Add keyName attribute matching the endpoint",
+      "BND-003": "Remove fetch/XHR/axios — use apiData/keyName binding",
+      "BND-004": "Use dot-notation data paths, not REST /api/ URLs",
+      "BND-005": "Prefix loop source with data. (e.g. data.blogPosts not blogPosts)",
+      "BND-010": "Fix keyName to match expected value for this apiData endpoint",
+      "BND-011": "Fix x-for source to use correct EXPOZY data path",
+      "BND-012": "Unknown x-for source — not a known EXPOZY data path",
+      "BND-013": "Use alpineListeners() for API calls, not custom functions",
+      "BND-014": "Unknown function — use alpineListeners() or EXPOZY module functions",
+      "BND-015": "Wrong state variable in x-data — check platform naming",
+      "BND-016": "Wrong state reference in expression — check platform naming",
+      "BND-017": "Replace vanilla JS DOM manipulation with Alpine directives",
+      "FLD-001": "Loop items are primitives, not objects — remove field access",
+      "FLD-002": "Wrong field name — check endpoint returns schema",
+      "FLD-003": "Unknown field — not in endpoint returns schema",
+      "HTM-001": "Close all opened tags",
+      "HTM-002": "Remove unexpected closing tag — no matching open tag",
+      "HTM-003": "Fix nesting — block element inside inline element",
+      "HTM-004": "Remove duplicate id attribute",
+      "HTM-005": "Replace deprecated HTML element",
+      "HTM-006": "Add required attribute (e.g. alt on img)",
+      "STR-001": "Add alt attribute to <img>",
+      "STR-002": "Add dark: variant for light background/text classes",
+      "STR-003": "Add is-section class to <section> elements",
+      "STR-004": "Replace ALL inline <svg> with FontAwesome <i> tags. Example: <i class='fa-solid fa-star text-amber-500'></i>. For brand logos use apiData='get.our_brands' with <img :src='brand.image.url'>. Maximum 2 inline SVGs per page.",
+      "STR-010": "Output HTML fragment only — remove <!DOCTYPE>, <html>, <head>, <body>",
+      "STR-011": "Use '!container is-container v2' instead of 'container mx-auto'",
+      "STR-012": "Move background/gradient to .is-overlay-bg child, not section root",
+      "STR-013": "Use dark:text-white or dark:text-slate-300, not dark:text-gray-700+",
+      "STR-014": "Remove CDN assets — platform loads Tailwind/Alpine globally"
+    },
+    "wrong_loop_sources": {},
+    "wrong_functions": {},
+    "wrong_state_vars": {},
+    "wrong_fields_by_context": {},
+    "known_wrong_fields_general": {},
+    "restricted_html_elements": {
+      "math": "MathML can contain script — verify content",
+      "style": "Inline <style> can contain CSS injection vectors"
+    },
+    "cdn_domains": [
+      "cdn.tailwindcss.com",
+      "unpkg.com",
+      "cdn.jsdelivr.net",
+      "cdnjs.cloudflare.com"
+    ],
+    "shadow_data_vars": [
+      "blogPosts",
+      "blogCategories",
+      "blogPosts_filters",
+      "menu",
+      "blogReviews",
+      "post",
+      "comments",
+      "sameCategoryPosts",
+      "newestPosts",
+      "testimonials",
+      "brands"
+    ],
+    "skip_functions": [
+      "alpineListeners",
+      "alert",
+      "confirm",
+      "prompt",
+      "setTimeout",
+      "setInterval",
+      "clearTimeout",
+      "clearInterval",
+      "requestAnimationFrame",
+      "parseInt",
+      "parseFloat",
+      "isNaN",
+      "isFinite",
+      "encodeURIComponent",
+      "decodeURIComponent",
+      "String",
+      "Number",
+      "Boolean",
+      "Array",
+      "Object",
+      "Date",
+      "Math",
+      "JSON",
+      "console",
+      "Error",
+      "event",
+      "window",
+      "document"
+    ],
+    "allowed_dotted_prefixes": [
+      "Math",
+      "JSON",
+      "Object",
+      "Array",
+      "String",
+      "Number",
+      "Date",
+      "console",
+      "Helpers",
+      "DateHelper",
+      "Gallery"
+    ],
+    "direct_call_modules": [
+      "Reviews",
+      "Newsletter",
+      "Contacts",
+      "User",
+      "Shop",
+      "Gallery",
+      "Countries",
+      "DateHelper"
+    ],
+    "vanilla_js_patterns": [
+      {
+        "pattern": "\\bdocument\\.\\w+",
+        "description": "document.* DOM access"
+      },
+      {
+        "pattern": "\\.classList\\b",
+        "description": ".classList manipulation"
+      },
+      {
+        "pattern": "\\.style\\.\\w+\\s*=",
+        "description": ".style.* direct manipulation"
+      },
+      {
+        "pattern": "\\.innerHTML\\b",
+        "description": ".innerHTML direct access"
+      },
+      {
+        "pattern": "\\.textContent\\b",
+        "description": ".textContent direct access"
+      },
+      {
+        "pattern": "\\.querySelector\\b",
+        "description": ".querySelector direct access"
+      },
+      {
+        "pattern": "\\.getElementById\\b",
+        "description": ".getElementById direct access"
+      },
+      {
+        "pattern": "\\.addEventListener\\b",
+        "description": ".addEventListener direct access"
+      },
+      {
+        "pattern": "\\.removeEventListener\\b",
+        "description": ".removeEventListener"
+      },
+      {
+        "pattern": "\\.appendChild\\b",
+        "description": ".appendChild DOM manipulation"
+      },
+      {
+        "pattern": "\\.removeChild\\b",
+        "description": ".removeChild DOM manipulation"
+      },
+      {
+        "pattern": "\\.setAttribute\\b",
+        "description": ".setAttribute direct access"
+      }
+    ],
+    "section_wrappers": {
+      "section_root_class": "is-section",
+      "overlay_bg_class": "is-overlay-bg",
+      "overlay_class": "is-overlay",
+      "correct_container": "!container is-container v2",
+      "wrong_container_markers": "container,mx-auto"
+    }
+  }
+}

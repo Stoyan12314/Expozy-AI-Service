@@ -1,0 +1,3010 @@
+{
+  "catalog_version": "7.2",
+  "platform": "EXPOZY",
+  "description": "Component catalog for EXPOZY AI page generation. Contains ONLY component specs, global config, and validation rules. Page definitions are in page_types.json.",
+  "page_selection_rules": [
+    "ONLY include pages the user actually needs. Less is more.",
+    "If the user asks for a specific set of pages, generate ONLY those.",
+    "Legal pages (cookie_policy, gdpr_policy, terms_conditions) only if the business sells online.",
+    "blog_listing + blog_post only if the user mentions blog/news/articles.",
+    "userpage only if the business has e-commerce or user accounts.",
+    "homepage is always included unless explicitly excluded.",
+    "header and footer are handled separately — do NOT include them."
+  ],
+  "ai_generation_rules": {
+    "system_role": "You are an EXPOZY template generator for the EXPOZY headless e-commerce CMS (Alpine-Expozy-StoreFront).",
+    "technology_contract": {
+      "stack": [
+        "Alpine.js (reactivity in templates via x-*, @click, :bind)",
+        "Global reactive object named `data` (persisted between page transitions)",
+        "TailwindCSS utility classes only (no build step; dynamic class generator)",
+        "Core API integration via HTML attributes: apiData + keyName + data-* params",
+        "Universal action handler: alpineListeners('METHOD.endpoint', $event)",
+        "SPA routing replaces only <main> content; no full page reload"
+      ],
+      "template_scope": {
+        "page_template_mode": "CRITICAL: Generate ONLY the HTML fragment that will be injected into <main>. Do NOT output <!DOCTYPE>, <html>, <head>, or <body>.",
+        "header_footer_mode": "If generating header/footer templates, output ONLY the header/nav/footer fragment (still no external assets)."
+      },
+      "framework_functions": {
+        "routing": "Use href('/bg/...') for internal navigation (SPA). Recommended pattern: <a href='/bg/x' @click.prevent=\"href('/bg/x')\">...</a>",
+        "language_switching": "Use changeLang('bg') / changeLang('en') for language switching.",
+        "api_calls": "Use apiData=\"get.something\" keyName=\"something\" and pass request params via attributes starting with data-.",
+        "actions": "Use @click=\"alpineListeners('post.something', $event)\" (PLURAL: alpineListeners). Optionally use @success and @error hooks."
+      }
+    },
+    "output_format": {
+      "description": "CRITICAL: You must output ONLY standard HTML elements. The component catalog below is a BLUEPRINT — not a web component library.",
+      "allowed_html_elements": [
+        "div",
+        "section",
+        "nav",
+        "header",
+        "footer",
+        "main",
+        "article",
+        "h1",
+        "h2",
+        "h3",
+        "p",
+        "a",
+        "span",
+        "img",
+        "br",
+        "strong",
+        "em",
+        "form",
+        "input",
+        "button",
+        "select",
+        "option",
+        "textarea",
+        "label",
+        "ul",
+        "li",
+        "ol",
+        "table",
+        "thead",
+        "tbody",
+        "tr",
+        "td",
+        "th",
+        "iframe",
+        "template",
+        "svg",
+        "path",
+        "circle",
+        "i"
+      ],
+      "forbidden_patterns": [
+        "NEVER output <!DOCTYPE>, <html>, <head>, <body> in page templates",
+        "NEVER output <script>, <style>, or <link rel='stylesheet'> in templates",
+        "NEVER include CDN assets (tailwindcdn, jsdelivr, cdnjs, etc.) in templates",
+        "NEVER output <expozy-*>, <component-*>, or ANY custom/non-standard HTML element tags",
+        "NEVER wrap content in tags named after catalog component IDs",
+        "NEVER use <expozy-section>, <expozy-item>, <expozy-component-*> or similar"
+      ],
+      "how_to_read_catalog": {
+        "properties": "Tells you WHAT content to generate (text, images, data values). Fill with AI-generated content matching the business context.",
+        "structure": "Tells you HOW to build the HTML. Dot-notation = CSS classes: 'div.md:flex.gap-6' → <div class=\"md:flex gap-6\">",
+        "structure.elements": "Nested element tree using shorthand: '>' = child, '+' = sibling, '[]' = repeat per item, '?' = optional",
+        "endpoints": "Which apiData/alpineListeners attributes to place on wrapper elements. Copy ref values exactly.",
+        "ai_fills": "Instructions for what content the AI should generate for each property."
+      },
+      "example": {
+        "given": "component 'feature_cards' with structure.per_item: 'div.md:flex.md:items-start.md:gap-6' and elements: ['span.p-4.bg-amber-500.rounded-2xl > svg', 'div > h2 + p']",
+        "correct": "<div class=\"md:flex md:items-start md:gap-6\"><span class=\"p-4 bg-gradient-to-br from-amber-500 to-amber-600 rounded-2xl\"><svg>...</svg></span><div><h2>Title here</h2><p>Description here</p></div></div>",
+        "wrong": "<expozy-component-feature_cards><expozy-item title=\"Title\" description=\"Description\"></expozy-item></expozy-component-feature_cards>"
+      }
+    },
+    "styling_rules": [
+      "Use Tailwind CSS utility classes for ALL styling.",
+      "Use FontAwesome 6 classes for icons (fa-solid, fa-regular, fa-brands).",
+      "Dark mode support: always include dark: variants for backgrounds and text.",
+      "Use inline <svg> for decorative feature icons (hero badges, feature cards, service cards, CTA buttons). Use FontAwesome <i> classes for star ratings, contact info icons, and UI icons (close, menu, arrows in nav).",
+      "For star ratings ALWAYS use FontAwesome: <i class='fa-solid fa-star text-amber-500'></i> — NEVER use inline <svg> star paths. For contact cards use FontAwesome (fa-phone, fa-envelope, fa-location-dot).",
+      "For brand/partner logos, use the brand_logos component with apiData binding — do NOT hardcode SVG logos."
+    ],
+    "content_rules": [
+      "All text MUST use vocabulary specific to the business type.",
+      "Tailor headings, descriptions, CTAs to the industry.",
+      "Write in the language specified in the business context.",
+      "Every text field MUST contain actual content — never empty.",
+      "ALL testimonials MUST use the testimonials component with apiData and x-for loops — NEVER hardcode static testimonial cards.",
+      "ALL brand/partner logos MUST use apiData='get.our_brands' with x-for loop — NEVER hardcode logo images or SVGs.",
+      "Content MUST match the business_context. If business_type is 'car service', write about car repairs — NOT generic template text."
+    ],
+    "security_rules": [
+      "ABSOLUTELY NO <script> tags anywhere in generated templates.",
+      "No vanilla JS DOM manipulation in templates.",
+      "No external resources except Google Maps iframe where specified by the catalog.",
+      "Images must use /static/images/ prefix or Helpers.image() fallback. All <img> need meaningful alt."
+    ],
+    "framework_rules": [
+      "apiData elements must NOT be inside <template> tags (framework restriction).",
+      "Use alpineListeners (PLURAL) exactly as the framework defines: alpineListeners('post.carts', $event).",
+      "Use @success and @error hooks only as Alpine attributes (no scripts).",
+      "For internal navigation links, prefer SPA routing via href('/path') (with href='...' fallback)."
+    ],
+    "common_mistakes": {
+      "description": "CRITICAL: The AI MUST avoid these patterns. Every violation listed here has occurred in past generations and MUST NOT be repeated.",
+      "1_no_vanilla_js": {
+        "rule": "NEVER use document.getElementById, document.querySelector, addEventListener, or any vanilla JS DOM manipulation. ALL interactivity MUST use Alpine.js directives.",
+        "wrong": "<script>document.getElementById('mobile-menu-button').addEventListener('click', function() { ... });</script>",
+        "correct": "<div x-data=\"{ open: false }\"><button @click=\"open = !open\"><i :class=\"open ? 'fa-xmark' : 'fa-bars'\" class=\"fa-solid text-xl\"></i></button><div x-show=\"open\" x-transition class=\"md:hidden\">...</div></div>",
+        "applies_to": [
+          "site_header mobile menu",
+          "any toggle/accordion/dropdown"
+        ]
+      },
+      "2_no_external_assets_or_full_document": {
+        "rule": "In page templates, NEVER output full HTML documents or external assets. No <!DOCTYPE>, <html>, <head>, <body>, <script>, <link>, <style>, or CDN URLs. The framework loads assets globally.",
+        "applies_to": [
+          "all page templates in /pages"
+        ]
+      },
+      "3_use_alpineListeners_plural": {
+        "rule": "Use alpineListeners (PLURAL). Do NOT use alpineListener (SINGULAR).",
+        "wrong": "@click=\"alpineListener('post.carts', $event)\"",
+        "correct": "@click=\"alpineListeners('post.carts', $event)\"",
+        "applies_to": [
+          "all actions"
+        ]
+      },
+      "4_no_hardcoded_nav": {
+        "rule": "The site_header component MUST use apiData='get.menu' to load navigation dynamically. Only the static home link is hardcoded. All other nav items come from x-for='menu in data.menu'.",
+        "wrong": "<nav><a href='./about.html'>За нас</a><a href='./contacts.html'>Контакти</a></nav>",
+        "correct": "<nav apiData='get.menu' keyName='menu'><a href='/' @click.prevent=\"href('/')\">Начало</a><template x-for='menu in data.menu' :key='menu.link'><a :href='menu.link' @click.prevent=\"href(menu.link)\" x-text='menu.title' class='px-4 py-2 text-sm font-medium'></a></template></nav>",
+        "applies_to": [
+          "site_header desktop_nav",
+          "site_header mobile_menu"
+        ]
+      },
+      "5_follow_page_sections_exactly": {
+        "rule": "Each page type defines its sections with specific components in a specific order. The AI MUST follow this structure EXACTLY. Do NOT improvise layouts, skip defined components, or add components not listed in the page definition.",
+        "applies_to": [
+          "all page types — check the page_types definition before generating"
+        ]
+      },
+      "6_use_catalog_iframe_template": {
+        "rule": "The google_map component defines an iframe_src_template. ALWAYS use it. NEVER use Google Maps embed URLs copied from the web or invented URLs with pb= parameters.",
+        "wrong": "<iframe src='https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2938...'></iframe>",
+        "correct": "<iframe src='https://maps.google.com/maps?q=Sofia,+ul.+Tsarigradsko+shose+123&hl=bg&t=m&z=15&output=embed' class='w-full h-full' loading='lazy'></iframe>",
+        "applies_to": [
+          "google_map component",
+          "contacts page"
+        ]
+      },
+      "7_complete_all_html": {
+        "rule": "NEVER truncate HTML output. Every opened tag MUST be closed. Every SVG MUST be complete. If approaching token limits, reduce the NUMBER of repeated items rather than truncating HTML.",
+        "applies_to": [
+          "testimonials",
+          "feature_cards",
+          "service_cards",
+          "any component with repeated items"
+        ]
+      },
+      "8_no_script_tags": {
+        "rule": "ABSOLUTELY NO <script> tags anywhere in generated HTML. This includes: mobile menu toggles, year display in footer, counters, animations, DOMContentLoaded handlers. Use Alpine.js directives instead.",
+        "wrong_examples": [
+          "<script>document.getElementById('year').textContent = new Date().getFullYear();</script>",
+          "<script>document.addEventListener('DOMContentLoaded', function() { ... });</script>",
+          "<script>document.addEventListener('alpine:init', () => { ... });</script>"
+        ],
+        "correct_examples": [
+          "<span x-data x-text='new Date().getFullYear()'></span>",
+          "<div x-data='{ open: false }'><button @click='open = !open'>Toggle</button><div x-show='open'>Content</div></div>"
+        ],
+        "applies_to": [
+          "footer year display",
+          "mobile menu toggle",
+          "any interactive behavior"
+        ]
+      },
+      "9_always_use_section_wrappers": {
+        "rule": "Every content section MUST use an EXPOZY section wrapper from global.section_wrappers. NEVER use plain <div class='container mx-auto'> as a section root.",
+        "applies_to": [
+          "every section in every page"
+        ]
+      },
+      "10_listeners_on_buttons_not_forms": {
+        "rule": "For POST/PUT/DELETE actions, alpineListeners() MUST be triggered from a clickable element (usually a <button type='button'>) using @click. DO NOT put alpineListeners() on <form @submit> or <form @submit.prevent>.",
+        "wrong": "<form @submit.prevent=\"alpineListeners('User.put_accounts', $el)\" class=\"space-y-4\">...</form>",
+        "correct": "<form class=\"space-y-4\">...<button type=\"button\" @click=\"alpineListeners('User.put_accounts', $event)\" class=\"px-4 py-2 rounded-lg bg-gray-900 text-white\">Save changes</button></form>",
+        "applies_to": [
+          "Any alpineListeners() call where the endpoint method is POST/PUT/DELETE (mutations)"
+        ]
+      },
+      "11_no_direct_module_calls": {
+        "rule": "NEVER call platform module functions directly in Alpine expressions. ALL platform calls MUST go through alpineListeners(). Direct calls like Gallery.open(url) bypass the event system and will not work.",
+        "wrong": "@click=\"Gallery.open(item.image.url)\"",
+        "correct": "@click=\"alpineListeners('Gallery.open', $event)\" :data-images=\"JSON.stringify(item.gallery)\"",
+        "applies_to": [
+          "gallery_tabs",
+          "any component calling platform module functions"
+        ]
+      },
+      "12_correct_container_classes": {
+        "rule": "Inside section wrappers (is-section), ALWAYS use '!container is-container v2' as the container class. NEVER use 'container mx-auto px-4'. The EXPOZY framework requires the is-container class for proper layout.",
+        "wrong": "<div class='container mx-auto px-4 py-16'>",
+        "correct": "<div class='!container is-container v2'>",
+        "applies_to": [
+          "every section in every page"
+        ]
+      },
+      "13_checkout_no_map_scripts": {
+        "rule": "The checkout component uses a geolocation map plugin. NEVER output <script src='https://maps.googleapis.com/...'>, <script src='/assets/plugins/google_map/...'>, or <link rel='stylesheet' href='/assets/plugins/google_map/...'> — these are loaded globally by the platform. Only output the three HTML hooks the plugin attaches to: (1) <input id='address'> for address autocomplete, (2) <button id='location'> for GPS crosshairs, (3) <div id='map'> for the map canvas.",
+        "wrong": "<script src='https://maps.googleapis.com/maps/api/js?key=AIza...'></script>\n<link rel='stylesheet' href='/assets/plugins/google_map/geolocation.css'>\n<script src='/assets/plugins/google_map/geolocation.js'></script>",
+        "correct": "<input type='text' id='address' name='addressGeo' ...>\n<button type='button' id='location'><i class='fa-solid fa-crosshairs'></i></button>\n<div id='map' class='h-full'></div>",
+        "applies_to": [
+          "checkout component — address delivery mode map section"
+        ]
+      }
+    },
+    "critical_patterns": [
+      {
+        "rule": "NEVER hardcode testimonials. ALWAYS use apiData='get.testimonials' with x-for.",
+        "WRONG": "<div class='testimonial_card'><p>'Great!'</p><h3>Иван</h3></div>",
+        "RIGHT": "<section apiData='get.testimonials' keyName='testimonials'><div class='grid md:grid-cols-3 gap-8'><template x-for='item in data.testimonials' :key='item.id'><div class='testimonial_card'><div class='flex mb-4'><template x-for='i in item.rating'><i class='fa-solid fa-star text-amber-500'></i></template></div><p x-text='item.comment'></p><div class='flex items-center'><img :src='item.image.url' :alt='item.author' class='w-12 h-12 rounded-full mr-4' /><div><h4 x-text='item.author'></h4></div></div></div></template></div></section>",
+        "id": "testimonials_api"
+      },
+      {
+        "rule": "NEVER hardcode brand logos or SVGs. ALWAYS use apiData='get.our_brands' with x-for.",
+        "WRONG": "<div class='logo_card'><svg viewBox='0 0 24 24'><path d='M12,2A10...'/></svg></div>",
+        "RIGHT": "<section apiData='get.our_brands' keyName='brands'><div class='grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6'><template x-for='brand in data.brands' :key='brand.id'><div class='logo_card bg-white dark:bg-slate-800 rounded-xl p-6 shadow-md flex items-center justify-center'><img :src='brand.image.url' :alt='brand.title' class='h-12 object-contain' /></div></template></div></section>",
+        "id": "brand_logos_api"
+      },
+      {
+        "rule": "For STAR RATINGS and CONTACT INFO icons, use FontAwesome <i> tags. Inline <svg> is fine for decorative feature icons.",
+        "WRONG": "<div class='flex'><svg class='w-5 h-5 text-amber-500' fill='currentColor' viewBox='0 0 20 20'><path d='M9.049 2.927c.3-.921...'/></svg> x5 (SVG stars)",
+        "RIGHT": "<div class='flex'><template x-for='i in item.rating'><i class='fa-solid fa-star text-amber-500'></i></template></div>",
+        "id": "icons_fontawesome"
+      },
+      {
+        "rule": "Star ratings: FontAwesome + x-for, NEVER 5 inline SVGs.",
+        "WRONG": "<svg>star</svg> x5",
+        "RIGHT": "<template x-for='i in 5'><i class='fa-solid fa-star text-amber-500'></i></template>",
+        "id": "star_ratings_fa"
+      },
+      {
+        "id": "container_classes",
+        "rule": "NEVER use 'container mx-auto'. ALWAYS use '!container is-container v2' inside section wrappers.",
+        "WRONG": "<div class='container mx-auto px-4 py-16'>",
+        "RIGHT": "<div class='!container is-container v2'>"
+      },
+      {
+        "id": "fragment_only",
+        "rule": "Output ONLY the HTML fragment for <main>. NEVER output <!DOCTYPE>, <html>, <head>, <body>, <script>, or CDN links. The platform loads all assets globally.",
+        "WRONG": "<!DOCTYPE html><html><head><script src='cdn.tailwindcss.com'></script></head><body>...",
+        "RIGHT": "<div class='is-section is-section-auto section'><!-- page content starts here -->"
+      }
+    ]
+  },
+  "global": {
+    "css_framework": "tailwindcss",
+    "js_framework": "alpine.js",
+    "color_scheme": {
+      "primary": "amber-500 to amber-600",
+      "text_primary": "slate-900 / gray-900",
+      "text_secondary": "slate-600 / gray-600",
+      "bg_light": "slate-50 / gray-50 / white",
+      "bg_dark": "gray-900 / slate-900",
+      "accent": "amber-500"
+    },
+    "section_wrappers": {
+      "standard": {
+        "description": "Default section wrapper for most content sections",
+        "required_classes": [
+          "is-section",
+          "is-section-auto",
+          "section"
+        ],
+        "container_classes": [
+          "!container",
+          "is-container",
+          "v2"
+        ],
+        "has_overlay": true,
+        "optional_padding": "!py-10 | !py-20"
+      },
+      "box": {
+        "description": "Full-width box for embedded content like maps",
+        "required_classes": [
+          "is-section",
+          "is-box",
+          "is-section-60"
+        ],
+        "container_classes": [
+          "is-container",
+          "v2",
+          "!w-full",
+          "is-content-none",
+          "!px-0"
+        ],
+        "has_overlay": true,
+        "extra_classes": [
+          "max-h-[400px]",
+          "box-autofit",
+          "last-box",
+          "scroll-target"
+        ]
+      },
+      "fullpage_box": {
+        "description": "Full-height box for static content pages (legal, policies)",
+        "required_classes": [
+          "is-section",
+          "is-box",
+          "is-section-100"
+        ],
+        "container_classes": [
+          "is-container",
+          "v2",
+          "is-content-1600"
+        ],
+        "has_overlay": true,
+        "extra_classes": [
+          "box-autofit",
+          "last-box",
+          "scroll-target",
+          "type-poppins"
+        ]
+      },
+      "plain_section": {
+        "description": "Standalone <section> with lock class. No is-section. For newsletter etc.",
+        "required_classes": [
+          "w-full",
+          "lock"
+        ],
+        "root_element": "section",
+        "container_classes": [
+          "max-w-4xl",
+          "mx-auto",
+          "px-4",
+          "sm:px-6",
+          "lg:px-8"
+        ]
+      },
+      "auth_page": {
+        "description": "Full-screen standalone <section> for auth pages (login, register, forgotten password). Gradient background, centered card layout with min-h-screen. No is-section wrapper.",
+        "required_classes": [
+          "w-full",
+          "min-h-screen"
+        ],
+        "root_element": "section",
+        "bg_classes": "bg-gradient-to-br from-slate-50 to-slate-100 dark:from-gray-950 dark:to-slate-900",
+        "container_classes": [
+          "flex",
+          "flex-col",
+          "items-center",
+          "justify-center",
+          "px-6",
+          "py-8",
+          "mx-auto",
+          "md:h-screen",
+          "lg:py-0"
+        ]
+      },
+      "none": {
+        "description": "No wrapper. Component renders own root element. For global components (nav, footer)."
+      }
+    },
+    "image_base_url": "/static/images/",
+    "allowed_image_formats": [
+      "webp",
+      "png",
+      "jpg",
+      "svg"
+    ],
+    "icon_library": "font-awesome",
+    "icon_prefix": [
+      "fa-solid",
+      "fa-regular"
+    ],
+    "global_components": {
+      "description": "Components on EVERY page, outside per-page section system.",
+      "components": [
+        "site_header",
+        "site_footer"
+      ]
+    }
+  },
+  "components": {
+    "hero_section": {
+      "id": "hero_section",
+      "name": "Hero Section",
+      "description": "Full two-column hero with badge, h1 heading, description paragraph, dual CTA buttons (primary filled + secondary outline), trust indicator chips, and a featured image with gradient glow backdrop. Right column hidden on mobile.",
+      "category": "headers",
+      "max_per_page": 1,
+      "properties": {
+        "badge": {
+          "type": "object",
+          "required": false,
+          "description": "Small pill badge above the heading (e.g. '20+ years of experience')",
+          "properties": {
+            "icon_svg": {
+              "type": "svg_icon",
+              "required": false,
+              "description": "Small SVG icon in the badge (e.g. star)"
+            },
+            "text": {
+              "type": "string",
+              "required": true,
+              "max_length": 40
+            }
+          }
+        },
+        "title": {
+          "type": "string",
+          "required": true,
+          "max_length": 100,
+          "description": "Main h1 heading, text-4xl md:text-5xl lg:text-6xl"
+        },
+        "description": {
+          "type": "string",
+          "required": true,
+          "max_length": 250,
+          "description": "Supporting paragraph, text-lg md:text-xl"
+        },
+        "primary_cta": {
+          "type": "object",
+          "required": true,
+          "properties": {
+            "text": {
+              "type": "string",
+              "required": true,
+              "max_length": 30
+            },
+            "href": {
+              "type": "string",
+              "required": true
+            },
+            "icon_svg": {
+              "type": "svg_icon",
+              "required": false
+            }
+          }
+        },
+        "secondary_cta": {
+          "type": "object",
+          "required": false,
+          "properties": {
+            "text": {
+              "type": "string",
+              "required": true,
+              "max_length": 30
+            },
+            "href": {
+              "type": "string",
+              "required": true
+            },
+            "icon_svg": {
+              "type": "svg_icon",
+              "required": false
+            }
+          }
+        },
+        "trust_indicators": {
+          "type": "array",
+          "min_items": 0,
+          "max_items": 4,
+          "description": "Small checkmark + text chips below buttons",
+          "item_properties": {
+            "text": {
+              "type": "string",
+              "required": true,
+              "max_length": 30
+            }
+          }
+        },
+        "image_src": {
+          "type": "image_path",
+          "required": true
+        },
+        "image_alt": {
+          "type": "string",
+          "required": true,
+          "max_length": 120
+        },
+        "glow_effect": {
+          "type": "boolean",
+          "default": true
+        }
+      },
+      "endpoints": [],
+      "structure": {
+        "wrapper": "Uses standard section wrapper with !py-20 and bg-gradient-to-br from-gray-50 via-white to-gray-50",
+        "layout": "grid md:grid-cols-2 gap-16 items-center",
+        "elements": [
+          "div.space-y-8 > [div.badge?.inline-flex.rounded-full.bg-gray-900.text-white, h1, p, div.flex.gap-4 > a.primary_cta + a.secondary_cta, div.trust_indicators?.flex.gap-8 > div > svg.checkmark + span]",
+          "div.relative > [div.absolute.glow.blur-2xl.opacity-30, img.rounded-2xl.shadow-2xl.hover:scale-105]"
+        ]
+      }
+    },
+    "hero_banner": {
+      "id": "hero_banner",
+      "name": "Hero Banner (Simple)",
+      "description": "Simple heading with optional subtitle and accent bar. For use in two-column layouts paired with image_showcase and feature_cards.",
+      "category": "headers",
+      "max_per_page": 1,
+      "properties": {
+        "title": {
+          "type": "string",
+          "required": true,
+          "max_length": 80
+        },
+        "subtitle": {
+          "type": "string",
+          "required": false,
+          "max_length": 200
+        },
+        "accent_bar": {
+          "type": "boolean",
+          "default": true
+        }
+      },
+      "endpoints": [],
+      "structure": {
+        "wrapper": "div",
+        "elements": [
+          "h1.text-3xl.font-bold.lg:text-4xl",
+          "div.accent_bar? > [span.w-32 + span.w-4 + span.w-2]"
+        ]
+      }
+    },
+    "feature_cards": {
+      "id": "feature_cards",
+      "name": "Feature Cards (Horizontal)",
+      "description": "Horizontal flex cards with SVG icon left, text right. For stacking in a column alongside hero_banner.",
+      "category": "content",
+      "max_per_page": 3,
+      "properties": {
+        "items": {
+          "type": "array",
+          "min_items": 1,
+          "max_items": 6,
+          "item_properties": {
+            "icon": {
+              "type": "svg_icon",
+              "required": true
+            },
+            "title": {
+              "type": "string",
+              "required": true,
+              "max_length": 60
+            },
+            "description": {
+              "type": "string",
+              "required": true,
+              "max_length": 250
+            }
+          }
+        }
+      },
+      "endpoints": [],
+      "structure": {
+        "wrapper": "div.space-y-10",
+        "per_item": "div.md:flex.md:items-start.md:gap-6",
+        "elements": [
+          "span.icon_container.p-4.bg-gradient-to-br.from-amber-500.to-amber-600.rounded-2xl > svg",
+          "div > h2 + p"
+        ]
+      }
+    },
+    "icon_feature_grid": {
+      "id": "icon_feature_grid",
+      "name": "Icon Feature Grid (Centered)",
+      "description": "Centered feature cards in a responsive grid. Each card has a large circular icon container, heading, and description. Includes section heading and subheading. Cards have hover:bg-gray-50 effect.",
+      "category": "content",
+      "max_per_page": 2,
+      "properties": {
+        "heading": {
+          "type": "string",
+          "required": true,
+          "max_length": 80
+        },
+        "subheading": {
+          "type": "string",
+          "required": false,
+          "max_length": 200
+        },
+        "items": {
+          "type": "array",
+          "min_items": 1,
+          "max_items": 6,
+          "item_properties": {
+            "icon_svg": {
+              "type": "svg_icon",
+              "required": true,
+              "description": "Stroke-based SVG, w-8 h-8 text-white, inside a w-16 h-16 bg-gray-900 rounded-full container"
+            },
+            "title": {
+              "type": "string",
+              "required": true,
+              "max_length": 40
+            },
+            "description": {
+              "type": "string",
+              "required": true,
+              "max_length": 200
+            }
+          }
+        },
+        "columns": {
+          "type": "responsive",
+          "mobile": 1,
+          "tablet_md": 3
+        }
+      },
+      "endpoints": [],
+      "structure": {
+        "wrapper": "Uses standard section wrapper with !py-20",
+        "elements": [
+          "div.text-center.mb-16 > h2.text-3xl.md:text-4xl.font-bold + p.text-lg.max-w-2xl.mx-auto",
+          "div.grid.md:grid-cols-3.gap-8 > div.text-center.p-8.rounded-lg.hover:bg-gray-50 > [div.w-16.h-16.bg-gray-900.rounded-full.mx-auto.mb-6 > svg, h3.text-xl.font-bold.mb-4, p.text-gray-600]"
+        ]
+      }
+    },
+    "service_cards": {
+      "id": "service_cards",
+      "name": "Service Cards",
+      "description": "Image-topped cards showing services. Each card has full-width image, heading, description, and 'learn more' link with arrow. Includes section heading and subheading.",
+      "category": "content",
+      "max_per_page": 1,
+      "properties": {
+        "heading": {
+          "type": "string",
+          "required": true,
+          "max_length": 80
+        },
+        "subheading": {
+          "type": "string",
+          "required": false,
+          "max_length": 200
+        },
+        "items": {
+          "type": "array",
+          "min_items": 1,
+          "max_items": 6,
+          "item_properties": {
+            "image_src": {
+              "type": "image_path",
+              "required": true
+            },
+            "image_alt": {
+              "type": "string",
+              "required": true,
+              "max_length": 80
+            },
+            "title": {
+              "type": "string",
+              "required": true,
+              "max_length": 60
+            },
+            "description": {
+              "type": "string",
+              "required": true,
+              "max_length": 300
+            },
+            "link_text": {
+              "type": "string",
+              "default": "Learn more",
+              "max_length": 30
+            },
+            "link_href": {
+              "type": "string",
+              "required": true
+            }
+          }
+        },
+        "columns": {
+          "type": "responsive",
+          "mobile": 1,
+          "tablet_md": 2
+        }
+      },
+      "endpoints": [],
+      "structure": {
+        "wrapper": "Uses standard section wrapper with !py-20 and bg-gray-50 overlay",
+        "elements": [
+          "div.text-center.mb-16 > h2 + p",
+          "div.grid.md:grid-cols-2.gap-8 > div.bg-white.rounded-lg.shadow-lg.hover:shadow-xl > [img.w-full.h-64.object-cover, div.p-8 > h3.text-2xl.font-bold.mb-4 + p.mb-6 + a.inline-flex.items-center > text + svg.arrow]"
+        ]
+      }
+    },
+    "stats_counter": {
+      "id": "stats_counter",
+      "name": "Stats Counter Bar",
+      "description": "Dark background section with 4-column grid of large numbers and labels. Used for trust-building metrics like projects count, satisfaction rate, years of experience.",
+      "category": "social_proof",
+      "max_per_page": 1,
+      "properties": {
+        "items": {
+          "type": "array",
+          "min_items": 2,
+          "max_items": 6,
+          "item_properties": {
+            "value": {
+              "type": "string",
+              "required": true,
+              "max_length": 10,
+              "description": "Display value (e.g. '500+', '98%', '24/7')"
+            },
+            "label": {
+              "type": "string",
+              "required": true,
+              "max_length": 30
+            }
+          }
+        }
+      },
+      "endpoints": [],
+      "structure": {
+        "wrapper": "Uses standard section wrapper with !py-10 and bg-gray-900 overlay",
+        "elements": [
+          "div.grid.md:grid-cols-4.gap-8.text-center > div > [div.text-4xl.md:text-5xl.font-bold.text-white.mb-2, div.text-gray-400]"
+        ]
+      }
+    },
+    "newsletter_signup": {
+      "id": "newsletter_signup",
+      "name": "Newsletter Signup",
+      "description": "Centered email subscription form with heading, subheading, email input + subscribe button, and privacy note. Submit via alpineListeners('Newsletter.post_newsletter'). Uses plain_section wrapper (standalone <section> with lock class, no is-section).",
+      "category": "forms",
+      "max_per_page": 1,
+      "properties": {
+        "heading": {
+          "type": "string",
+          "required": true,
+          "max_length": 60
+        },
+        "subheading": {
+          "type": "string",
+          "required": false,
+          "max_length": 150
+        },
+        "placeholder": {
+          "type": "string",
+          "default": "Your email address",
+          "max_length": 40
+        },
+        "button_text": {
+          "type": "string",
+          "default": "Subscribe",
+          "max_length": 20
+        },
+        "privacy_note": {
+          "type": "string",
+          "required": false,
+          "max_length": 100,
+          "description": "Small text below form (e.g. 'We will never share your email with third parties')"
+        }
+      },
+      "endpoints": [],
+      "section_wrapper_override": "plain_section",
+      "alpine_actions": {
+        "Newsletter.post_newsletter": "Submits email via alpineListeners. Uses options-clear='true' to clear input after success."
+      },
+      "structure": {
+        "root": "section.py-20.bg-white.w-full.lock",
+        "container": "div.max-w-4xl.mx-auto.text-center",
+        "elements": [
+          "h2.text-3xl.md:text-4xl.font-bold.mb-4",
+          "p.text-lg.text-gray-600.mb-8",
+          "form.flex.flex-col.sm:flex-row.gap-4.max-w-xl.mx-auto > [input[type=email][name=email].flex-1, button[type=button][@click=alpineListeners('Newsletter.post_newsletter')][options-clear=true].bg-gray-900.text-white]",
+          "p.text-sm.text-gray-500.mt-4"
+        ]
+      }
+    },
+    "cta_section": {
+      "id": "cta_section",
+      "name": "Call-to-Action Section",
+      "description": "Centered CTA block with heading, description, and dual action buttons. Primary button can trigger a modal (via callModal). Secondary is a regular link. Can optionally bind to an endpoint for modal data.",
+      "category": "content",
+      "max_per_page": 2,
+      "properties": {
+        "heading": {
+          "type": "string",
+          "required": true,
+          "max_length": 80
+        },
+        "description": {
+          "type": "string",
+          "required": false,
+          "max_length": 200
+        },
+        "primary_button": {
+          "type": "object",
+          "required": true,
+          "properties": {
+            "text": {
+              "type": "string",
+              "required": true,
+              "max_length": 40
+            },
+            "action": {
+              "type": "enum",
+              "values": [
+                "link",
+                "modal"
+              ],
+              "required": true
+            },
+            "href": {
+              "type": "string",
+              "required": false,
+              "description": "URL if action=link"
+            },
+            "modal_name": {
+              "type": "string",
+              "required": false,
+              "description": "Modal ID if action=modal (e.g. 'meeting')"
+            },
+            "icon_svg": {
+              "type": "svg_icon",
+              "required": false
+            }
+          }
+        },
+        "secondary_button": {
+          "type": "object",
+          "required": false,
+          "properties": {
+            "text": {
+              "type": "string",
+              "required": true,
+              "max_length": 40
+            },
+            "href": {
+              "type": "string",
+              "required": true
+            },
+            "icon_svg": {
+              "type": "svg_icon",
+              "required": false
+            }
+          }
+        }
+      },
+      "endpoints": [
+        {
+          "ref": "get.meeting_calendars",
+          "binding": "apiData",
+          "method": "GET",
+          "required": false,
+          "description": "Only needed if CTA triggers meeting modal. Provides calendar data for the modal.",
+          "returns": {
+            "result": [
+              {
+                "id": "number",
+                "title": "string",
+                "link": "string",
+                "days": [
+                  {
+                    "date": "string (Y-m-d)",
+                    "time_slots": [
+                      {
+                        "id": "number",
+                        "time_start": "string (HH:mm)",
+                        "time_end": "string (HH:mm)",
+                        "status_id": "number (1=available, 2=booked)"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ],
+      "alpine_actions": {
+        "callModal": "Opens a modal by name. Called as callModal($el) with data-modal attribute on the element."
+      },
+      "structure": {
+        "wrapper": "Uses standard section wrapper with !py-20 and bg-gray-50 overlay",
+        "required_attributes_conditional": {
+          "apiData": "get.meeting_calendars (only if modal needs calendar data)"
+        },
+        "elements": [
+          "div.max-w-4xl.mx-auto.text-center > [h2, p.mb-8, div.flex.gap-4.justify-center > button.primary[@click=callModal][data-modal] + a.secondary]"
+        ]
+      }
+    },
+    "meeting_booking_modal": {
+      "id": "meeting_booking_modal",
+      "name": "Meeting Booking Modal",
+      "description": "Full-featured meeting/appointment booking modal. Contains service selector (from meeting_calendars API data), name/email/phone inputs, date picker with available dates, time slot selection, message textarea, and submit. On success, shows a confirmation modal with meeting details and Google Calendar link. Triggered by cta_section via callModal.",
+      "category": "modals",
+      "max_per_page": 1,
+      "properties": {
+        "modal_name": {
+          "type": "string",
+          "default": "meeting"
+        },
+        "success_modal_name": {
+          "type": "string",
+          "default": "meetingSuccess"
+        },
+        "heading": {
+          "type": "string",
+          "default": "Book a meeting",
+          "max_length": 40
+        },
+        "service_label": {
+          "type": "string",
+          "default": "Service",
+          "max_length": 20
+        },
+        "service_placeholder": {
+          "type": "string",
+          "default": "Select a service",
+          "max_length": 30
+        },
+        "fields": {
+          "type": "array",
+          "default_fields": [
+            {
+              "name": "name",
+              "type": "text",
+              "label": "Name",
+              "col_span": 2
+            },
+            {
+              "name": "email",
+              "type": "text",
+              "label": "Email",
+              "col_span": 1
+            },
+            {
+              "name": "phone",
+              "type": "text",
+              "label": "Phone",
+              "col_span": 1
+            },
+            {
+              "name": "message",
+              "type": "textarea",
+              "label": "Additional message",
+              "rows": 4,
+              "col_span": 2
+            }
+          ]
+        },
+        "date_placeholder": {
+          "type": "string",
+          "default": "Select a date",
+          "max_length": 20
+        },
+        "submit_text": {
+          "type": "string",
+          "default": "Book now",
+          "max_length": 30
+        },
+        "success_heading": {
+          "type": "string",
+          "default": "Meeting booked successfully",
+          "max_length": 40
+        },
+        "success_subtext": {
+          "type": "string",
+          "default": "We have received your request. Below you will find the meeting details.",
+          "max_length": 120
+        },
+        "calendar_button_text": {
+          "type": "string",
+          "default": "Add to Google Calendar",
+          "max_length": 30
+        },
+        "close_button_text": {
+          "type": "string",
+          "default": "Close",
+          "max_length": 15
+        }
+      },
+      "endpoints": [
+        {
+          "ref": "post.meetings",
+          "binding": "alpineListeners",
+          "method": "POST",
+          "description": "Submits meeting booking.",
+          "submit_pattern": "@click=\"alpineListeners('post.meetings', $el)\" keyName=\"meetingSuccess\"",
+          "success_callback": "@success=\"callModal($el)\" data-modal=\"meetingSuccess\"",
+          "request_fields": [
+            "calendar_id",
+            "name",
+            "email",
+            "phone",
+            "date_start",
+            "timeSlot_id",
+            "message"
+          ]
+        }
+      ],
+      "data_source": "get.meeting_calendars (bound on cta_section, shared via data.meeting_calendars)",
+      "alpine_data": {
+        "local_scope": {
+          "selectedCalendarId": "'empty'",
+          "selectedDate": "null",
+          "selectedSlot": "null",
+          "availableDates": "[]",
+          "showCalendar": "false"
+        },
+        "platform_state": {
+          "data.modals.meeting": "Boolean, modal visibility state",
+          "data.modals.meetingSuccess": "Boolean, success modal visibility",
+          "data.meeting_calendars": "Calendar objects from get.meeting_calendars",
+          "data.meetingSuccess": "Response from post.meetings (contains calendar_id)"
+        }
+      },
+      "alpine_actions": {
+        "callModal": "Opens/closes modals by data-modal attribute",
+        "DateHelper.date": "Platform date picker component."
+      },
+      "sub_components": {
+        "booking_modal": {
+          "description": "Main booking form modal",
+          "visibility": "template x-if='data.modals.meeting' > div x-show with backdrop blur",
+          "service_select": {
+            "x-model": "selectedCalendarId",
+            "options_loop": "x-for=\"calendar in data.meeting_calendars\"",
+            "fields_used": [
+              "calendar.id — :value",
+              "calendar.title — x-text"
+            ],
+            "on_change": "Finds calendar by ID, extracts .days into availableDates, shows date picker"
+          },
+          "date_picker": {
+            "visibility": "template x-if='showCalendar'",
+            "config": "DateHelper.date({dateFormat:'Y-m-d', enable: filtered available dates, minDate:'today', maxDate:'today+29'})",
+            "on_change": "Sets selectedDate, resets selectedSlot"
+          },
+          "time_slots": {
+            "visibility": "x-show='selectedDate != empty'",
+            "loop": "x-for=\"slot in availableDates.find(obj => obj.date == selectedDate).time_slots\"",
+            "active_state": {
+              "selected": "bg-[#1d78be] text-white",
+              "booked": "bg-gray-300 cursor-not-allowed"
+            },
+            "click": "slot.status_id == 1 ? selectedSlot = slot : ''",
+            "display": "slot.time_start + ' - ' + slot.time_end",
+            "hidden_input": "input[type=hidden][name=timeSlot_id][:value=selectedSlot.id]"
+          }
+        },
+        "success_modal": {
+          "description": "Confirmation modal shown after successful booking",
+          "visibility": "x-show='data.modals.meetingSuccess' with backdrop blur",
+          "displays": {
+            "service": "Object.values(data.meeting_calendars).find(obj => obj.id == data.meetingSuccess.calendar_id).title",
+            "date": "selectedDate",
+            "time": "selectedSlot.time_start + ' – ' + selectedSlot.time_end",
+            "meeting_link": "...find(obj => obj.id == data.meetingSuccess.calendar_id).link"
+          },
+          "google_calendar_button": {
+            "url_template": "https://calendar.google.com/calendar/render?action=TEMPLATE&text={title}&dates={start}/{end}&details={link}&ctz=Europe/Sofia"
+          }
+        }
+      },
+      "structure": {
+        "wrapper": "div[x-data with local state] — sits at page level, outside section wrappers",
+        "booking_elements": [
+          "template[x-if='data.modals.meeting'] > div.backdrop > div.modal_card > [div.header.bg-gray-900.text-white, form.grid.grid-cols-2 > select + inputs + date_picker + time_slots + textarea + button]"
+        ],
+        "success_elements": [
+          "div[x-show='data.modals.meetingSuccess'] > div.modal_card > [header with check icon, content with details, google_calendar_button, close_button]"
+        ]
+      }
+    },
+    "image_showcase": {
+      "id": "image_showcase",
+      "name": "Image Showcase",
+      "description": "Single featured image with gradient glow. Hidden on mobile, shown on lg+.",
+      "category": "media",
+      "max_per_page": 2,
+      "properties": {
+        "image_src": {
+          "type": "image_path",
+          "required": true
+        },
+        "alt_text": {
+          "type": "string",
+          "required": true,
+          "max_length": 120
+        },
+        "glow_effect": {
+          "type": "boolean",
+          "default": true
+        },
+        "size": {
+          "type": "enum",
+          "values": [
+            "small",
+            "medium",
+            "large"
+          ],
+          "default": "large"
+        }
+      },
+      "endpoints": [],
+      "structure": {
+        "wrapper": "div.hidden.lg:flex.lg:items-center.lg:w-1/2.lg:justify-center",
+        "elements": [
+          "div.relative > div.glow?.blur-2xl.opacity-20",
+          "img.object-cover.rounded-3xl.shadow-2xl.ring-4"
+        ]
+      }
+    },
+    "brand_logos": {
+      "id": "brand_logos",
+      "name": "Brand Logos Bar",
+      "description": "Grid of partner/trust logos loaded dynamically from API via apiData='get.our_brands'. Logo images via x-for loop. NEVER hardcode logos or SVGs.",
+      "category": "social_proof",
+      "max_per_page": 1,
+      "properties": {
+        "heading": {
+          "type": "string",
+          "required": false,
+          "max_length": 60
+        },
+        "logos": {
+          "type": "api_driven",
+          "description": "DEPRECATED: logos come from get.our_brands API. Do NOT hardcode logos or SVGs."
+        }
+      },
+      "endpoints": [
+        {
+          "ref": "get.our_brands",
+          "binding": "apiData",
+          "method": "GET",
+          "returns": {
+            "result": [
+              {
+                "id": "number",
+                "title": "string",
+                "image": {
+                  "url": "string"
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "structure": {
+        "wrapper": "section",
+        "required_attributes": {
+          "apiData": "get.our_brands",
+          "keyName": "brands"
+        },
+        "elements": [
+          "h2.text-3xl.font-bold.text-center.mb-12?",
+          "div.grid.grid-cols-2.sm:grid-cols-3.md:grid-cols-4.lg:grid-cols-6.gap-6 > template[x-for='brand in data.brands'][:key='brand.id'] > div.logo_card.bg-white.dark:bg-slate-800.rounded-xl.p-6.shadow-md.flex.items-center.justify-center > img[:src='brand.image.url'][:alt='brand.title'].h-12.object-contain"
+        ]
+      },
+      "alpine_data": {
+        "data.brands": "Brand/partner objects from get.our_brands API"
+      },
+      "ai_fill_instructions": "NEVER hardcode brand logos, SVG icons, or placeholder images. ALWAYS use apiData='get.our_brands' keyName='brands' on the wrapper <section>, then x-for='brand in data.brands' to loop. The API provides: brand.title, brand.image.url. AI generates ONLY the section heading text."
+    },
+    "gallery_tabs": {
+      "id": "gallery_tabs",
+      "name": "Gallery with Category Tabs",
+      "description": "Tabbed image gallery from API. Tab switching, lightbox.",
+      "category": "media",
+      "max_per_page": 1,
+      "properties": {
+        "columns": {
+          "type": "responsive",
+          "mobile": 2,
+          "tablet_sm": 4,
+          "desktop_md": 5
+        },
+        "enable_lightbox": {
+          "type": "boolean",
+          "default": true
+        },
+        "fallback_image": {
+          "type": "string",
+          "default": "product"
+        }
+      },
+      "endpoints": [
+        {
+          "ref": "get.gallery_categories",
+          "binding": "apiData",
+          "method": "GET",
+          "returns": {
+            "result": [
+              {
+                "id": "string",
+                "title": "string",
+                "gallery": [
+                  {
+                    "image": {
+                      "url": "string"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ],
+      "alpine_data": {
+        "data.gallery": "API response",
+        "data.selectedGallery": "Active category",
+        "data.screenWidth": "Viewport width"
+      },
+      "alpine_actions": {
+        "Gallery.open": "Opens lightbox"
+      },
+      "structure": {
+        "wrapper": "section",
+        "required_attributes": {
+          "apiData": "get.gallery_categories",
+          "keyName": "gallery"
+        }
+      }
+    },
+    "testimonials": {
+      "id": "testimonials",
+      "name": "Testimonials Grid",
+      "description": "Grid of testimonial cards loaded dynamically from API via apiData='get.testimonials'. Stars via FontAwesome, quote, avatar, name, role — all from x-for loop. NEVER hardcode static testimonial cards.",
+      "category": "social_proof",
+      "max_per_page": 1,
+      "properties": {
+        "heading": {
+          "type": "string",
+          "required": false,
+          "max_length": 80
+        },
+        "subheading": {
+          "type": "string",
+          "required": false,
+          "max_length": 250
+        }
+      },
+      "endpoints": [
+        {
+          "ref": "get.testimonials",
+          "binding": "apiData",
+          "method": "GET",
+          "returns": {
+            "result": [
+              {
+                "id": "number",
+                "author": "string",
+                "comment": "string",
+                "rating": "number",
+                "image": {
+                  "url": "string"
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "structure": {
+        "wrapper": "section",
+        "required_attributes": {
+          "apiData": "get.testimonials",
+          "keyName": "testimonials"
+        },
+        "elements": [
+          "h2.text-3xl.font-bold.text-center.mb-4?",
+          "p.text-center.text-slate-600.mb-12?",
+          "div.grid.grid-cols-1.md:grid-cols-2.lg:grid-cols-3.gap-8 > template[x-for='item in data.testimonials'][:key='item.id'] > div.testimonial_card.bg-white.dark:bg-slate-800.rounded-2xl.p-6.shadow-lg > [div.flex.mb-4 > template[x-for='i in item.rating'] > i.fa-solid.fa-star.text-amber-500, p.italic[x-text='item.comment'], div.flex.items-center > img[:src='item.image.url'][:alt='item.author'].w-12.h-12.rounded-full.mr-4 + div > h4.font-semibold[x-text='item.author']]"
+        ]
+      },
+      "alpine_data": {
+        "data.testimonials": "Testimonial objects from get.testimonials API"
+      },
+      "ai_fill_instructions": "NEVER hardcode testimonial cards with static names/quotes. ALWAYS use apiData='get.testimonials' keyName='testimonials' on the wrapper <section>, then x-for='item in data.testimonials' to loop. The API provides: item.author, item.comment, item.rating, item.image.url. AI generates ONLY the section heading and subheading text."
+    },
+    "section_divider": {
+      "id": "section_divider",
+      "name": "Section Divider",
+      "description": "Gradient horizontal line.",
+      "category": "layout",
+      "max_per_page": 10,
+      "properties": {
+        "spacing": {
+          "type": "enum",
+          "values": [
+            "small",
+            "medium",
+            "large"
+          ],
+          "default": "large"
+        }
+      },
+      "endpoints": [],
+      "structure": {
+        "wrapper": "div.my-16",
+        "elements": [
+          "div.h-px.bg-gradient-to-r.from-transparent.via-slate-300.to-transparent"
+        ]
+      }
+    },
+    "blog_sidebar": {
+      "id": "blog_sidebar",
+      "name": "Blog Sidebar",
+      "description": "Sidebar with search, category nav, tag filters. Controls blog_post_grid.",
+      "category": "navigation",
+      "max_per_page": 1,
+      "properties": {
+        "show_search": {
+          "type": "boolean",
+          "default": true
+        },
+        "show_categories": {
+          "type": "boolean",
+          "default": true
+        },
+        "show_tags": {
+          "type": "boolean",
+          "default": true
+        }
+      },
+      "endpoints": [
+        {
+          "ref": "get.blogCategories",
+          "binding": "apiData",
+          "method": "GET",
+          "returns": {
+            "result": [
+              {
+                "id": "string",
+                "title": "string",
+                "url": "string"
+              }
+            ]
+          }
+        }
+      ],
+      "controls": {
+        "target_component": "blog_post_grid",
+        "trigger_method": "alpineListeners('get.blogPosts', $event)"
+      },
+      "sub_components": {
+        "search_bar": {
+          "alpine_event": "@input=\"alpineListeners('get.blogPosts', $event)\"",
+          "input_name": "search"
+        },
+        "category_list": {
+          "data_source": "data.blogCategories",
+          "click_logic": "href(category.url) or href('/bg/blog')",
+          "active_state": {
+            "condition": "window.location.href.includes(category.url)"
+          }
+        },
+        "tag_filter": {
+          "data_source": "data.blogPosts_filters.tags",
+          "alpine_event": "@click=\"alpineListeners('get.blogPosts', $event)\"",
+          "required_attributes": {
+            "keyName": "blogPosts",
+            ":data-tag": "tag"
+          }
+        }
+      },
+      "alpine_data": {
+        "data.blogCategories": "From endpoint",
+        "data.blogPosts_filters.tags": "From page endpoint",
+        "data.pageUrl.tag": "Active tag"
+      },
+      "structure": {
+        "wrapper": "div.lg:w-2/5.xl:w-1/5.hidden.lg:block",
+        "required_attributes": {
+          "apiData": "get.blogCategories",
+          "keyName": "blogCategories"
+        }
+      }
+    },
+    "blog_post_grid": {
+      "id": "blog_post_grid",
+      "name": "Blog Post Grid",
+      "description": "Responsive blog card grid with pagination. Filterable by blog_sidebar.",
+      "category": "content",
+      "max_per_page": 1,
+      "properties": {
+        "columns": {
+          "type": "responsive",
+          "mobile": 1,
+          "tablet_md": 2,
+          "desktop_lg": 3
+        },
+        "show_pagination": {
+          "type": "boolean",
+          "default": true
+        }
+      },
+      "endpoints": [
+        {
+          "ref": "get.blogPosts",
+          "binding": "apiData",
+          "method": "GET",
+          "options": {
+            "pushurl": true
+          },
+          "dynamic_attributes": {
+            ":data-category_id": "data.corePage.target_id != 0 ? data.corePage.target_id : 'empty'"
+          },
+          "returns": {
+            "result": [
+              {
+                "id": "string",
+                "title": "string",
+                "url": "string",
+                "seo_description": "string",
+                "created_at": "string",
+                "views": "number",
+                "read_time": "number",
+                "images": [
+                  {
+                    "url": "string"
+                  }
+                ],
+                "category": {
+                  "id": "string",
+                  "title": "string"
+                }
+              }
+            ],
+            "pagination": {
+              "total_pages": "number",
+              "current_page": "number"
+            }
+          }
+        }
+      ],
+      "controlled_by": {
+        "component": "blog_sidebar"
+      },
+      "structure": {
+        "wrapper": "div.w-full.lg:w-3/5.xl:w-4/5",
+        "required_attributes": {
+          "apiData": "get.blogPosts",
+          "keyName": "blogPosts",
+          "options-pushurl": "true"
+        }
+      }
+    },
+    "google_map": {
+      "id": "google_map",
+      "name": "Google Map Embed",
+      "description": "Full-width Google Maps iframe. Uses 'box' wrapper.",
+      "category": "media",
+      "max_per_page": 1,
+      "properties": {
+        "location_query": {
+          "type": "string",
+          "required": true,
+          "max_length": 200
+        },
+        "zoom": {
+          "type": "number",
+          "default": 10
+        },
+        "height": {
+          "type": "number",
+          "default": 400
+        },
+        "language": {
+          "type": "string",
+          "default": "en"
+        }
+      },
+      "endpoints": [],
+      "section_wrapper_override": "box",
+      "iframe_src_template": "https://maps.google.com/maps?q={location_query}&hl={language}&t=m&z={zoom}&output=embed"
+    },
+    "contact_info_cards": {
+      "id": "contact_info_cards",
+      "name": "Contact Info Cards",
+      "description": "Vertical stack of contact cards with gradient icon, label, value.",
+      "category": "content",
+      "max_per_page": 1,
+      "properties": {
+        "heading": {
+          "type": "string",
+          "required": false,
+          "max_length": 60
+        },
+        "subheading": {
+          "type": "string",
+          "required": false,
+          "max_length": 150
+        },
+        "items": {
+          "type": "array",
+          "min_items": 1,
+          "max_items": 6,
+          "item_properties": {
+            "icon": {
+              "type": "fa_icon",
+              "required": true
+            },
+            "label": {
+              "type": "string",
+              "required": true,
+              "max_length": 40
+            },
+            "value": {
+              "type": "string_or_array",
+              "required": true
+            },
+            "link_type": {
+              "type": "enum",
+              "values": [
+                "tel",
+                "mailto",
+                "none"
+              ],
+              "default": "none"
+            },
+            "link_href": {
+              "type": "string",
+              "required": false
+            }
+          }
+        }
+      },
+      "endpoints": []
+    },
+    "contact_form": {
+      "id": "contact_form",
+      "name": "Contact Form",
+      "description": "Form with fields, submit via alpineListeners('Contacts.post_contacts').",
+      "category": "forms",
+      "max_per_page": 1,
+      "properties": {
+        "heading": {
+          "type": "string",
+          "default": "Send us a message",
+          "max_length": 60
+        },
+        "fields": {
+          "type": "array",
+          "default_fields": [
+            {
+              "name": "email",
+              "type": "email",
+              "label": "Email"
+            },
+            {
+              "name": "name",
+              "type": "text",
+              "label": "Name"
+            },
+            {
+              "name": "phone",
+              "type": "tel",
+              "label": "Phone"
+            },
+            {
+              "name": "subject",
+              "type": "text",
+              "label": "Subject"
+            },
+            {
+              "name": "message",
+              "type": "textarea",
+              "label": "Message",
+              "rows": 5
+            }
+          ]
+        },
+        "submit_text": {
+          "type": "string",
+          "default": "Send message",
+          "max_length": 30
+        }
+      },
+      "endpoints": [],
+      "alpine_actions": {
+        "Contacts.post_contacts": "Submits form via alpineListeners"
+      }
+    },
+    "static_content_block": {
+      "id": "static_content_block",
+      "name": "Static Content Block",
+      "description": "Full-page static HTML for legal pages. No dynamic data. Uses 'fullpage_box' wrapper.",
+      "category": "content",
+      "max_per_page": 1,
+      "properties": {
+        "title": {
+          "type": "string",
+          "required": true,
+          "max_length": 120
+        },
+        "content_blocks": {
+          "type": "array",
+          "min_items": 1,
+          "item_properties": {
+            "type": {
+              "type": "enum",
+              "values": [
+                "paragraph",
+                "heading_h2",
+                "heading_h3",
+                "bold_paragraph",
+                "link",
+                "list",
+                "spacer"
+              ]
+            },
+            "text": {
+              "type": "string",
+              "required": false
+            },
+            "href": {
+              "type": "string",
+              "required": false
+            },
+            "items": {
+              "type": "array_of_strings",
+              "required": false
+            }
+          }
+        }
+      },
+      "endpoints": [],
+      "section_wrapper_override": "fullpage_box",
+      "allowed_html_elements": [
+        "h1",
+        "h2",
+        "h3",
+        "p",
+        "a",
+        "span",
+        "br",
+        "strong",
+        "em",
+        "table",
+        "tbody",
+        "tr",
+        "td",
+        "div"
+      ],
+      "allowed_css_classes_in_content": [
+        "font-semibold",
+        "strong",
+        "italic",
+        "not-italic",
+        "mt-0",
+        "text-page",
+        "text-center",
+        "page-section",
+        "page-section-light",
+        "page-title",
+        "white-background-wrapper"
+      ],
+      "inner_variants": {
+        "page_section": {
+          "structure": "div.row > div.page-section.page-section-light.py-5.px-5"
+        },
+        "text_page": {
+          "structure": "div.row > div.column > div.text-page"
+        },
+        "titled_text_page": {
+          "structure": "div.row > div.column > div.white-background-wrapper > [div.page-title > h1.text-center[style='font-size:32px;'] + p > br, div.text-page]"
+        }
+      }
+    },
+    "blog_post_detail": {
+      "id": "blog_post_detail",
+      "name": "Blog Post Detail",
+      "description": "Full blog post view with hero image, article content, social share, meta bar, same-category posts, tags, comment system with star ratings, and sidebar with related posts and newest posts.",
+      "category": "content",
+      "max_per_page": 1,
+      "section_wrapper_override": "none",
+      "properties": {
+        "social_links": {
+          "type": "array",
+          "default_items": [
+            {
+              "icon": "fa-brands fa-facebook",
+              "label": "Facebook",
+              "href": "#"
+            },
+            {
+              "icon": "fa-brands fa-x-twitter",
+              "label": "Twitter",
+              "href": "#"
+            },
+            {
+              "icon": "fa-brands fa-linkedin",
+              "label": "LinkedIn",
+              "href": "#"
+            }
+          ]
+        },
+        "show_read_time": {
+          "type": "boolean",
+          "default": true
+        },
+        "show_views": {
+          "type": "boolean",
+          "default": true
+        },
+        "show_date": {
+          "type": "boolean",
+          "default": true
+        },
+        "show_tags": {
+          "type": "boolean",
+          "default": true
+        },
+        "show_same_category": {
+          "type": "boolean",
+          "default": true
+        },
+        "show_comments": {
+          "type": "boolean",
+          "default": true
+        },
+        "show_related_posts": {
+          "type": "boolean",
+          "default": true
+        },
+        "show_newest_posts": {
+          "type": "boolean",
+          "default": true
+        },
+        "same_category_heading": {
+          "type": "string",
+          "default": "On the same topic",
+          "max_length": 30
+        },
+        "related_heading": {
+          "type": "string",
+          "default": "Related articles",
+          "max_length": 30
+        },
+        "newest_heading": {
+          "type": "string",
+          "default": "Recently added",
+          "max_length": 30
+        },
+        "comments_heading": {
+          "type": "string",
+          "default": "Comments",
+          "max_length": 30
+        },
+        "comment_form_heading": {
+          "type": "string",
+          "default": "Leave a comment",
+          "max_length": 30
+        },
+        "comment_submit_text": {
+          "type": "string",
+          "default": "Publish",
+          "max_length": 20
+        },
+        "fallback_image": {
+          "type": "string",
+          "default": "product"
+        }
+      },
+      "endpoints": [
+        {
+          "ref": "get.blogPosts",
+          "binding": "apiData",
+          "method": "GET",
+          "scope": "page_level",
+          "key_name": "post",
+          "dynamic_attributes": {
+            ":data-id": "data.corePage.target_id"
+          },
+          "returns": {
+            "id": "string",
+            "title": "string",
+            "url": "string",
+            "seo_description": "string",
+            "description": "string (HTML)",
+            "date_created": "string",
+            "views": "number",
+            "read_time": "number",
+            "images": [
+              {
+                "url": "string",
+                "url_10x10": "string"
+              }
+            ],
+            "category": {
+              "id": "string",
+              "title": "string",
+              "url": "string"
+            },
+            "tags": [
+              "string"
+            ],
+            "related_posts": [
+              {
+                "id": "string",
+                "title": "string",
+                "url": "string",
+                "seo_description": "string",
+                "date_publish": "string",
+                "images": [
+                  {
+                    "url_10x10": "string"
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "ref": "Reviews.get_blog_comments",
+          "binding": "apiData",
+          "method": "GET",
+          "scope": "component_level",
+          "key_name": "blogReviews",
+          "dynamic_attributes": {
+            ":data-subject_id": "data.corePage.target_id"
+          },
+          "returns": [
+            {
+              "user_name": "string",
+              "email": "string",
+              "date": "string",
+              "rating": "number",
+              "comment": "string"
+            }
+          ]
+        },
+        {
+          "ref": "Reviews.post_blog_comments",
+          "binding": "alpineListeners",
+          "method": "POST",
+          "submit_pattern": "@click=\"alpineListeners('Reviews.post_blog_comments', $event)\" options-clear=\"true\"",
+          "request_fields": [
+            "subject_id",
+            "email",
+            "user_name",
+            "comment",
+            "rating"
+          ]
+        }
+      ],
+      "auto_fetched_data": {
+        "sameCategoryPosts": {
+          "trigger": "x-init=\"alpineListeners('get.blogPosts', $el)\"",
+          "key_name": "sameCategoryPosts",
+          "data_path": "data.sameCategoryPosts.result"
+        },
+        "newestPosts": {
+          "trigger": "x-init=\"alpineListeners('get.blogPosts', $el)\" data-sort=\"newest\"",
+          "key_name": "newestPosts",
+          "data_path": "data.newestPosts.result"
+        }
+      },
+      "alpine_data": {
+        "data.post": "Single blog post object",
+        "data.sameCategoryPosts": "Posts from same category",
+        "data.newestPosts": "Newest posts",
+        "data.blogReviews": "Comments",
+        "data.corePage.target_id": "Current post ID",
+        "data.user.email": "Logged-in user email",
+        "data.user.names": "Logged-in user name"
+      },
+      "sub_components": {
+        "post_hero": {
+          "description": "Full-width darkened hero image with gradient overlay, category badge, title, description."
+        },
+        "meta_bar": {
+          "description": "Social links (left) and stats (right) — read_time, views, date."
+        },
+        "article_body": {
+          "description": "HTML content via x-html with prose classes.",
+          "render": "x-html=\"data.post.description\""
+        },
+        "same_category_posts": {
+          "description": "List of posts from same category, auto-fetched via x-init."
+        },
+        "post_tags": {
+          "description": "Clickable tag badges."
+        },
+        "comments_list": {
+          "description": "Comments with star ratings."
+        },
+        "comment_form": {
+          "description": "Expandable comment form with star rating widget."
+        },
+        "sidebar_related_posts": {
+          "description": "Related posts from embedded data."
+        },
+        "sidebar_newest_posts": {
+          "description": "Newest posts auto-fetched in sidebar."
+        }
+      },
+      "structure": {
+        "root": "div.w-full.dark:bg-gray-900.dark:text-gray-200",
+        "required_attributes": {
+          "apiData": "get.blogPosts",
+          "keyName": "post",
+          ":data-id": "data.corePage.target_id"
+        },
+        "layout": [
+          "div.hero > [img, gradient_overlay, category_badge + h1 + p]",
+          "div.mt-[-350px].container > div.bg-white.rounded-xl.shadow-2xl > div.flex.flex-wrap > [",
+          "  div.w-full.lg:w-2/3.p-10 (main) > [meta_bar, article_body, same_category_posts, post_tags, comments]",
+          "  div.w-full.lg:w-1/3.p-10.bg-slate-50 (sidebar) > [related_posts, newest_posts]",
+          "]"
+        ]
+      }
+    },
+    "user_dashboard": {
+      "id": "user_dashboard",
+      "name": "User Dashboard",
+      "description": "Full user account page with sidebar tab navigation and 8 content panels.",
+      "category": "account",
+      "max_per_page": 1,
+      "section_wrapper_override": "none",
+      "properties": {
+        "default_tab": {
+          "type": "string",
+          "default": "profile"
+        },
+        "tabs": {
+          "type": "array",
+          "default_items": [
+            {
+              "id": "profile",
+              "label": "Profile",
+              "icon": "fa-solid fa-user"
+            },
+            {
+              "id": "invoice",
+              "label": "Invoice",
+              "icon": "fa-solid fa-file-invoice"
+            },
+            {
+              "id": "orders",
+              "label": "Orders",
+              "icon": "fa-solid fa-bag-shopping"
+            },
+            {
+              "id": "addresses",
+              "label": "Addresses",
+              "icon": "fa-solid fa-location-dot"
+            },
+            {
+              "id": "passwords",
+              "label": "Passwords",
+              "icon": "fa-solid fa-lock"
+            },
+            {
+              "id": "loyalCard",
+              "label": "Loyalty Card",
+              "icon": "fa-solid fa-certificate"
+            },
+            {
+              "id": "services",
+              "label": "Services",
+              "icon": "fa-solid fa-tag"
+            },
+            {
+              "id": "digital",
+              "label": "Digital Products",
+              "icon": "fa-solid fa-download"
+            }
+          ]
+        },
+        "logout_link": {
+          "type": "object",
+          "properties": {
+            "text": {
+              "default": "Sign Out"
+            },
+            "href": {
+              "default": "/logout"
+            },
+            "icon": {
+              "default": "fa-solid fa-right-from-bracket"
+            }
+          }
+        }
+      },
+      "endpoints": [
+        {
+          "ref": "User.get_accounts",
+          "binding": "apiData",
+          "method": "GET",
+          "scope": "tab:profile",
+          "key_name": "user",
+          "returns": {
+            "email": "string",
+            "phone": "string",
+            "first_name": "string",
+            "last_name": "string",
+            "balance": "number"
+          }
+        },
+        {
+          "ref": "User.put_accounts",
+          "binding": "alpineListeners",
+          "method": "PUT",
+          "scope": "tab:profile,passwords"
+        },
+        {
+          "ref": "get.my_company",
+          "binding": "apiData",
+          "method": "GET",
+          "scope": "tab:invoice",
+          "key_name": "my_company",
+          "returns": {
+            "name": "string",
+            "country_id": "number",
+            "city": "string",
+            "address": "string",
+            "phone": "string",
+            "mol": "string",
+            "vat": "string",
+            "vat_registered": "number"
+          }
+        },
+        {
+          "ref": "put.company",
+          "binding": "alpineListeners",
+          "method": "PUT",
+          "scope": "tab:invoice"
+        },
+        {
+          "ref": "Countries.get_countries",
+          "binding": "apiData",
+          "method": "GET",
+          "scope": "tab:invoice,addresses",
+          "key_name": "countries",
+          "returns": [
+            {
+              "id": "number",
+              "title": "string"
+            }
+          ]
+        },
+        {
+          "ref": "Shop.get_orders",
+          "binding": "apiData",
+          "method": "GET",
+          "scope": "tab:orders,services,digital",
+          "returns": [
+            {
+              "number": "string",
+              "price": "string",
+              "total_price": "string",
+              "date_created": "string",
+              "currency": {
+                "symbol": "string"
+              },
+              "payment_method": {
+                "title": "string"
+              },
+              "status": {
+                "title": "string"
+              },
+              "products": [
+                {
+                  "title": "string",
+                  "quantity": "number",
+                  "total": "string"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "ref": "get.my_addresses",
+          "binding": "apiData",
+          "method": "GET",
+          "scope": "tab:addresses",
+          "key_name": "my_addresses",
+          "returns": [
+            {
+              "id": "number",
+              "country": {
+                "title": "string"
+              },
+              "city": "string",
+              "post_code": "string",
+              "shipping_address": "string"
+            }
+          ]
+        },
+        {
+          "ref": "User.post_user_address",
+          "binding": "alpineListeners",
+          "method": "POST",
+          "scope": "tab:addresses"
+        },
+        {
+          "ref": "User.delete_user_address",
+          "binding": "alpineListeners",
+          "method": "DELETE",
+          "scope": "tab:addresses"
+        }
+      ],
+      "alpine_data": {
+        "local_scope": {
+          "tab": "'profile'"
+        },
+        "platform_state": {
+          "data.user": "User profile",
+          "data.my_company": "Invoice data",
+          "data.countries": "Country list",
+          "data.orders": "Orders",
+          "data.services": "Service orders",
+          "data.my_addresses": "Addresses"
+        }
+      },
+      "sub_components": {
+        "sidebar": {
+          "description": "User info card + tab nav buttons + logout link."
+        },
+        "tab_profile": {
+          "description": "Profile form: email (disabled), phone, first_name, last_name."
+        },
+        "tab_invoice": {
+          "description": "Company invoice form with country select, VAT checkbox."
+        },
+        "tab_orders": {
+          "description": "Expandable order cards with accordion."
+        },
+        "tab_addresses": {
+          "description": "Address cards + add-new form."
+        },
+        "tab_passwords": {
+          "description": "Password change form."
+        },
+        "tab_loyalCard": {
+          "description": "Loyalty card display with points."
+        },
+        "tab_services": {
+          "description": "Service product cards from orders."
+        },
+        "tab_digital": {
+          "description": "Digital product cards with download button."
+        }
+      },
+      "structure": {
+        "root": "div.bg-slate-50.dark:bg-slate-900.w-full",
+        "root_alpine": "x-data=\"{ tab: 'profile' }\"",
+        "layout": "div.container.mx-auto.px-4.md:flex.pb-16.gap-8",
+        "elements": [
+          "div.md:w-1/4.lg:w-1/5 (sidebar)",
+          "div.flex-1 (tab panels with x-show)"
+        ]
+      }
+    },
+    "login_form": {
+      "id": "login_form",
+      "name": "Login Form",
+      "description": "Full-screen centered login card with email/password, submit via User.login, register and forgot password links.",
+      "category": "forms",
+      "max_per_page": 1,
+      "section_wrapper_override": "auth_page",
+      "properties": {
+        "heading": {
+          "type": "string",
+          "default": "Login",
+          "max_length": 30
+        },
+        "subheading": {
+          "type": "string",
+          "default": "Sign in to your account",
+          "max_length": 60
+        },
+        "fields": {
+          "type": "array",
+          "default_fields": [
+            {
+              "name": "email",
+              "type": "email",
+              "label": "Email",
+              "icon": "fa-solid fa-envelope"
+            },
+            {
+              "name": "password",
+              "type": "password",
+              "label": "Password",
+              "icon": "fa-solid fa-lock"
+            }
+          ]
+        },
+        "submit_text": {
+          "type": "string",
+          "default": "Sign In",
+          "max_length": 20
+        },
+        "register_link": {
+          "type": "object",
+          "properties": {
+            "prompt_text": {
+              "default": "Don't have an account?"
+            },
+            "link_text": {
+              "default": "Register"
+            },
+            "href": {
+              "default": "/bg/registration"
+            }
+          }
+        },
+        "forgot_password_link": {
+          "type": "object",
+          "properties": {
+            "text": {
+              "default": "Forgot password"
+            },
+            "href": {
+              "default": "/bg/forgotten-password"
+            }
+          }
+        }
+      },
+      "endpoints": [],
+      "alpine_actions": {
+        "User.login": "Submits login via alpineListeners('User.login', $event)."
+      },
+      "structure": {
+        "root": "section.bg-gradient-to-br.from-slate-50.to-slate-100.w-full.min-h-screen",
+        "container": "div.flex.flex-col.items-center.justify-center.px-6.py-8.mx-auto.md:h-screen",
+        "card": "div.w-full.bg-white.rounded-2xl.shadow-2xl.sm:max-w-md > div.p-8.space-y-6",
+        "elements": [
+          "h1 + p",
+          "form > [icon inputs, submit button, register + forgot links]"
+        ]
+      }
+    },
+    "site_header": {
+      "id": "site_header",
+      "name": "Site Header / Navigation",
+      "description": "Global sticky nav with brand, dynamic menu from API, language switcher, CTA, mobile hamburger.",
+      "category": "global",
+      "max_per_page": 1,
+      "is_global": true,
+      "section_wrapper_override": "none",
+      "properties": {
+        "brand_name": {
+          "type": "string",
+          "required": true,
+          "max_length": 30
+        },
+        "static_home_link": {
+          "type": "object",
+          "properties": {
+            "text": {
+              "default": "Home"
+            },
+            "href": {
+              "default": "/"
+            }
+          }
+        },
+        "languages": {
+          "type": "array",
+          "min_items": 1,
+          "max_items": 10,
+          "item_properties": {
+            "code": {
+              "type": "string"
+            },
+            "label": {
+              "type": "string",
+              "max_length": 30
+            }
+          }
+        },
+        "cta_button": {
+          "type": "object",
+          "required": false,
+          "properties": {
+            "text": {
+              "default": "Contact us"
+            },
+            "href": {
+              "default": "/bg/contacts"
+            }
+          }
+        }
+      },
+      "endpoints": [
+        {
+          "ref": "get.menu",
+          "binding": "apiData",
+          "method": "GET",
+          "returns": {
+            "result": [
+              {
+                "link": "string",
+                "title": "string"
+              }
+            ]
+          }
+        }
+      ],
+      "alpine_data": {
+        "data.menu": "Menu items",
+        "data.openMobileMenu": "Boolean"
+      },
+      "alpine_actions": {
+        "changeLang": "Platform language switcher"
+      },
+      "sub_components": {
+        "desktop_nav": {
+          "visibility": "hidden md:flex",
+          "menu_loop": "x-for=\"menu in data.menu\""
+        },
+        "language_switcher": {
+          "local_state": "x-data=\"{openLang:false}\""
+        },
+        "mobile_menu": {
+          "visibility": "md:hidden",
+          "toggle": "data.openMobileMenu"
+        }
+      },
+      "structure": {
+        "root": "nav.bg-white.border-b.sticky.top-0.z-50.w-full.shadow-sm",
+        "required_attributes": {
+          "apiData": "get.menu",
+          "keyName": "menu"
+        }
+      }
+    },
+    "site_footer": {
+      "id": "site_footer",
+      "name": "Site Footer",
+      "description": "Global dark footer with 4-column grid and bottom bar.",
+      "category": "global",
+      "max_per_page": 1,
+      "is_global": true,
+      "section_wrapper_override": "none",
+      "properties": {
+        "brand_column": {
+          "type": "object",
+          "required": true,
+          "properties": {
+            "title": {
+              "type": "string",
+              "max_length": 40
+            },
+            "tagline": {
+              "type": "string",
+              "max_length": 120
+            }
+          }
+        },
+        "nav_columns": {
+          "type": "array",
+          "min_items": 1,
+          "max_items": 3,
+          "item_properties": {
+            "heading": {
+              "type": "string",
+              "max_length": 30
+            },
+            "links": {
+              "type": "array",
+              "item_properties": {
+                "text": {
+                  "type": "string"
+                },
+                "href": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "contact_column": {
+          "type": "object",
+          "required": false
+        },
+        "bottom_bar": {
+          "type": "object",
+          "required": true,
+          "properties": {
+            "copyright": {
+              "type": "string",
+              "max_length": 80
+            },
+            "legal_links": {
+              "type": "array"
+            }
+          }
+        }
+      },
+      "endpoints": [],
+      "structure": {
+        "root": "footer.bg-gray-900.text-white.py-12.w-full",
+        "layout": "grid md:grid-cols-4 gap-8"
+      }
+    },
+    "checkout": {
+      "id": "checkout",
+      "name": "Checkout Page",
+      "description": "Full two-column checkout page. Left column (lg:w-3/5): numbered step cards — (1) customer data + optional invoice toggle, (2) delivery method (address with geo-map or courier office picker), (3) payment method selection, plus GDPR/terms checkboxes and submit button. Right column (lg:w-2/5): sticky dark slate cart panel with product list (x-for over data.cart.products), comment textarea, promo code input/remove block, and order totals. Standalone full-screen layout — no is-section wrappers. All four apiData loaders are placed as standalone top-level divs BEFORE the main x-data wrapper div.",
+      "category": "ecommerce",
+      "max_per_page": 1,
+      "section_wrapper_override": "none",
+      "ai_generation_note": "CRITICAL: Geolocation map is handled by the platform plugin loaded globally. DO NOT generate any <script> or <link> tags for Google Maps or the geolocation plugin. Only output the three HTML hooks: input[id=address], button[id=location], div[id=map]. See common_mistakes.13_checkout_no_map_scripts.",
+      "properties": {
+        "submit_text": {
+          "type": "string",
+          "default": "Приключване на поръчката",
+          "max_length": 50
+        },
+        "cart_heading": {
+          "type": "string",
+          "default": "Вашата поръчка",
+          "max_length": 40
+        },
+        "promo_code_enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show/hide promo code block in cart sidebar"
+        }
+      },
+      "endpoints": [
+        {
+          "ref": "Payments.get_payment_methods",
+          "binding": "apiData",
+          "method": "GET",
+          "key_name": "payment_methods",
+          "placement": "standalone top-level div — also carries x-init redirect guard",
+          "pattern": "<div x-init=\"!data.cart.products[0] ? href('/') : ''\" apiData=\"Payments.get_payment_methods\" keyName=\"payment_methods\"></div>",
+          "returns": [
+            {
+              "code": "string",
+              "title": "string"
+            }
+          ]
+        },
+        {
+          "ref": "Econt.get_offices",
+          "binding": "apiData",
+          "method": "GET",
+          "key_name": "econt_offices",
+          "placement": "standalone top-level div",
+          "returns": [
+            {
+              "officeCode": "string",
+              "address": "string"
+            }
+          ]
+        },
+        {
+          "ref": "Speedy.get_speedy",
+          "binding": "apiData",
+          "method": "GET",
+          "key_name": "speedy_offices",
+          "placement": "standalone top-level div",
+          "returns": [
+            {
+              "office_id": "string",
+              "address": "string"
+            }
+          ]
+        },
+        {
+          "ref": "User.get_my_addresses",
+          "binding": "apiData",
+          "method": "GET",
+          "key_name": "my_addresses",
+          "placement": "standalone top-level div",
+          "returns": [
+            {
+              "id": "number",
+              "shipping_address": "string",
+              "country": {
+                "title": "string",
+                "code": "string"
+              },
+              "city": "string",
+              "post_code": "string",
+              "streetName": "string",
+              "streetNumber": "string"
+            }
+          ]
+        },
+        {
+          "ref": "Shop.post_orders",
+          "binding": "alpineListeners",
+          "method": "POST",
+          "submit_pattern": "@click=\"alpineListeners('Shop.post_orders', $event)\"",
+          "description": "Submits the full order. All form inputs are read by the framework."
+        },
+        {
+          "ref": "Shop.post_promocode",
+          "binding": "alpineListeners",
+          "method": "POST",
+          "submit_pattern": "@click=\"alpineListeners('Shop.post_promocode', $event)\" keyname=\"cart\"",
+          "description": "Applies a promo code. keyname='cart' triggers cart data refresh."
+        },
+        {
+          "ref": "Shop.delete_promocode",
+          "binding": "alpineListeners",
+          "method": "DELETE",
+          "submit_pattern": "@click=\"alpineListeners('Shop.delete_promocode', $event)\" keyname=\"cart\"",
+          "description": "Removes the currently applied promo code."
+        }
+      ],
+      "alpine_data": {
+        "root_x_data": {
+          "shipTo": "'address'",
+          "courier": "'econt'",
+          "comment": "''",
+          "wantInvoice": "false",
+          "pickAddress": "false",
+          "addAddress": "false",
+          "selectedAddress": "undefined"
+        },
+        "init_selected_address": "template[x-if='data.my_addresses[0] && data.my_addresses[0].shipping_address != \"\"'] > div[x-init='selectedAddress = data.my_addresses[0]']",
+        "platform_state": {
+          "data.cart.products": "Array of cart items",
+          "data.cart.subtotal": "string",
+          "data.cart.discount": "string",
+          "data.cart.total": "number",
+          "data.cart.promocode_id": "number — 0 if no promo applied",
+          "data.cart.promocode_info.promocode": "string — active promo code label",
+          "data.payment_methods": "From Payments.get_payment_methods",
+          "data.econt_offices": "From Econt.get_offices",
+          "data.speedy_offices": "From Speedy.get_speedy",
+          "data.my_addresses": "From User.get_my_addresses",
+          "data.user.first_name": "string",
+          "data.user.last_name": "string",
+          "data.user.email": "string",
+          "data.user.phone": "string",
+          "data.user.logged_in": "boolean",
+          "data.user.company.name": "string",
+          "data.user.company.mol": "string",
+          "data.user.company.city": "string",
+          "data.user.company.address": "string",
+          "data.user.company.phone": "string",
+          "data.user.company.vat": "string",
+          "data.user.company.vat_registered": "number (1 = yes)",
+          "data.location.country": "string — populated by geolocation plugin",
+          "data.location.city": "string",
+          "data.location.post_code": "string",
+          "data.location.streetName": "string",
+          "data.location.streetNumber": "string",
+          "data.settings.logo": "string — store logo URL"
+        },
+        "cart_product_fields": {
+          "product.title": "string",
+          "product.quantity": "number",
+          "product.total": "string — line total",
+          "product.images[0].image_10x10": "string — CORRECT field name is image_10x10, NOT url_10x10",
+          "product.variation.selling_price": "string",
+          "product.variation.currency": "string",
+          "product.variation.sku": "string"
+        }
+      },
+      "sub_components": {
+        "redirect_guard": {
+          "description": "First element. Top-level div combining redirect guard (x-init) with Payments.get_payment_methods loader.",
+          "pattern": "<div x-init=\"!data.cart.products[0] ? href('/') : ''\" apiData=\"Payments.get_payment_methods\" keyName=\"payment_methods\"></div>"
+        },
+        "customer_data_step": {
+          "description": "Step 1 card. Grid 2-col inputs pre-filled from data.user.*: first_name, last_name, email, phone. Checkbox @click='wantInvoice = !wantInvoice'. template x-if='wantInvoice' reveals invoice fields: invoice_company, invoice_mol, invoice_city, invoice_address, invoice_phone, invoice_vat, plus vat_registered checkbox (:checked='data.user.company.vat_registered == 1'). Hidden input name='wantInvoice' value='1' inside the invoice block."
+        },
+        "delivery_step": {
+          "description": "Step 2 card. Pill toggle: button @click='shipTo = \"address\"' and @click='shipTo = \"office\"'.",
+          "address_mode": {
+            "description": "x-show='shipTo==\"address\"'. Auto-selects data.my_addresses[0] as selectedAddress via x-init. Shows selected address card (click toggles pickAddress). Picker: x-show='pickAddress' with x-for='address in data.my_addresses'. 'Add new' sets addAddress=true. New address form: input[id=address] + button[id=location] + div[id=map] (geolocation plugin hooks). Manual fields bound to data.location.*.",
+            "hidden_inputs": [
+              "country, country_code, city, post_code, streetName, streetNumber, address (full concatenated string)"
+            ]
+          },
+          "office_mode": {
+            "description": "template x-if='shipTo==\"office\"'. Courier radio buttons econt (default) / speedy. Each: template x-if='courier==\"econt/speedy\"' with searchable combobox (local x-data: {text:'', officeId:0, selectedOffice:'', open:false}). Filter: x-show='office.address.toLowerCase().includes(text.toLowerCase())'. On select: officeId = office.officeCode or office.office_id.",
+            "hidden_inputs": {
+              "econt": "input[type=hidden][name='addressEkontOfis'][:value='officeId'] — stores office.officeCode",
+              "speedy": "input[type=hidden][name='addressSpeedyOfis'][:value='officeId'] — stores office.office_id"
+            }
+          }
+        },
+        "payment_step": {
+          "description": "Step 3 card. x-for='(payment, index) in data.payment_methods'. Radio: name='payment_method', :value='payment.code', :checked='index==0'. Label: x-text='payment.title'."
+        },
+        "terms_gdpr_block": {
+          "description": "Two checkboxes: name='terms' links to /bg/terms-conditions, name='gdpr' links to /bg/gdpr."
+        },
+        "cart_sidebar": {
+          "description": "Right sticky dark panel (bg-gradient-to-br from-slate-800 via-slate-700 to-slate-800, text-white). Products: x-for='product in data.cart.products'. Image: :src='product.images[0] ? product.images[0].image_10x10 : data.settings.logo'. Comment: textarea x-model='comment' (also hidden input name='comment' x-text='comment' in form). Promo: template x-if='data.cart.promocode_id == 0' → input[name=promocode] + apply button; x-if='data.cart.promocode_id != 0' → x-text='data.cart.promocode_info.promocode' + remove button. Totals: subtotal, discount (amber), total (large)."
+        }
+      },
+      "form_fields_summary": {
+        "customer": [
+          "first_name",
+          "last_name",
+          "email",
+          "phone"
+        ],
+        "invoice_optional": [
+          "wantInvoice",
+          "invoice_company",
+          "invoice_mol",
+          "invoice_city",
+          "invoice_address",
+          "invoice_phone",
+          "invoice_vat",
+          "vat_registered"
+        ],
+        "address_delivery": [
+          "country",
+          "country_code",
+          "city",
+          "post_code",
+          "streetName",
+          "streetNumber",
+          "address",
+          "addressGeo"
+        ],
+        "office_delivery": [
+          "courier",
+          "addressEkontOfis OR addressSpeedyOfis"
+        ],
+        "payment": [
+          "payment_method"
+        ],
+        "order": [
+          "terms",
+          "gdpr",
+          "comment"
+        ]
+      },
+      "structure": {
+        "top_level_api_divs_order": [
+          "<div x-init=\"!data.cart.products[0] ? href('/') : ''\" apiData=\"Payments.get_payment_methods\" keyName=\"payment_methods\"></div>",
+          "<div apiData=\"Econt.get_offices\" keyName=\"econt_offices\"></div>",
+          "<div apiData=\"Speedy.get_speedy\" keyName=\"speedy_offices\"></div>",
+          "<div apiData=\"User.get_my_addresses\" keyName=\"my_addresses\"></div>"
+        ],
+        "root": "div.w-full.flex.flex-col.lg:flex-row.min-h-screen.bg-slate-50",
+        "root_x_data": "{ shipTo: 'address', courier: 'econt', comment: '', wantInvoice: false, pickAddress: false, addAddress: false, selectedAddress: undefined }",
+        "selected_address_init": "template[x-if='data.my_addresses[0] && data.my_addresses[0].shipping_address != \"\"'] > div[x-init='selectedAddress = data.my_addresses[0]']",
+        "left_column": "div.w-full.lg:w-3/5.bg-slate-50.p-6.sm:p-8.lg:p-16.flex.justify-center.lg:justify-end > div.w-full.max-w-2xl > form > [logo, step_1, step_2, step_3, terms_gdpr, submit_button]",
+        "right_column": "div.w-full.lg:w-2/5.bg-gradient-to-br.from-slate-800.via-slate-700.to-slate-800.text-white.lg:sticky.lg:top-0.lg:h-screen.lg:overflow-y-auto > [heading, products_list, comment_textarea, promo_code_block, totals]"
+      }
+    }
+  },
+  "validation_rules": {
+    "structural": {
+      "required_section_wrapper": "Every section must use a wrapper from global.section_wrappers.",
+      "max_heading_depth": "h3. Exception: static_content_block.",
+      "no_inline_scripts": "No <script> tags.",
+      "x_html_usage": "x-html only for CMS content (data.post.description). Never user-submitted.",
+      "no_external_resources": "Exceptions: Google Maps iframe, Google Calendar URL."
+    },
+    "data_binding": {
+      "all_endpoints_must_match": "Only refs in component.endpoints or page.page_endpoints",
+      "all_data_fields_must_exist": "Every x-text, :src, :class must match endpoint returns",
+      "cross_component_communication": "Via alpineListeners(), data.*, callModal(), @success"
+    },
+    "alpine_js": {
+      "directives_allowed": [
+        "x-data",
+        "x-init",
+        "x-if",
+        "x-for",
+        "x-text",
+        "x-html",
+        "x-show",
+        "x-bind",
+        "x-on",
+        "x-cloak",
+        "x-model",
+        "x-transition",
+        "x-amount",
+        "@click",
+        "@click.prevent",
+        "@click.outside",
+        "@input",
+        "@change",
+        "@success",
+        "@mouseenter",
+        "@mouseleave",
+        "@submit",
+        "@submit.prevent",
+        ":class",
+        ":src",
+        ":href",
+        ":value",
+        ":selected",
+        ":alt",
+        ":data-id",
+        ":data-subject_id",
+        ":data-tag",
+        ":data-page",
+        ":data-category_id",
+        ":key"
+      ],
+      "listeners_allowed": [
+        "Gallery.open",
+        "get.blogPosts",
+        "Contacts.post_contacts",
+        "Newsletter.post_newsletter",
+        "post.meetings",
+        "User.login",
+        "Reviews.get_blog_comments",
+        "Reviews.post_blog_comments",
+        "User.get_accounts",
+        "User.put_accounts",
+        "User.post_user_address",
+        "User.delete_user_address",
+        "get.my_company",
+        "put.company",
+        "Countries.get_countries",
+        "Shop.get_orders",
+        "get.my_addresses",
+        "get.meeting_calendars",
+        "get.testimonials",
+        "get.our_brands",
+        "Shop.post_orders",
+        "Shop.post_promocode",
+        "Shop.delete_promocode",
+        "Payments.get_payment_methods",
+        "Econt.get_offices",
+        "Speedy.get_speedy"
+      ],
+      "navigation_allowed": [
+        "href(url)",
+        "changeLang(code)"
+      ],
+      "helpers_allowed": [
+        "Helpers.image(key)",
+        "DateHelper.date(config)",
+        "callModal($el)",
+        "$nextTick(fn)"
+      ],
+      "custom_directives": {
+        "x-amount": "Formats monetary values."
+      },
+      "listener_options": {
+        "options-clear": "Clears inputs after success",
+        "options-pushurl": "Updates browser URL",
+        "data-sort": "Sort order",
+        "data-product_type": "Product type filter"
+      },
+      "auto_fetch_pattern": "x-init=\"alpineListeners('{endpoint}', $el)\" keyName=\"{keyName}\""
+    },
+    "modals": {
+      "trigger_pattern": "@click=\"callModal($el)\" data-modal=\"{modal_name}\"",
+      "state_pattern": "data.modals.{modal_name}",
+      "success_pattern": "@success=\"callModal($el)\" data-modal=\"{success_modal_name}\"",
+      "backdrop": "backdrop-blur bg-gray-950/70 fixed z-50"
+    },
+    "images": {
+      "sources_allowed": [
+        "image_base_url",
+        "API URLs",
+        "Helpers.image()"
+      ],
+      "must_have_alt": true
+    },
+    "iframes": {
+      "allowed_domains": [
+        "maps.google.com"
+      ],
+      "only_in_components": [
+        "google_map"
+      ]
+    },
+    "static_content": {
+      "allowed_in_components": [
+        "static_content_block"
+      ],
+      "allowed_html": [
+        "h1",
+        "h2",
+        "h3",
+        "p",
+        "a",
+        "span",
+        "br",
+        "strong"
+      ]
+    },
+    "global_components": {
+      "rendered_outside_page_sections": true,
+      "no_duplication": true
+    }
+  },
+  "validator_hints": {
+    "error_hints": {
+      "SEC-001": "Remove all <script> tags — use Alpine.js directives instead",
+      "SEC-002": "Remove <style>/<math> — platform loads styles globally",
+      "SEC-003": "Use only standard HTML elements from the allowed list",
+      "SEC-004": "Iframes only from maps.google.com, no srcdoc",
+      "SEC-005": "Remove javascript:/data:/vbscript: URLs",
+      "SEC-006": "Replace onclick/onerror with Alpine @click/@error",
+      "SEC-007": "Remove CSS expression()/@import/data: from style attributes",
+      "SEC-008": "Remove <meta http-equiv> — cannot override security headers",
+      "SEC-009": "Add rel=\"noopener\" to target=\"_blank\" links",
+      "SEC-010": "Form actions must use alpineListeners(), not external URLs",
+      "SEC-011": "Remove dangerous attribute values (javascript:/data:text/html)",
+      "ALP-001": "Use only allowed Alpine directives/events/bindings from the catalog",
+      "ALP-002": "Use only allowed alpineListeners() endpoints from the catalog",
+      "ALP-003": "x-html only for CMS content (data.post.description)",
+      "ALP-004": "Use href(url) for navigation, not $dispatch()",
+      "ALP-005": "Use alpineListeners() instead of direct module calls",
+      "ALP-006": "Use @submit.prevent or button @click with alpineListeners()",
+      "ALP-007": "x-for must be on <template>, not other elements",
+      "BND-001": "Use only apiData endpoints defined in the component catalog",
+      "BND-002": "Add keyName attribute matching the endpoint",
+      "BND-003": "Remove fetch/XHR/axios — use apiData/keyName binding",
+      "BND-004": "Use dot-notation data paths, not REST /api/ URLs",
+      "BND-005": "Prefix loop source with data. (e.g. data.blogPosts not blogPosts)",
+      "BND-010": "Fix keyName to match expected value for this apiData endpoint",
+      "BND-011": "Fix x-for source to use correct EXPOZY data path",
+      "BND-012": "Unknown x-for source — not a known EXPOZY data path",
+      "BND-013": "Use alpineListeners() for API calls, not custom functions",
+      "BND-014": "Unknown function — use alpineListeners() or EXPOZY module functions",
+      "BND-015": "Wrong state variable in x-data — check platform naming",
+      "BND-016": "Wrong state reference in expression — check platform naming",
+      "BND-017": "Replace vanilla JS DOM manipulation with Alpine directives",
+      "FLD-001": "Loop items are primitives, not objects — remove field access",
+      "FLD-002": "Wrong field name — check endpoint returns schema",
+      "FLD-003": "Unknown field — not in endpoint returns schema",
+      "HTM-001": "Close all opened tags",
+      "HTM-002": "Remove unexpected closing tag — no matching open tag",
+      "HTM-003": "Fix nesting — block element inside inline element",
+      "HTM-004": "Remove duplicate id attribute",
+      "HTM-005": "Replace deprecated HTML element",
+      "HTM-006": "Add required attribute (e.g. alt on img)",
+      "STR-001": "Add alt attribute to <img>",
+      "STR-002": "Add dark: variant for light background/text classes",
+      "STR-003": "Add is-section class to <section> elements",
+      "STR-004": "Replace ALL inline <svg> with FontAwesome <i> tags. Example: <i class='fa-solid fa-star text-amber-500'></i>. For brand logos use apiData='get.our_brands' with <img :src='brand.image.url'>. Maximum 2 inline SVGs per page.",
+      "STR-010": "Output HTML fragment only — remove <!DOCTYPE>, <html>, <head>, <body>",
+      "STR-011": "Use '!container is-container v2' instead of 'container mx-auto'",
+      "STR-012": "Move background/gradient to .is-overlay-bg child, not section root",
+      "STR-013": "Use dark:text-white or dark:text-slate-300, not dark:text-gray-700+",
+      "STR-014": "Remove CDN assets — platform loads Tailwind/Alpine globally"
+    },
+    "restricted_html_elements": {
+      "math": "MathML can contain script — verify content",
+      "style": "Inline <style> can contain CSS injection vectors"
+    },
+    "cdn_domains": [
+      "cdn.tailwindcss.com",
+      "unpkg.com",
+      "cdn.jsdelivr.net",
+      "cdnjs.cloudflare.com"
+    ],
+    "shadow_data_vars": [
+      "blogPosts",
+      "blogCategories",
+      "blogPosts_filters",
+      "menu",
+      "blogReviews",
+      "post",
+      "comments",
+      "sameCategoryPosts",
+      "newestPosts",
+      "testimonials",
+      "brands",
+      "cart",
+      "payment_methods",
+      "econt_offices",
+      "speedy_offices"
+    ],
+    "skip_functions": [
+      "alpineListeners",
+      "alert",
+      "confirm",
+      "prompt",
+      "setTimeout",
+      "setInterval",
+      "clearTimeout",
+      "clearInterval",
+      "requestAnimationFrame",
+      "parseInt",
+      "parseFloat",
+      "isNaN",
+      "isFinite",
+      "encodeURIComponent",
+      "decodeURIComponent",
+      "String",
+      "Number",
+      "Boolean",
+      "Array",
+      "Object",
+      "Date",
+      "Math",
+      "JSON",
+      "console",
+      "Error",
+      "event",
+      "window",
+      "document"
+    ],
+    "allowed_dotted_prefixes": [
+      "Math",
+      "JSON",
+      "Object",
+      "Array",
+      "String",
+      "Number",
+      "Date",
+      "console",
+      "Helpers",
+      "DateHelper",
+      "Gallery"
+    ],
+    "direct_call_modules": [
+      "Reviews",
+      "Newsletter",
+      "Contacts",
+      "User",
+      "Shop",
+      "Gallery",
+      "Countries",
+      "DateHelper",
+      "Payments",
+      "Econt",
+      "Speedy"
+    ],
+    "vanilla_js_patterns": [
+      {
+        "pattern": "\\bdocument\\.\\w+",
+        "description": "document.* DOM access"
+      },
+      {
+        " pattern": "\\.classList\\b",
+        "description": ".classList manipulation"
+      },
+      {
+        "pattern": "\\.style\\.\\w+\\s*=",
+        "description": ".style.* direct manipulation"
+      },
+      {
+        "pattern": "\\.innerHTML\\b",
+        "description": ".innerHTML direct access"
+      },
+      {
+        "pattern": "\\.textContent\\b",
+        "description": ".textContent direct access"
+      },
+      {
+        "pattern": "\\.querySelector\\b",
+        "description": ".querySelector direct access"
+      },
+      {
+        "pattern": "\\.getElementById\\b",
+        "description": ".getElementById direct access"
+      },
+      {
+        "pattern": "\\.addEventListener\\b",
+        "description": ".addEventListener direct access"
+      },
+      {
+        "pattern": "\\.removeEventListener\\b",
+        "description": ".removeEventListener"
+      },
+      {
+        "pattern": "\\.appendChild\\b",
+        "description": ".appendChild DOM manipulation"
+      },
+      {
+        "pattern": "\\.removeChild\\b",
+        "description": ".removeChild DOM manipulation"
+      },
+      {
+        "pattern": "\\.setAttribute\\b",
+        "description": ".setAttribute direct access"
+      }
+    ],
+    "section_wrappers": {
+      "section_root_class": "is-section",
+      "overlay_bg_class": "is-overlay-bg",
+      "overlay_class": "is-overlay",
+      "correct_container": "!container is-container v2",
+      "wrong_container_markers": "container,mx-auto"
+    },
+    "wrong_loop_sources": {},
+    "wrong_functions": {},
+    "wrong_state_vars": {},
+    "wrong_fields_by_context": {},
+    "known_wrong_fields_general": {}
+  }
+}
