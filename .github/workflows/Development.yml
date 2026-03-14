@@ -3,10 +3,10 @@ name: Development
 on:
   push:
     branches:
-      - development
+      - Development
   pull_request:
     branches:
-      - development
+      - Development
 
 jobs:
 

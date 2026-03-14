@@ -3,7 +3,7 @@ name: Deployment
 on:
   pull_request:
     branches:
-      - deployment
+      - Deployment
     types:
       - closed
 
