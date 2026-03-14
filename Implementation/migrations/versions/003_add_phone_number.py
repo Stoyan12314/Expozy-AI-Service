@@ -17,12 +17,24 @@ depends_on: Union[str, Sequence[str], None] = None
 
 
 def upgrade() -> None:
-    op.add_column(
-        'telegram_login_state',
-        sa.Column('phone', sa.String(length=50), nullable=True,
-                  comment='Collected phone number during newstore flow'),
-    )
+    conn = op.get_bind()
+    result = conn.execute(sa.text(
+        "SELECT 1 FROM information_schema.columns "
+        "WHERE table_name = 'telegram_login_state' AND column_name = 'phone'"
+    ))
+    if not result.fetchone():
+        op.add_column(
+            'telegram_login_state',
+            sa.Column('phone', sa.String(length=50), nullable=True,
+                      comment='Collected phone number during newstore flow'),
+        )
 
 
 def downgrade() -> None:
-    op.drop_column('telegram_login_state', 'phone')
+    conn = op.get_bind()
+    result = conn.execute(sa.text(
+        "SELECT 1 FROM information_schema.columns "
+        "WHERE table_name = 'telegram_login_state' AND column_name = 'phone'"
+    ))
+    if result.fetchone():
+        op.drop_column('telegram_login_state', 'phone')

@@ -8,7 +8,7 @@ from shared.config import get_settings
 from shared.services import get_session
 from shared.utils import get_logger
 
-from api.telegram.service.telegram_service import handle_telegram_update
+from api.telegram.service.handler import handle_telegram_update
 from api.telegram.persistence.telegram_persistence import insert_telegram_update_dedup
 
 router = APIRouter()
