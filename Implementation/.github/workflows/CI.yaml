@@ -50,31 +50,33 @@ jobs:
 
       - name: Run tests with coverage
         env:
+          # ── Secrets ──────────────────────────────────────────────────────
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           RABBITMQ_URL: ${{ secrets.RABBITMQ_URL }}
-          JOB_QUEUE_NAME: ${{ secrets.JOB_QUEUE_NAME }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_SECRET_TOKEN: ${{ secrets.TELEGRAM_SECRET_TOKEN }}
-          TELEGRAM_SEND_MESSAGE_URL: ${{ secrets.TELEGRAM_SEND_MESSAGE_URL }}
-          PREVIEW_BASE_URL: ${{ secrets.PREVIEW_BASE_URL }}
-          PREVIEWS_PATH: ${{ secrets.PREVIEWS_PATH }}
-          AI_PROVIDER: ${{ secrets.AI_PROVIDER }}
-          AI_MODEL: ${{ secrets.AI_MODEL }}
-          AI_TIMEOUT: ${{ secrets.AI_TIMEOUT }}
           DASHSCOPE_API_KEY: ${{ secrets.DASHSCOPE_API_KEY }}
-          DASHSCOPE_API_URL: ${{ secrets.DASHSCOPE_API_URL }}
           DASHVECTOR_API_KEY: ${{ secrets.DASHVECTOR_API_KEY }}
-          DASHVECTOR_ENDPOINT: ${{ secrets.DASHVECTOR_ENDPOINT }}
-          CHUNK_STORE_PATH: ${{ secrets.CHUNK_STORE_PATH }}
-          MAX_RETRIES: ${{ secrets.MAX_RETRIES }}
-          RETRY_BASE_DELAY: ${{ secrets.RETRY_BASE_DELAY }}
-          RETRY_MAX_DELAY: ${{ secrets.RETRY_MAX_DELAY }}
           CORE_SAAS_TELEGRAM_URL: ${{ secrets.CORE_SAAS_TELEGRAM_URL }}
           CORE_LOGIN_TELEGRAM_URL: ${{ secrets.CORE_LOGIN_TELEGRAM_URL }}
-          EXPOZY_ADMIN_LOGIN_URL: ${{ secrets.EXPOZY_ADMIN_LOGIN_URL }}
-          EXPOZY_STORE_DOMAIN: ${{ secrets.EXPOZY_STORE_DOMAIN }}
-          LOG_LEVEL: INFO
-          LOG_FORMAT: json
+          # ── Variables ─────────────────────────────────────────────────────
+          AI_MODEL: ${{ vars.AI_MODEL }}
+          AI_PROVIDER: ${{ vars.AI_PROVIDER }}
+          AI_TIMEOUT: ${{ vars.AI_TIMEOUT }}
+          CHUNK_STORE_PATH: ${{ vars.CHUNK_STORE_PATH }}
+          DASHSCOPE_API_URL: ${{ vars.DASHSCOPE_API_URL }}
+          DASHVECTOR_ENDPOINT: ${{ vars.DASHVECTOR_ENDPOINT }}
+          EXPOZY_ADMIN_LOGIN_URL: ${{ vars.EXPOZY_ADMIN_LOGIN_URL }}
+          EXPOZY_STORE_DOMAIN: ${{ vars.EXPOZY_STORE_DOMAIN }}
+          JOB_QUEUE_NAME: ${{ vars.JOB_QUEUE_NAME }}
+          LOG_FORMAT: ${{ vars.LOG_FORMAT }}
+          LOG_LEVEL: ${{ vars.LOG_LEVEL }}
+          MAX_RETRIES: ${{ vars.MAX_RETRIES }}
+          PREVIEWS_PATH: ${{ vars.PREVIEWS_PATH }}
+          PREVIEW_BASE_URL: ${{ vars.PREVIEW_BASE_URL }}
+          RETRY_BASE_DELAY: ${{ vars.RETRY_BASE_DELAY }}
+          RETRY_MAX_DELAY: ${{ vars.RETRY_MAX_DELAY }}
+          TELEGRAM_SEND_MESSAGE_URL: ${{ vars.TELEGRAM_SEND_MESSAGE_URL }}
         run: |
           coverage run -m pytest tests/ -v
           coverage report --fail-under=70
@@ -118,12 +120,25 @@ jobs:
       - name: Run catalog_vectorizer.py
         if: steps.catalog_check.outputs.changed == 'true'
         env:
+          # ── Secrets ──────────────────────────────────────────────────────
           DASHSCOPE_API_KEY: ${{ secrets.DASHSCOPE_API_KEY }}
-          DASHSCOPE_API_URL: ${{ secrets.DASHSCOPE_API_URL }}
           DASHVECTOR_API_KEY: ${{ secrets.DASHVECTOR_API_KEY }}
-          DASHVECTOR_ENDPOINT: ${{ secrets.DASHVECTOR_ENDPOINT }}
-          CHUNK_STORE_PATH: ${{ secrets.CHUNK_STORE_PATH }}
-        run: python api/orchestrator/vectorizer/catalog_vectorizer.py
+          # ── Variables ─────────────────────────────────────────────────────
+          DASHSCOPE_API_URL: ${{ vars.DASHSCOPE_API_URL }}
+          DASHVECTOR_ENDPOINT: ${{ vars.DASHVECTOR_ENDPOINT }}
+          CHUNK_STORE_PATH: ${{ vars.CHUNK_STORE_PATH }}
+        run: |
+          for attempt in 1 2 3; do
+            echo "Attempt $attempt/3"
+            python api/orchestrator/vectorizer/catalog_vectorizer.py && break
+            if [ $attempt -lt 3 ]; then
+              echo "Failed, retrying in 10s..."
+              sleep 10
+            else
+              echo "All 3 attempts failed"
+              exit 1
+            fi
+          done
 
       - name: Commit updated combined_catalog.json
         if: steps.catalog_check.outputs.changed == 'true'
