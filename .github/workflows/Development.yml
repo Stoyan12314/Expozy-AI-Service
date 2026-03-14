@@ -116,7 +116,7 @@ jobs:
           RETRY_MAX_DELAY: ${{ vars.RETRY_MAX_DELAY }}
           TELEGRAM_SEND_MESSAGE_URL: ${{ vars.TELEGRAM_SEND_MESSAGE_URL }}
         run: |
-          coverage run -m pytest tests/ -v
+          coverage run --omit="api/orchestrator/db/models/*,api/orchestrator/models/dto/*,migrations/*,*/__init__.py" -m pytest tests/ -v
           coverage report
           coverage html
 
