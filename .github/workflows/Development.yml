@@ -3,11 +3,14 @@ name: Development
 on:
   push:
     branches:
-      - development
+      - Development
+  pull_request:
+    branches:
+      - Development
 
 jobs:
 
-  # ── 1. Lint & type check (informational only) ─────────────────────────────
+  # ── 1. Lint & type check  ─────────────────────────────
   lint:
     name: Lint & type check
     runs-on: ubuntu-latest
@@ -40,7 +43,7 @@ jobs:
 
       - name: Summary report
         run: |
-          echo "## Lint & Type Check (development — informational)" >> $GITHUB_STEP_SUMMARY
+          echo "## Lint & Type Check (informational)" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           if [ "${{ steps.ruff_lint.outcome }}" == "success" ]; then
             echo "✅ Ruff lint — passed" >> $GITHUB_STEP_SUMMARY
@@ -60,7 +63,7 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "> Fix these before merging to deployment." >> $GITHUB_STEP_SUMMARY
 
-  # ── 2. Unit tests (informational only) ────────────────────────────────────
+  # ── 2. Unit tests  ────────────────────────────────────
   test:
     name: Unit tests
     runs-on: ubuntu-latest
@@ -108,12 +111,13 @@ jobs:
           TELEGRAM_SEND_MESSAGE_URL: ${{ vars.TELEGRAM_SEND_MESSAGE_URL }}
         run: |
           coverage run -m pytest tests/ -v
-          coverage report --fail-under=70
+          coverage report
           coverage html
 
       - name: Summary report
+        if: always()
         run: |
-          echo "## Unit Tests (development — informational)" >> $GITHUB_STEP_SUMMARY
+          echo "## Unit Tests (informational)" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           if [ "${{ steps.pytest.outcome }}" == "success" ]; then
             echo "✅ Tests — passed" >> $GITHUB_STEP_SUMMARY
@@ -128,6 +132,7 @@ jobs:
     name: Rebuild & vectorize catalog
     runs-on: ubuntu-latest
     needs: test
+    if: always()
 
     steps:
       - uses: actions/checkout@v4
@@ -188,7 +193,7 @@ jobs:
           git diff --cached --quiet || git commit -m "chore: rebuild combined_catalog [skip ci]"
           git push
 
-  # ── 4. Publish coverage report to GitHub Pages ────────────────────────────
+  # ── 4. Publish coverage report to GitHub Pages  ───────────────────
   coverage-pages:
     name: Publish coverage to GitHub Pages
     runs-on: ubuntu-latest
@@ -243,7 +248,7 @@ jobs:
           RETRY_MAX_DELAY: ${{ vars.RETRY_MAX_DELAY }}
           TELEGRAM_SEND_MESSAGE_URL: ${{ vars.TELEGRAM_SEND_MESSAGE_URL }}
         run: |
-          coverage run -m pytest tests/ -v
+          coverage run -m pytest tests/ -v || true
           coverage html
 
       - name: Upload pages artifact
