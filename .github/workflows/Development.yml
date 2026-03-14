@@ -84,7 +84,7 @@ jobs:
           cache: pip
 
       - name: Install dependencies
-        run: pip install -r requirements.txt pytest coverage
+        run: pip install -r requirements.txt pytest coverage pytest-asyncio
 
       - name: Run tests
         id: pytest
@@ -119,6 +119,13 @@ jobs:
           coverage run -m pytest tests/ -v
           coverage report
           coverage html
+
+      - name: Upload htmlcov artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: htmlcov
+          path: Implementation/htmlcov/
 
       - name: Summary report
         if: always()
@@ -208,9 +215,6 @@ jobs:
     runs-on: ubuntu-latest
     needs: test
     if: always()
-    defaults:
-      run:
-        working-directory: Implementation
 
     permissions:
       pages: write
@@ -221,52 +225,16 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
 
     steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-python@v5
+      - name: Download htmlcov artifact
+        uses: actions/download-artifact@v4
         with:
-          python-version: "3.12"
-          cache: pip
-
-      - name: Install dependencies
-        run: pip install -r requirements.txt pytest coverage
-
-      - name: Run tests and generate HTML report
-        continue-on-error: true
-        env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
-          RABBITMQ_URL: ${{ secrets.RABBITMQ_URL }}
-          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          TELEGRAM_SECRET_TOKEN: ${{ secrets.TELEGRAM_SECRET_TOKEN }}
-          DASHSCOPE_API_KEY: ${{ secrets.DASHSCOPE_API_KEY }}
-          DASHVECTOR_API_KEY: ${{ secrets.DASHVECTOR_API_KEY }}
-          CORE_SAAS_TELEGRAM_URL: ${{ secrets.CORE_SAAS_TELEGRAM_URL }}
-          CORE_LOGIN_TELEGRAM_URL: ${{ secrets.CORE_LOGIN_TELEGRAM_URL }}
-          AI_MODEL: ${{ vars.AI_MODEL }}
-          AI_PROVIDER: ${{ vars.AI_PROVIDER }}
-          AI_TIMEOUT: ${{ vars.AI_TIMEOUT }}
-          CHUNK_STORE_PATH: ${{ vars.CHUNK_STORE_PATH }}
-          DASHSCOPE_API_URL: ${{ vars.DASHSCOPE_API_URL }}
-          DASHVECTOR_ENDPOINT: ${{ vars.DASHVECTOR_ENDPOINT }}
-          EXPOZY_ADMIN_LOGIN_URL: ${{ vars.EXPOZY_ADMIN_LOGIN_URL }}
-          EXPOZY_STORE_DOMAIN: ${{ vars.EXPOZY_STORE_DOMAIN }}
-          JOB_QUEUE_NAME: ${{ vars.JOB_QUEUE_NAME }}
-          LOG_FORMAT: ${{ vars.LOG_FORMAT }}
-          LOG_LEVEL: ${{ vars.LOG_LEVEL }}
-          MAX_RETRIES: ${{ vars.MAX_RETRIES }}
-          PREVIEWS_PATH: ${{ vars.PREVIEWS_PATH }}
-          PREVIEW_BASE_URL: ${{ vars.PREVIEW_BASE_URL }}
-          RETRY_BASE_DELAY: ${{ vars.RETRY_BASE_DELAY }}
-          RETRY_MAX_DELAY: ${{ vars.RETRY_MAX_DELAY }}
-          TELEGRAM_SEND_MESSAGE_URL: ${{ vars.TELEGRAM_SEND_MESSAGE_URL }}
-        run: |
-          coverage run -m pytest tests/ -v || true
-          coverage html
+          name: htmlcov
+          path: htmlcov/
 
       - name: Upload pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: Implementation/htmlcov/
+          path: htmlcov/
 
       - name: Deploy to GitHub Pages
         id: deployment
